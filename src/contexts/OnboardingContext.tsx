@@ -11,7 +11,8 @@ import {
   SkutocnyMajitel,
   FakturacneUdaje,
   PodpisSuhlasy,
-  defaultOnboardingData
+  defaultOnboardingData,
+  Zariadenie
 } from '@/types/onboarding';
 
 const OnboardingContext = createContext<OnboardingContextType | undefined>(undefined);

@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import SignatureCanvas from './SignatureCanvas';
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Download, Eye } from 'lucide-react';
+import { Download, Eye, Check } from 'lucide-react';
 import { toast } from 'sonner';
 
 export const StepSign: React.FC = () => {
