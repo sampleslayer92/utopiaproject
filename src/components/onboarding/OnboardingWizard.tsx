@@ -1,0 +1,50 @@
+
+import React from 'react';
+import { OnboardingProvider } from '@/contexts/OnboardingContext';
+import { OnboardingSidebar } from './OnboardingSidebar';
+import { StepContainer } from './StepContainer';
+import { StepCompany } from './steps/StepCompany';
+import { StepBusiness } from './steps/StepBusiness';
+import { StepProducts } from './steps/StepProducts';
+import { StepPersons } from './steps/StepPersons';
+import { StepBeneficialOwners } from './steps/StepBeneficialOwners';
+import { StepBilling } from './steps/StepBilling';
+import { StepSign } from './steps/StepSign';
+import { useOnboarding } from '@/contexts/OnboardingContext';
+
+// Step renderer component
+const StepRenderer: React.FC = () => {
+  const { currentStep } = useOnboarding();
+
+  switch (currentStep) {
+    case 'company':
+      return <StepCompany />;
+    case 'business':
+      return <StepBusiness />;
+    case 'products':
+      return <StepProducts />;
+    case 'persons':
+      return <StepPersons />;
+    case 'beneficialOwners':
+      return <StepBeneficialOwners />;
+    case 'billing':
+      return <StepBilling />;
+    case 'sign':
+      return <StepSign />;
+    default:
+      return <div>Unknown step</div>;
+  }
+};
+
+export const OnboardingWizard: React.FC = () => {
+  return (
+    <OnboardingProvider>
+      <div className="flex h-full min-h-screen bg-gray-50">
+        <OnboardingSidebar />
+        <div className="flex-1 px-6 py-2 overflow-auto">
+          <StepRenderer />
+        </div>
+      </div>
+    </OnboardingProvider>
+  );
+};
