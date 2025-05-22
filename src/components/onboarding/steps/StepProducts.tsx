@@ -11,10 +11,13 @@ export const StepProducts: React.FC = () => {
   
   return (
     <StepContainer
-      title={t('products.title', 'Výber produktov a služieb')}
-      subtitle={t('products.subtitle', 'Vyberte si zariadenia a služby, ktoré potrebujete')}
+      title={t('products.title')}
+      subtitle={t('products.subtitle')}
     >
-      <ProductSelectionWizard />
+      <ProductSelectionWizard 
+        onNext={nextStep} 
+        onBack={prevStep} 
+      />
       
       {/* Navigation buttons are now handled in StepContainer */}
     </StepContainer>

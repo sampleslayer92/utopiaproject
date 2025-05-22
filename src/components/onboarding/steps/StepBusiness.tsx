@@ -116,8 +116,8 @@ export const StepBusiness: React.FC = () => {
   
   return (
     <StepContainer
-      title={t('business.title', 'Údaje o prevádzke')}
-      subtitle={t('business.subtitle', 'Zadajte informácie o vašej prevádzke')}
+      title={t('business.title')}
+      subtitle={t('business.subtitle')}
     >
       <div className="space-y-6">
         {data.prevadzky && data.prevadzky.map((prevadzka, index) => (
@@ -137,7 +137,7 @@ export const StepBusiness: React.FC = () => {
                     <ChevronDown className="h-5 w-5 text-gray-500" />
                   }
                   <h3 className="text-lg font-medium">
-                    {prevadzka.nazovPrevadzky || t('business.location', `Prevádzka ${index + 1}`)}
+                    {prevadzka.nazovPrevadzky || t('business.location')}
                   </h3>
                 </div>
                 
@@ -167,7 +167,7 @@ export const StepBusiness: React.FC = () => {
                     onCheckedChange={(checked) => handleUseCompanyData(prevadzka.id, checked === true)}
                   />
                   <Label htmlFor={`use-company-data-${prevadzka.id}`}>
-                    {t('business.useCompanyData', 'Použiť údaje z firemnej adresy')}
+                    {t('business.useCompanyData')}
                   </Label>
                 </div>
                 
@@ -175,13 +175,13 @@ export const StepBusiness: React.FC = () => {
                   {/* Názov prevádzky */}
                   <div className="space-y-2">
                     <Label htmlFor={`nazov-prevadzky-${prevadzka.id}`}>
-                      {t('business.locationName', 'Názov prevádzky')}*
+                      {t('business.locationName')}*
                     </Label>
                     <Input
                       id={`nazov-prevadzky-${prevadzka.id}`}
                       value={prevadzka.nazovPrevadzky}
                       onChange={(e) => updatePrevadzka(prevadzka.id, { nazovPrevadzky: e.target.value })}
-                      placeholder={t('business.locationNamePlaceholder', 'Zadajte názov prevádzky')}
+                      placeholder={t('business.locationNamePlaceholder')}
                       disabled={prevadzka.pouzitFiremneUdaje}
                     />
                   </div>
@@ -189,13 +189,13 @@ export const StepBusiness: React.FC = () => {
                   {/* Adresa prevádzky */}
                   <div className="space-y-2">
                     <Label htmlFor={`adresa-prevadzky-${prevadzka.id}`}>
-                      {t('business.locationAddress', 'Adresa prevádzky')}*
+                      {t('business.locationAddress')}*
                     </Label>
                     <Input
                       id={`adresa-prevadzky-${prevadzka.id}`}
                       value={prevadzka.adresaPrevadzky}
                       onChange={(e) => updatePrevadzka(prevadzka.id, { adresaPrevadzky: e.target.value })}
-                      placeholder={t('business.locationAddressPlaceholder', 'Ulica, číslo')}
+                      placeholder={t('business.locationAddressPlaceholder')}
                       disabled={prevadzka.pouzitFiremneUdaje}
                     />
                   </div>
@@ -203,59 +203,59 @@ export const StepBusiness: React.FC = () => {
                   {/* Mesto */}
                   <div className="space-y-2">
                     <Label htmlFor={`mesto-${prevadzka.id}`}>
-                      {t('business.city', 'Mesto')}*
+                      {t('business.city')}*
                     </Label>
                     <Input
                       id={`mesto-${prevadzka.id}`}
                       value={prevadzka.mesto}
                       onChange={(e) => updatePrevadzka(prevadzka.id, { mesto: e.target.value })}
-                      placeholder={t('business.cityPlaceholder', 'Zadajte mesto')}
+                      placeholder={t('business.cityPlaceholder')}
                     />
                   </div>
                   
                   {/* PSČ */}
                   <div className="space-y-2">
                     <Label htmlFor={`psc-${prevadzka.id}`}>
-                      {t('business.zipCode', 'PSČ')}*
+                      {t('business.zipCode')}*
                     </Label>
                     <Input
                       id={`psc-${prevadzka.id}`}
                       value={prevadzka.psc}
                       onChange={(e) => updatePrevadzka(prevadzka.id, { psc: e.target.value })}
-                      placeholder={t('business.zipCodePlaceholder', 'Zadajte PSČ')}
+                      placeholder={t('business.zipCodePlaceholder')}
                     />
                   </div>
                   
                   {/* Telefón */}
                   <div className="space-y-2">
                     <Label htmlFor={`telefon-${prevadzka.id}`}>
-                      {t('business.phone', 'Telefón')}*
+                      {t('business.phone')}*
                     </Label>
                     <Input
                       id={`telefon-${prevadzka.id}`}
                       value={prevadzka.telefon}
                       onChange={(e) => updatePrevadzka(prevadzka.id, { telefon: e.target.value })}
-                      placeholder={t('business.phonePlaceholder', '+421')}
+                      placeholder={t('business.phonePlaceholder')}
                     />
                   </div>
                   
                   {/* Email */}
                   <div className="space-y-2">
                     <Label htmlFor={`email-${prevadzka.id}`}>
-                      {t('business.email', 'Email')}*
+                      {t('business.email')}*
                     </Label>
                     <Input
                       id={`email-${prevadzka.id}`}
                       value={prevadzka.email}
                       onChange={(e) => updatePrevadzka(prevadzka.id, { email: e.target.value })}
-                      placeholder={t('business.emailPlaceholder', 'kontakt@firma.sk')}
+                      placeholder={t('business.emailPlaceholder')}
                     />
                   </div>
                   
                   {/* Typ prevádzky */}
                   <div className="space-y-2">
                     <Label htmlFor={`typ-prevadzky-${prevadzka.id}`}>
-                      {t('business.locationType', 'Typ prevádzky')}
+                      {t('business.locationType')}
                     </Label>
                     <Select
                       value={prevadzka.typPrevadzky}
@@ -263,13 +263,13 @@ export const StepBusiness: React.FC = () => {
                       disabled={prevadzka.pouzitFiremneUdaje}
                     >
                       <SelectTrigger id={`typ-prevadzky-${prevadzka.id}`}>
-                        <SelectValue placeholder={t('business.selectLocationType', 'Vyberte typ prevádzky')} />
+                        <SelectValue placeholder={t('business.selectLocationType')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Kamenná">{t('business.storeType', 'Kamenná')}</SelectItem>
-                        <SelectItem value="Mobilná">{t('business.mobileType', 'Mobilná')}</SelectItem>
-                        <SelectItem value="Online">{t('business.onlineType', 'Online')}</SelectItem>
-                        <SelectItem value="Iná">{t('business.otherType', 'Iná')}</SelectItem>
+                        <SelectItem value="Kamenná">{t('business.storeType')}</SelectItem>
+                        <SelectItem value="Mobilná">{t('business.mobileType')}</SelectItem>
+                        <SelectItem value="Online">{t('business.onlineType')}</SelectItem>
+                        <SelectItem value="Iná">{t('business.otherType')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -277,13 +277,13 @@ export const StepBusiness: React.FC = () => {
                   {/* Otváracie hodiny */}
                   <div className="space-y-2">
                     <Label htmlFor={`otvaracie-hodiny-${prevadzka.id}`}>
-                      {t('business.openingHours', 'Otváracie hodiny')}
+                      {t('business.openingHours')}
                     </Label>
                     <Input
                       id={`otvaracie-hodiny-${prevadzka.id}`}
                       value={prevadzka.otvaracieHodiny}
                       onChange={(e) => updatePrevadzka(prevadzka.id, { otvaracieHodiny: e.target.value })}
-                      placeholder={t('business.openingHoursPlaceholder', 'Po-Pia 9:00-17:00')}
+                      placeholder={t('business.openingHoursPlaceholder')}
                       disabled={prevadzka.pouzitFiremneUdaje}
                     />
                   </div>
@@ -298,7 +298,7 @@ export const StepBusiness: React.FC = () => {
                       onCheckedChange={(checked) => updatePrevadzka(prevadzka.id, { sezonnost: checked })}
                     />
                     <Label htmlFor={`sezonnost-${prevadzka.id}`}>
-                      {t('business.seasonal', 'Sezónna prevádzka')}
+                      {t('business.seasonal')}
                     </Label>
                   </div>
                   
@@ -306,7 +306,7 @@ export const StepBusiness: React.FC = () => {
                     <div className="pl-8">
                       <div className="space-y-2">
                         <Label htmlFor={`trvanie-sezony-${prevadzka.id}`}>
-                          {t('business.seasonLength', 'Trvanie sezóny (mesiace)')}
+                          {t('business.seasonLength')}
                         </Label>
                         <Input
                           id={`trvanie-sezony-${prevadzka.id}`}
@@ -325,7 +325,7 @@ export const StepBusiness: React.FC = () => {
                   {/* Odhadovaný ročný obrat */}
                   <div className="space-y-2">
                     <Label htmlFor={`rocny-obrat-${prevadzka.id}`}>
-                      {t('business.yearlyTurnover', 'Odhadovaný ročný obrat (€)')}
+                      {t('business.yearlyTurnover')}
                     </Label>
                     <Input
                       id={`rocny-obrat-${prevadzka.id}`}
@@ -338,7 +338,7 @@ export const StepBusiness: React.FC = () => {
                   {/* Priemerná výška transakcie */}
                   <div className="space-y-2">
                     <Label htmlFor={`priemerna-transakcia-${prevadzka.id}`}>
-                      {t('business.averageTransaction', 'Priemerná výška transakcie (€)')}
+                      {t('business.averageTransaction')}
                     </Label>
                     <Input
                       id={`priemerna-transakcia-${prevadzka.id}`}
@@ -351,7 +351,7 @@ export const StepBusiness: React.FC = () => {
                   {/* Očakávaný obrat platobných kariet */}
                   <div className="space-y-2">
                     <Label htmlFor={`ocakavany-obrat-kariet-${prevadzka.id}`}>
-                      {t('business.expectedCardTurnover', 'Očakávaný obrat platobných kariet (€)')}
+                      {t('business.expectedCardTurnover')}
                     </Label>
                     <Input
                       id={`ocakavany-obrat-kariet-${prevadzka.id}`}
@@ -365,13 +365,13 @@ export const StepBusiness: React.FC = () => {
                 {/* Predmet podnikania */}
                 <div className="space-y-2">
                   <Label htmlFor={`predmet-podnikania-${prevadzka.id}`}>
-                    {t('business.businessSubject', 'Predmet podnikania')}
+                    {t('business.businessSubject')}
                   </Label>
                   <Textarea
                     id={`predmet-podnikania-${prevadzka.id}`}
                     value={prevadzka.predmetPodnikania}
                     onChange={(e) => updatePrevadzka(prevadzka.id, { predmetPodnikania: e.target.value })}
-                    placeholder={t('business.businessSubjectPlaceholder', 'Opíšte predmet podnikania')}
+                    placeholder={t('business.businessSubjectPlaceholder')}
                     disabled={prevadzka.pouzitFiremneUdaje}
                     className="min-h-[80px]"
                   />
@@ -380,7 +380,7 @@ export const StepBusiness: React.FC = () => {
                 {/* Pripojenie */}
                 <div className="space-y-2">
                   <Label className="block mb-2">
-                    {t('business.connection', 'Pripojenie')}
+                    {t('business.connection')}
                   </Label>
                   <div className="flex flex-wrap gap-3">
                     <div className="flex items-center space-x-2">
@@ -389,7 +389,7 @@ export const StepBusiness: React.FC = () => {
                         checked={prevadzka.hasWifi}
                         onCheckedChange={(checked) => updatePrevadzka(prevadzka.id, { hasWifi: checked === true })}
                       />
-                      <Label htmlFor={`wifi-${prevadzka.id}`}>{t('business.wifi', 'WiFi')}</Label>
+                      <Label htmlFor={`wifi-${prevadzka.id}`}>{t('business.wifi')}</Label>
                     </div>
                     
                     <div className="flex items-center space-x-2">
@@ -398,7 +398,7 @@ export const StepBusiness: React.FC = () => {
                         checked={prevadzka.hasSimCard}
                         onCheckedChange={(checked) => updatePrevadzka(prevadzka.id, { hasSimCard: checked === true })}
                       />
-                      <Label htmlFor={`sim-${prevadzka.id}`}>{t('business.simCard', 'SIM karta')}</Label>
+                      <Label htmlFor={`sim-${prevadzka.id}`}>{t('business.simCard')}</Label>
                     </div>
                     
                     <div className="flex items-center space-x-2">
@@ -407,7 +407,7 @@ export const StepBusiness: React.FC = () => {
                         checked={prevadzka.hasEthernet}
                         onCheckedChange={(checked) => updatePrevadzka(prevadzka.id, { hasEthernet: checked === true })}
                       />
-                      <Label htmlFor={`ethernet-${prevadzka.id}`}>{t('business.ethernet', 'Ethernet')}</Label>
+                      <Label htmlFor={`ethernet-${prevadzka.id}`}>{t('business.ethernet')}</Label>
                     </div>
                   </div>
                 </div>
@@ -428,7 +428,7 @@ export const StepBusiness: React.FC = () => {
                           <ChevronDown className="h-4 w-4 text-gray-500" />
                         }
                         <h4 className="text-md font-medium">
-                          {t('business.bankAccounts', 'Bankové účty')}
+                          {t('business.bankAccounts')}
                         </h4>
                       </div>
                     </div>
@@ -451,33 +451,33 @@ export const StepBusiness: React.FC = () => {
                             {/* Názov účtu */}
                             <div className="space-y-2">
                               <Label htmlFor={`nazov-uctu-${ucet.id}`}>
-                                {t('business.accountName', 'Názov účtu')}
+                                {t('business.accountName')}
                               </Label>
                               <Input
                                 id={`nazov-uctu-${ucet.id}`}
                                 value={ucet.nazov}
                                 onChange={(e) => updateBankovyUcet(prevadzka.id, ucet.id, { nazov: e.target.value })}
-                                placeholder={t('business.accountNamePlaceholder', 'Hlavný účet')}
+                                placeholder={t('business.accountNamePlaceholder')}
                               />
                             </div>
                             
                             {/* IBAN */}
                             <div className="space-y-2">
                               <Label htmlFor={`iban-${ucet.id}`}>
-                                {t('business.iban', 'IBAN')}*
+                                {t('business.iban')}*
                               </Label>
                               <Input
                                 id={`iban-${ucet.id}`}
                                 value={ucet.iban}
                                 onChange={(e) => updateBankovyUcet(prevadzka.id, ucet.id, { iban: e.target.value })}
-                                placeholder={t('business.ibanPlaceholder', 'SK...')}
+                                placeholder={t('business.ibanPlaceholder')}
                               />
                             </div>
                             
                             {/* Mena */}
                             <div className="space-y-2">
                               <Label htmlFor={`mena-${ucet.id}`}>
-                                {t('business.currency', 'Mena')}*
+                                {t('business.currency')}*
                               </Label>
                               <Select
                                 value={ucet.mena}
@@ -500,13 +500,13 @@ export const StepBusiness: React.FC = () => {
                             {/* SWIFT/BIC */}
                             <div className="space-y-2">
                               <Label htmlFor={`swift-${ucet.id}`}>
-                                {t('business.swift', 'SWIFT/BIC')} ({t('business.optional', 'Voliteľné')})
+                                {t('business.swift')} ({t('business.optional')})
                               </Label>
                               <Input
                                 id={`swift-${ucet.id}`}
                                 value={ucet.swift || ''}
                                 onChange={(e) => updateBankovyUcet(prevadzka.id, ucet.id, { swift: e.target.value })}
-                                placeholder={t('business.swiftPlaceholder', 'GIBASKBX')}
+                                placeholder={t('business.swiftPlaceholder')}
                               />
                             </div>
                           </div>
@@ -519,7 +519,7 @@ export const StepBusiness: React.FC = () => {
                         className="w-full mt-2"
                       >
                         <Plus className="h-4 w-4 mr-2" />
-                        {t('business.addBankAccount', 'Pridať účet')}
+                        {t('business.addBankAccount')}
                       </Button>
                     </div>
                   </CollapsibleContent>
@@ -535,7 +535,7 @@ export const StepBusiness: React.FC = () => {
           className="w-full"
         >
           <Plus className="h-4 w-4 mr-2" />
-          {t('business.addLocation', 'Pridať ďalšiu prevádzku')}
+          {t('business.addLocation')}
         </Button>
       </div>
     </StepContainer>
