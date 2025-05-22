@@ -15,7 +15,7 @@ export const CountryFlag: React.FC<CountryFlagProps> = ({
   const [hasError, setHasError] = React.useState(false);
   const countryEmoji = getCountryEmoji(countryCode);
   
-  // Use local SVG files for all countries except Slovakia
+  // Define flag URLs for special cases
   let flagUrl;
   if (countryCode.toLowerCase() === 'sk') {
     flagUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Flag_of_Slovakia.svg/1280px-Flag_of_Slovakia.svg.png';

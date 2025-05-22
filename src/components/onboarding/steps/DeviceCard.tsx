@@ -26,6 +26,7 @@ interface DeviceCardProps {
     frekvenciaPlatby: 'mesačne' | 'ročne' | 'sezónne' | 'z obratu';
     hasWifi: boolean;
     hasSim: boolean;
+    hasEthernet?: boolean;
     imageUrl?: string;
     hasDiscount?: boolean;
   };
@@ -213,12 +214,12 @@ export const DeviceCard: React.FC<DeviceCardProps> = ({
               
               <div 
                 className={`flex items-center gap-2 p-3 border rounded-lg transition-all cursor-pointer ${
-                  false ? 'bg-emerald-50 border-emerald-500 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300' : 'hover:bg-gray-50 dark:hover:bg-slate-800'
+                  device.hasEthernet ? 'bg-emerald-50 border-emerald-500 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300' : 'hover:bg-gray-50 dark:hover:bg-slate-800'
                 }`}
-                onClick={() => handleConnectivityChange(device.id, 'ethernet', true)}
+                onClick={() => handleConnectivityChange(device.id, 'ethernet', !device.hasEthernet)}
               >
-                <div className={`p-2 rounded-full ${false ? 'bg-emerald-100 dark:bg-emerald-900/40' : 'bg-gray-100 dark:bg-slate-700'}`}>
-                  <HardDrive className={`h-4 w-4`} />
+                <div className={`p-2 rounded-full ${device.hasEthernet ? 'bg-emerald-100 dark:bg-emerald-900/40' : 'bg-gray-100 dark:bg-slate-700'}`}>
+                  <HardDrive className={`h-4 w-4 ${device.hasEthernet ? 'text-emerald-500' : ''}`} />
                 </div>
                 <span>Ethernet</span>
               </div>

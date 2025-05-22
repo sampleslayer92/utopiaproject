@@ -6,12 +6,12 @@ import { LanguageSwitcher } from '@/components/ui/language-switcher';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { CountryFlag } from '@/components/ui/country-flag';
 
 interface CountryInfo {
   code: string;
   name: string;
   nameEN: string;
-  flag: string;
 }
 
 interface CountrySelectionScreenProps {
@@ -30,13 +30,13 @@ export const CountrySelectionScreen: React.FC<CountrySelectionScreenProps> = ({
   const { t, language } = useLanguage();
 
   const countries: CountryInfo[] = [
-    { code: 'SK', name: 'Slovensko', nameEN: 'Slovakia', flag: '/flags/sk.svg' },
-    { code: 'CZ', name: 'Česká republika', nameEN: 'Czech Republic', flag: '/flags/cz.svg' },
-    { code: 'AT', name: 'Rakúsko', nameEN: 'Austria', flag: '/flags/at.svg' },
-    { code: 'HU', name: 'Maďarsko', nameEN: 'Hungary', flag: '/flags/hu.svg' },
-    { code: 'PL', name: 'Poľsko', nameEN: 'Poland', flag: '/flags/pl.svg' },
-    { code: 'DE', name: 'Nemecko', nameEN: 'Germany', flag: '/flags/de.svg' },
-    { code: 'GB', name: 'Spojené kráľovstvo', nameEN: 'United Kingdom', flag: '/flags/gb.svg' }
+    { code: 'SK', name: 'Slovensko', nameEN: 'Slovakia' },
+    { code: 'CZ', name: 'Česká republika', nameEN: 'Czech Republic' },
+    { code: 'AT', name: 'Rakúsko', nameEN: 'Austria' },
+    { code: 'HU', name: 'Maďarsko', nameEN: 'Hungary' },
+    { code: 'PL', name: 'Poľsko', nameEN: 'Poland' },
+    { code: 'DE', name: 'Nemecko', nameEN: 'Germany' },
+    { code: 'GB', name: 'Spojené kráľovstvo', nameEN: 'United Kingdom' }
   ];
 
   return (
@@ -90,15 +90,9 @@ export const CountrySelectionScreen: React.FC<CountrySelectionScreenProps> = ({
                     onClick={() => onSelect(country.code)}
                   >
                     <div className="w-16 h-12 rounded-md overflow-hidden shadow-md">
-                      <img
-                        src={country.flag}
-                        alt={`${country.name} flag`}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.onerror = null;
-                          target.src = `/flags/placeholder.svg`;
-                        }}
+                      <CountryFlag 
+                        countryCode={country.code}
+                        className="w-full h-full"
                       />
                     </div>
                     <span className="font-medium text-sm text-center">
