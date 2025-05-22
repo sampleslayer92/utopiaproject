@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { StepContainer } from '../StepContainer';
 import { useOnboarding } from '@/contexts/OnboardingContext';
@@ -168,28 +169,28 @@ export const StepBusiness: React.FC = () => {
             <div>
               <Label htmlFor="typPrevadzky">{t('business.type')}</Label>
               <Select 
-                value={business.typPrevadzky || 'brick-and-mortar'}
-                onValueChange={(value) => updateBusinessInfo({ typPrevadzky: value })}
+                value={business.typPrevadzky}
+                onValueChange={(value: "Kamenná" | "Mobilná" | "Sezónna" | "Iné") => updateBusinessInfo({ typPrevadzky: value })}
               >
                 <SelectTrigger>
                   <SelectValue placeholder={t('business.type')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="brick-and-mortar">{t('brick.and.mortar')}</SelectItem>
-                  <SelectItem value="mobile">{t('mobile')}</SelectItem>
-                  <SelectItem value="seasonal">{t('seasonal_business')}</SelectItem>
-                  <SelectItem value="other">{t('other')}</SelectItem>
+                  <SelectItem value="Kamenná">{t('brick.and.mortar')}</SelectItem>
+                  <SelectItem value="Mobilná">{t('mobile')}</SelectItem>
+                  <SelectItem value="Sezónna">{t('seasonal_business')}</SelectItem>
+                  <SelectItem value="Iné">{t('other')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             
             <div>
-              <Label htmlFor="otvHodiny">{t('opening.hours')}</Label>
+              <Label htmlFor="otvaracieHodiny">{t('opening.hours')}</Label>
               <Input
-                id="otvHodiny"
+                id="otvaracieHodiny"
                 placeholder="Po-Pia 9:00 - 17:00, So-Ne zatvorené"
-                value={business.otvHodiny || ''}
-                onChange={(e) => updateBusinessInfo({ otvHodiny: e.target.value })}
+                value={business.otvaracieHodiny || ''}
+                onChange={(e) => updateBusinessInfo({ otvaracieHodiny: e.target.value })}
               />
             </div>
           </div>
@@ -205,16 +206,16 @@ export const StepBusiness: React.FC = () => {
           
           {business.sezonnost && (
             <div className="mb-4">
-              <Label htmlFor="trvanieSezonnosti">{t('season.duration')}</Label>
+              <Label htmlFor="trvanieSezony">{t('season.duration')}</Label>
               <div className="flex items-center gap-2">
                 <Input
-                  id="trvanieSezonnosti"
+                  id="trvanieSezony"
                   type="number"
                   min="1"
                   max="52"
                   className="max-w-[100px]"
-                  value={business.trvanieSezonnosti || 12}
-                  onChange={(e) => updateBusinessInfo({ trvanieSezonnosti: parseInt(e.target.value) })}
+                  value={business.trvanieSezony || 12}
+                  onChange={(e) => updateBusinessInfo({ trvanieSezony: parseInt(e.target.value) })}
                 />
                 <span>{t('weeks')}</span>
               </div>
@@ -223,32 +224,32 @@ export const StepBusiness: React.FC = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
             <div>
-              <Label htmlFor="rocnyObrat">{t('estimated.annual.turnover')}</Label>
+              <Label htmlFor="odhadovanyRocnyObrat">{t('estimated.annual.turnover')}</Label>
               <Input
-                id="rocnyObrat"
+                id="odhadovanyRocnyObrat"
                 type="number"
                 min="0"
                 step="1000"
-                value={business.rocnyObrat || 0}
-                onChange={(e) => updateBusinessInfo({ rocnyObrat: parseInt(e.target.value) })}
+                value={business.odhadovanyRocnyObrat || 0}
+                onChange={(e) => updateBusinessInfo({ odhadovanyRocnyObrat: parseInt(e.target.value) })}
               />
               <div className="text-sm text-slate-500 mt-1">
-                {formatCurrency(business.rocnyObrat || 0)}
+                {formatCurrency(business.odhadovanyRocnyObrat || 0)}
               </div>
             </div>
             
             <div>
-              <Label htmlFor="priemTransakcia">{t('average.transaction')}</Label>
+              <Label htmlFor="priemernaVyskaTransakcie">{t('average.transaction')}</Label>
               <Input
-                id="priemTransakcia"
+                id="priemernaVyskaTransakcie"
                 type="number"
                 min="0"
                 step="1"
-                value={business.priemTransakcia || 0}
-                onChange={(e) => updateBusinessInfo({ priemTransakcia: parseInt(e.target.value) })}
+                value={business.priemernaVyskaTransakcie || 0}
+                onChange={(e) => updateBusinessInfo({ priemernaVyskaTransakcie: parseInt(e.target.value) })}
               />
               <div className="text-sm text-slate-500 mt-1">
-                {formatCurrency(business.priemTransakcia || 0)}
+                {formatCurrency(business.priemernaVyskaTransakcie || 0)}
               </div>
             </div>
           </div>
