@@ -17,11 +17,11 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <LanguageProvider>
-      <OnboardingProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
+      <BrowserRouter>
+        <OnboardingProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
             <Routes>
               <Route path="/" element={<RegistrationPage />} />
               <Route path="/dashboard" element={<DashboardPage />} />
@@ -29,9 +29,9 @@ const App = () => (
               <Route path="/onboarding/:step" element={<OnboardingWizard />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </OnboardingProvider>
+          </TooltipProvider>
+        </OnboardingProvider>
+      </BrowserRouter>
     </LanguageProvider>
   </QueryClientProvider>
 );

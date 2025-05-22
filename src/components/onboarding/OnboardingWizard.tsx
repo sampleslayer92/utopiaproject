@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { OnboardingProvider } from '@/contexts/OnboardingContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { OnboardingSidebar } from './OnboardingSidebar';
 import { OnboardingHeader } from './OnboardingHeader';
@@ -52,19 +51,15 @@ const StepRenderer: React.FC = () => {
 
 export const OnboardingWizard: React.FC = () => {
   return (
-    <LanguageProvider>
-      <OnboardingProvider>
-        <div className="flex h-full min-h-screen bg-gray-50">
-          <OnboardingSidebar />
-          <div className="flex-1 flex flex-col">
-            <OnboardingHeader />
-            <div className="flex-1 px-6 py-2 overflow-auto">
-              <StepRenderer />
-            </div>
-          </div>
+    <div className="flex h-full min-h-screen bg-gray-50">
+      <OnboardingSidebar />
+      <div className="flex-1 flex flex-col">
+        <OnboardingHeader />
+        <div className="flex-1 px-6 py-2 overflow-auto">
+          <StepRenderer />
         </div>
-        <ChatSupportBubble />
-      </OnboardingProvider>
-    </LanguageProvider>
+      </div>
+      <ChatSupportBubble />
+    </div>
   );
 };

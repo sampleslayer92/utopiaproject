@@ -1,5 +1,6 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams, useNavigate as useReactRouterNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { 
   OnboardingContextType, 
@@ -19,7 +20,7 @@ import {
 const OnboardingContext = createContext<OnboardingContextType | undefined>(undefined);
 
 export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const navigate = useNavigate();
+  const navigate = useReactRouterNavigate ? useReactRouterNavigate() : undefined;
   const { step } = useParams<{ step: string }>();
   const [currentStep, setCurrentStep] = useState<OnboardingStep>('company');
   const [data, setData] = useState<OnboardingData>(defaultOnboardingData);
@@ -54,7 +55,9 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   const setStep = (step: OnboardingStep) => {
     setCurrentStep(step);
-    navigate(`/onboarding/${step}`);
+    if (navigate) {
+      navigate(`/onboarding/${step}`);
+    }
   };
 
   const saveProgress = () => {
@@ -174,6 +177,8 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   const nextStep = () => {
+    if (!navigate) return;
+    
     switch (currentStep) {
       case 'company':
         setStep('business');
@@ -203,6 +208,8 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   const prevStep = () => {
+    if (!navigate) return;
+    
     switch (currentStep) {
       case 'company':
         navigate('/dashboard');
