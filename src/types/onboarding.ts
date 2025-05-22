@@ -6,7 +6,7 @@ export interface CompanyInfo {
   sidlo: string;
   zapisVOrsr: string;
   manualInput: boolean;
-  predmetCinnosti?: string; // Add this field to fix StepBusiness errors
+  predmetCinnosti?: string;
 }
 
 export interface BusinessInfo {
@@ -16,7 +16,7 @@ export interface BusinessInfo {
   psc: string;
   telefon: string;
   email: string;
-  typPrevadzky: "Kamenná" | "Mobilná" | "Sezónna" | "Iné";
+  typPrevadzky: "Kamenná" | "Mobilná" | "Online" | "Iná";
   predmetPodnikania: string;
   otvaracieHodiny: string;
   sezonnost: boolean;
@@ -36,7 +36,7 @@ export type Zariadenie = {
   viazanost: 12 | 24 | 36;
   frekvenciaPlatby: "mesačne" | "ročne" | "sezónne" | "z obratu";
   selected: boolean;
-  hasWifi?: boolean; // Add these fields to fix StepProducts errors
+  hasWifi?: boolean;
   hasSim?: boolean;
   imageUrl?: string;
   hasDiscount?: boolean;
