@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Badge } from '@/components/ui/badge';
+import { Wifi, Smartphone } from 'lucide-react';
 
 interface DeviceCardProps {
   device: {
@@ -23,17 +23,15 @@ interface DeviceCardProps {
     typNakupu: 'Prenájom' | 'Kúpa';
     viazanost: 12 | 24 | 36;
     frekvenciaPlatby: 'mesačne' | 'ročne' | 'sezónne' | 'z obratu';
-    imageUrl?: string;
-    hasDiscount?: boolean;
+    hasWifi?: boolean;
     hasSim?: boolean;
-    simSelected?: boolean;
   };
   onSelect: (id: string) => void;
   onQtyChange: (id: string, qty: number) => void;
   onPurchaseTypeChange: (id: string, type: 'Prenájom' | 'Kúpa') => void;
   onCommitmentChange: (id: string, months: 12 | 24 | 36) => void;
   onPaymentFrequencyChange: (id: string, frequency: 'mesačne' | 'ročne' | 'sezónne' | 'z obratu') => void;
-  onSimOptionChange?: (id: string, selected: boolean) => void;
+  onConnectivityChange?: (id: string, type: 'wifi' | 'sim', value: boolean) => void;
 }
 
 export const DeviceCard: React.FC<DeviceCardProps> = ({
@@ -43,18 +41,12 @@ export const DeviceCard: React.FC<DeviceCardProps> = ({
   onPurchaseTypeChange,
   onCommitmentChange,
   onPaymentFrequencyChange,
-  onSimOptionChange
+  onConnectivityChange
 }) => {
   const { t } = useLanguage();
 
   return (
     <div className="relative p-4 border rounded-lg bg-gray-50 dark:bg-slate-900/50 transition-all hover:shadow-md">
-      {device.hasDiscount && (
-        <Badge className="absolute right-2 top-2 bg-red-500 hover:bg-red-600">
-          20% {t('discount')}
-        </Badge>
-      )}
-      
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center">
           <Switch 
@@ -67,16 +59,6 @@ export const DeviceCard: React.FC<DeviceCardProps> = ({
           </Label>
         </div>
       </div>
-      
-      {device.imageUrl && (
-        <div className="mb-4 flex justify-center">
-          <img
-            src={device.imageUrl}
-            alt={device.nazov}
-            className="h-32 object-contain rounded-md"
-          />
-        </div>
-      )}
       
       {device.selected && (
         <div className="space-y-4">
@@ -145,20 +127,34 @@ export const DeviceCard: React.FC<DeviceCardProps> = ({
             </div>
           </div>
           
-          {device.hasSim && (
-            <div className="border-t pt-3 mt-3">
-              <div className="flex items-center">
-                <Switch
-                  checked={device.simSelected}
-                  onCheckedChange={(checked) => onSimOptionChange && onSimOptionChange(device.id, checked)}
-                  className="mr-3"
-                />
-                <Label htmlFor={`sim-${device.id}`} className="cursor-pointer">
-                  {t('include.sim.card')}
-                </Label>
+          <div className="border-t pt-3 mt-3">
+            <h4 className="text-base font-medium mb-3">{t('connectivity')}</h4>
+            <div className="flex flex-wrap gap-3">
+              <div 
+                className={`flex items-center gap-2 p-3 border rounded-lg transition-all cursor-pointer ${
+                  device.hasWifi ? 'bg-emerald-50 border-emerald-500 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300' : 'hover:bg-gray-50 dark:hover:bg-slate-800'
+                }`}
+                onClick={() => onConnectivityChange && onConnectivityChange(device.id, 'wifi', !device.hasWifi)}
+              >
+                <div className={`p-2 rounded-full ${device.hasWifi ? 'bg-emerald-100 dark:bg-emerald-900/40' : 'bg-gray-100 dark:bg-slate-700'}`}>
+                  <Wifi className={`h-4 w-4 ${device.hasWifi ? 'text-emerald-500' : ''}`} />
+                </div>
+                <span>{t('wifi')}</span>
+              </div>
+              
+              <div 
+                className={`flex items-center gap-2 p-3 border rounded-lg transition-all cursor-pointer ${
+                  device.hasSim ? 'bg-emerald-50 border-emerald-500 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300' : 'hover:bg-gray-50 dark:hover:bg-slate-800'
+                }`}
+                onClick={() => onConnectivityChange && onConnectivityChange(device.id, 'sim', !device.hasSim)}
+              >
+                <div className={`p-2 rounded-full ${device.hasSim ? 'bg-emerald-100 dark:bg-emerald-900/40' : 'bg-gray-100 dark:bg-slate-700'}`}>
+                  <Smartphone className={`h-4 w-4 ${device.hasSim ? 'text-emerald-500' : ''}`} />
+                </div>
+                <span>{t('sim.card')}</span>
               </div>
             </div>
-          )}
+          </div>
         </div>
       )}
     </div>

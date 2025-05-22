@@ -104,7 +104,7 @@ export const DashboardPage: React.FC = () => {
   };
   
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
       <div className="h-1 bg-gray-200 dark:bg-slate-700">
         <div 
           className="h-1 bg-emerald-600" 
