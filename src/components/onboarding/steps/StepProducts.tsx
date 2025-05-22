@@ -16,7 +16,10 @@ export const StepProducts: React.FC = () => {
       title="Výber produktov a služieb"
       subtitle="Vyberte si zariadenia a služby, ktoré potrebujete"
     >
-      <ProductSelectionWizard />
+      <ProductSelectionWizard 
+        onNext={nextStep} 
+        onBack={prevStep}
+      />
       
       <div className="mt-8 flex justify-between">
         <BackButton onClick={prevStep} />
