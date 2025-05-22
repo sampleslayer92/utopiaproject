@@ -17,6 +17,8 @@ type DeviceType = {
   frekvenciaPlatby: 'mesačne' | 'ročne' | 'sezónne' | 'z obratu';
   hasWifi: boolean;
   hasSim: boolean;
+  imageUrl?: string;
+  hasDiscount?: boolean;
 };
 
 export const StepProducts: React.FC = () => {
@@ -34,7 +36,9 @@ export const StepProducts: React.FC = () => {
       viazanost: 24,
       frekvenciaPlatby: 'mesačne',
       hasWifi: false,
-      hasSim: false
+      hasSim: false,
+      imageUrl: 'https://www.mobilnaterminaly.sk/wp-content/uploads/2021/05/a920-3-uhl-1.jpg',
+      hasDiscount: true
     },
     {
       id: 'terminal-s800',
@@ -45,7 +49,9 @@ export const StepProducts: React.FC = () => {
       viazanost: 24,
       frekvenciaPlatby: 'mesačne',
       hasWifi: false,
-      hasSim: false
+      hasSim: false,
+      imageUrl: 'https://www.mobilnaterminaly.sk/wp-content/uploads/2022/01/s800-1.png',
+      hasDiscount: false
     },
     {
       id: 'terminal-pax-a80',
@@ -56,7 +62,9 @@ export const StepProducts: React.FC = () => {
       viazanost: 24,
       frekvenciaPlatby: 'mesačne',
       hasWifi: false,
-      hasSim: false
+      hasSim: false,
+      imageUrl: 'https://b2bchannels.co.uk/wp-content/uploads/2021/03/PAXA80.jpg',
+      hasDiscount: false
     }
   ]);
 
@@ -93,7 +101,7 @@ export const StepProducts: React.FC = () => {
     ));
   };
 
-  const handleConnectivityChange = (id: string, type: 'wifi' | 'sim', value: boolean) => {
+  const handleConnectivityChange = (id: string, type: 'wifi' | 'sim' | 'ethernet', value: boolean) => {
     setDevices(devices.map(device => 
       device.id === id 
         ? { 
@@ -119,7 +127,9 @@ export const StepProducts: React.FC = () => {
           pocetKs: device.pocetKs,
           typNakupu: device.typNakupu,
           viazanost: device.viazanost,
-          frekvenciaPlatby: device.frekvenciaPlatby
+          frekvenciaPlatby: device.frekvenciaPlatby,
+          hasWifi: device.hasWifi,
+          hasSim: device.hasSim
         });
       }
     });
@@ -156,6 +166,7 @@ export const StepProducts: React.FC = () => {
           <Button 
             onClick={handleContinue}
             disabled={!devices.some(d => d.selected)}
+            className="bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600"
           >
             {t('next.step')}
           </Button>

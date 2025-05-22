@@ -15,8 +15,13 @@ export const CountryFlag: React.FC<CountryFlagProps> = ({
   const [hasError, setHasError] = React.useState(false);
   const countryEmoji = getCountryEmoji(countryCode);
   
-  // Use local SVG files for all countries
-  const flagUrl = `/flags/${countryCode.toLowerCase()}.svg`;
+  // Use local SVG files for all countries except Slovakia
+  let flagUrl;
+  if (countryCode.toLowerCase() === 'sk') {
+    flagUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Flag_of_Slovakia.svg/1280px-Flag_of_Slovakia.svg.png';
+  } else {
+    flagUrl = `/flags/${countryCode.toLowerCase()}.svg`;
+  }
   
   // Map country codes to emoji fallbacks
   function getCountryEmoji(code: string): string {
