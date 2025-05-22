@@ -2,7 +2,21 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Check, Clock, MessageCircle, Home, ShoppingBag, Building2, FileText, HelpCircle } from 'lucide-react';
+import { 
+  ArrowRight, 
+  Check, 
+  Clock, 
+  MessageCircle, 
+  Home, 
+  ShoppingBag, 
+  Building2, 
+  FileText, 
+  HelpCircle,
+  Monitor,
+  CreditCard,
+  Smartphone,
+  Battery
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { LanguageSwitcher } from '@/components/ui/language-switcher';
 import { motion } from 'framer-motion';
