@@ -63,24 +63,35 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				utopia: {
-					50: '#f0f7ff',
-					100: '#e0eefe',
-					200: '#c0ddfd',
-					300: '#8bc0fa',
-					400: '#619ef5',
-					500: '#367fea',
-					600: '#2062d7',
-					700: '#1a4eab',
-					800: '#1d448d',
-					900: '#1e3a70',
-					950: '#172447',
-				}
+				emerald: {
+					50: '#ecfdf5',
+					100: '#d1fae5',
+					200: '#a7f3d0',
+					300: '#6ee7b7',
+					400: '#34d399',
+					500: '#10b981', // Primary emerald green
+					600: '#059669',
+					700: '#047857',
+					800: '#065f46',
+					950: '#052e16',
+				},
+				glass: 'rgba(255, 255, 255, 0.6)',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
+				sm: 'calc(var(--radius) - 4px)',
+				xl: '1rem',
+				'2xl': '1.5rem',
+			},
+			boxShadow: {
+				'glass': '0 4px 30px rgba(0, 0, 0, 0.1)',
+				'glass-sm': '0 2px 10px rgba(0, 0, 0, 0.05)',
+				'inner-sm': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.05)',
+				'soft': '0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01)',
+			},
+			backdropBlur: {
+				'glass': '10px',
 			},
 			keyframes: {
 				'accordion-down': {
@@ -98,6 +109,14 @@ export default {
 				'slide-out-right': {
 					'0%': { transform: 'translateX(0)' },
 					'100%': { transform: 'translateX(100%)' }
+				},
+				'slide-in-left': {
+					'0%': { transform: 'translateX(-100%)' },
+					'100%': { transform: 'translateX(0)' }
+				},
+				'slide-in-up': {
+					'0%': { transform: 'translateY(10px)', opacity: '0' },
+					'100%': { transform: 'translateY(0)', opacity: '1' }
 				},
 				'fade-in': {
 					'0%': { opacity: '0', transform: 'translateY(10px)' },
@@ -121,6 +140,8 @@ export default {
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'slide-in-right': 'slide-in-right 0.3s ease-out',
 				'slide-out-right': 'slide-out-right 0.3s ease-out',
+				'slide-in-left': 'slide-in-left 0.3s ease-out',
+				'slide-in-up': 'slide-in-up 0.3s ease-out',
 				'fade-in': 'fade-in 0.3s ease-out',
 				'fade-out': 'fade-out 0.3s ease-out',
 				'scale-in': 'scale-in 0.2s ease-out',

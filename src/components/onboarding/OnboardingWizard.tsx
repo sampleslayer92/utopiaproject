@@ -14,29 +14,40 @@ import { StepBeneficialOwners } from './steps/StepBeneficialOwners';
 import { StepBilling } from './steps/StepBilling';
 import { StepSign } from './steps/StepSign';
 import { useOnboarding } from '@/contexts/OnboardingContext';
+import { AnimatePresence, motion } from 'framer-motion';
 
 // Step renderer component
 const StepRenderer: React.FC = () => {
   const { currentStep } = useOnboarding();
 
-  switch (currentStep) {
-    case 'company':
-      return <StepCompany />;
-    case 'business':
-      return <StepBusiness />;
-    case 'products':
-      return <StepProducts />;
-    case 'persons':
-      return <StepPersons />;
-    case 'beneficialOwners':
-      return <StepBeneficialOwners />;
-    case 'billing':
-      return <StepBilling />;
-    case 'sign':
-      return <StepSign />;
-    default:
-      return <div>Unknown step</div>;
-  }
+  // Define animation variants
+  const pageVariants = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -20 }
+  };
+
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={currentStep}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        variants={pageVariants}
+        transition={{ duration: 0.3 }}
+        className="flex-1 w-full"
+      >
+        {currentStep === 'company' && <StepCompany />}
+        {currentStep === 'business' && <StepBusiness />}
+        {currentStep === 'products' && <StepProducts />}
+        {currentStep === 'persons' && <StepPersons />}
+        {currentStep === 'beneficialOwners' && <StepBeneficialOwners />}
+        {currentStep === 'billing' && <StepBilling />}
+        {currentStep === 'sign' && <StepSign />}
+      </motion.div>
+    </AnimatePresence>
+  );
 };
 
 export const OnboardingWizard: React.FC = () => {

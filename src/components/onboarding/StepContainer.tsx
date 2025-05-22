@@ -4,11 +4,15 @@ import { cn } from '@/lib/utils';
 import { BackButton } from './BackButton';
 import { NextButton } from './NextButton';
 import { SaveContinueLater } from './SaveContinueLater';
+import { motion } from 'framer-motion';
+import { HelpCircle, Info } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface StepContainerProps {
   children: React.ReactNode;
   title: string;
   subtitle?: string;
+  helpText?: string;
   className?: string;
   actionBar?: React.ReactNode;
   nextButtonDisabled?: boolean;
@@ -19,23 +23,77 @@ export const StepContainer: React.FC<StepContainerProps> = ({
   children,
   title,
   subtitle,
+  helpText,
   className,
   actionBar,
   nextButtonDisabled,
   onBeforeNext
 }) => {
+  const [showHelp, setShowHelp] = React.useState(false);
+
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { 
+        duration: 0.5,
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0 }
+  };
+
   return (
-    <div className={cn("animate-fade-in flex-1 max-w-4xl mx-auto py-8", className)}>
-      <div className="mb-8">
+    <motion.div 
+      className={cn("flex-1 max-w-4xl mx-auto py-8 px-4", className)}
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
+      <motion.div variants={itemVariants} className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
         {subtitle && <p className="mt-2 text-gray-500">{subtitle}</p>}
-      </div>
+        
+        {helpText && (
+          <div className="mt-4">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="text-emerald-600 border-emerald-200 hover:bg-emerald-50"
+              onClick={() => setShowHelp(!showHelp)}
+            >
+              <Info className="h-4 w-4 mr-2" />
+              {showHelp ? "Skryť informáciu" : "Prečo to potrebujeme?"}
+            </Button>
+            
+            {showHelp && (
+              <motion.div 
+                className="mt-3 p-4 bg-emerald-50 border border-emerald-100 rounded-lg text-sm text-emerald-800"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                {helpText}
+              </motion.div>
+            )}
+          </div>
+        )}
+      </motion.div>
 
-      <div className="space-y-6">
+      <motion.div className="space-y-6" variants={itemVariants}>
         {children}
-      </div>
+      </motion.div>
 
-      <div className="mt-12 pt-4 border-t flex items-center justify-between">
+      <motion.div 
+        variants={itemVariants}
+        className="mt-12 pt-4 border-t flex items-center justify-between"
+      >
         <SaveContinueLater />
         
         <div className="flex items-center gap-4">
@@ -45,7 +103,7 @@ export const StepContainer: React.FC<StepContainerProps> = ({
             onBeforeNext={onBeforeNext}
           />
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
