@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 type Language = 'sk' | 'en';
@@ -128,7 +127,7 @@ const translations: Record<string, Record<string, string>> = {
     'cancel': 'Zrušiť',
     'brick.and.mortar': 'Kamenná',
     'mobile': 'Mobilná',
-    'seasonal': 'Sezónna',
+    'seasonal_business': 'Sezónna',
     'other': 'Iné'
   },
   en: {
@@ -246,7 +245,7 @@ const translations: Record<string, Record<string, string>> = {
     'cancel': 'Cancel',
     'brick.and.mortar': 'Brick and mortar',
     'mobile': 'Mobile',
-    'seasonal': 'Seasonal',
+    'seasonal_business': 'Seasonal',
     'other': 'Other'
   }
 };

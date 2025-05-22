@@ -23,6 +23,8 @@ export interface BusinessInfo {
   odhadovanyRocnyObrat: number;
   priemernaVyskaTransakcie: number;
   ocakavanyObratKariet: number;
+  hasWifi: boolean;
+  hasSimCard: boolean;
 }
 
 export type Zariadenie = {
@@ -173,7 +175,9 @@ export const defaultOnboardingData: OnboardingData = {
     trvanieSezony: 0,
     odhadovanyRocnyObrat: 0,
     priemernaVyskaTransakcie: 0,
-    ocakavanyObratKariet: 0
+    ocakavanyObratKariet: 0,
+    hasWifi: false,
+    hasSimCard: false
   },
   zariadenia: [
     { id: "a920-gprs", nazov: "A920 GPRS", pocetKs: 1, typNakupu: "Prenájom", viazanost: 24, frekvenciaPlatby: "mesačne", selected: false },

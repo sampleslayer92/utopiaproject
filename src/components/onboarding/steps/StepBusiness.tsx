@@ -9,7 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Plus, Minus, Wifi, Sim } from 'lucide-react';
+import { Plus, Minus, Wifi, SimCard } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -26,8 +26,8 @@ export const StepBusiness: React.FC = () => {
     { id: '1', name: business.nazovPrevadzky || '', address: business.adresaPrevadzky || '' }
   ]);
   const [connectivity, setConnectivity] = useState<{wifi: boolean, sim: boolean}>({
-    wifi: false,
-    sim: false
+    wifi: business.hasWifi || false,
+    sim: business.hasSimCard || false
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -65,7 +65,7 @@ export const StepBusiness: React.FC = () => {
   const handleSimToggle = () => {
     setConnectivity(prev => ({ ...prev, sim: !prev.sim }));
     updateBusinessInfo({
-      hasSim: !connectivity.sim
+      hasSimCard: !connectivity.sim
     });
   };
 
@@ -296,7 +296,7 @@ export const StepBusiness: React.FC = () => {
                   onClick={handleSimToggle}
                 >
                   <div className={`p-2 rounded-full ${connectivity.sim ? 'bg-emerald-100 dark:bg-emerald-900/40' : 'bg-gray-100 dark:bg-slate-700'}`}>
-                    <Sim className={`h-4 w-4 ${connectivity.sim ? 'text-emerald-500' : ''}`} />
+                    <SimCard className={`h-4 w-4 ${connectivity.sim ? 'text-emerald-500' : ''}`} />
                   </div>
                   <span>{t('sim.card')}</span>
                 </div>
