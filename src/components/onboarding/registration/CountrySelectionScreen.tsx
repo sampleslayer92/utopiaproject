@@ -11,7 +11,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 
 interface CountryOption {
   id: string;
-  flag: string;
+  flagSrc: string;
   name: string;
   englishName: string;
 }
@@ -34,38 +34,38 @@ export const CountrySelectionScreen: React.FC<CountrySelectionScreenProps> = ({
   const countries: CountryOption[] = [
     {
       id: 'SK',
-      flag: '🇸🇰',
-      name: 'Slovensko',
+      flagSrc: '/flags/sk.svg',
+      name: t('slovakia'),
       englishName: 'Slovakia'
     },
     {
       id: 'CZ',
-      flag: '🇨🇿',
-      name: 'Česká republika',
+      flagSrc: '/flags/cz.svg',
+      name: t('czech.republic'),
       englishName: 'Czech Republic'
     },
     {
       id: 'GB',
-      flag: '🇬🇧',
-      name: 'Spojené kráľovstvo',
+      flagSrc: '/flags/gb.svg',
+      name: t('united.kingdom'),
       englishName: 'United Kingdom'
     },
     {
       id: 'AT',
-      flag: '🇦🇹',
-      name: 'Rakúsko',
+      flagSrc: '/flags/at.svg',
+      name: t('austria'),
       englishName: 'Austria'
     },
     {
       id: 'HU',
-      flag: '🇭🇺',
-      name: 'Maďarsko',
+      flagSrc: '/flags/hu.svg',
+      name: t('hungary'),
       englishName: 'Hungary'
     },
     {
       id: 'PL',
-      flag: '🇵🇱',
-      name: 'Poľsko',
+      flagSrc: '/flags/pl.svg',
+      name: t('poland'),
       englishName: 'Poland'
     },
   ];
@@ -79,7 +79,7 @@ export const CountrySelectionScreen: React.FC<CountrySelectionScreenProps> = ({
           className="flex items-center gap-2 text-blue-700 dark:text-blue-300 hover:bg-blue-100/50 dark:hover:bg-blue-900/20"
         >
           <ArrowLeft className="h-4 w-4" />
-          {language === 'sk' ? 'Späť' : 'Back'}
+          {t('back')}
         </Button>
         <div className="flex items-center gap-3">
           <ThemeToggle />
@@ -96,10 +96,10 @@ export const CountrySelectionScreen: React.FC<CountrySelectionScreenProps> = ({
         <div className="w-full max-w-2xl">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-              {language === 'sk' ? t('select.country') : t('select.country')}
+              {t('select.country')}
             </h1>
             <p className="mt-2 text-slate-600 dark:text-blue-300">
-              {language === 'sk' ? t('country.subtitle') : t('country.subtitle')}
+              {t('country.subtitle')}
             </p>
           </div>
           
@@ -121,7 +121,13 @@ export const CountrySelectionScreen: React.FC<CountrySelectionScreenProps> = ({
                   onClick={() => onSelect(country.id)}
                 >
                   <CardContent className="p-6 flex items-center space-x-4">
-                    <span className="text-5xl">{country.flag}</span>
+                    <div className="w-10 h-6 relative overflow-hidden rounded shadow-sm">
+                      <img 
+                        src={country.flagSrc} 
+                        alt={language === 'sk' ? country.name : country.englishName} 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                     <div>
                       <h3 className="font-medium text-slate-900 dark:text-white">
                         {language === 'sk' ? country.name : country.englishName}
@@ -139,7 +145,7 @@ export const CountrySelectionScreen: React.FC<CountrySelectionScreenProps> = ({
               disabled={!selectedCountry}
               className="px-8 py-6 text-lg rounded-full bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 transition-all duration-300 hover-lift shadow-md disabled:opacity-50"
             >
-              <span>{language === 'sk' ? t('continue') : t('continue')}</span>
+              <span>{t('continue')}</span>
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
@@ -147,7 +153,7 @@ export const CountrySelectionScreen: React.FC<CountrySelectionScreenProps> = ({
       </motion.main>
       
       <footer className="py-4 text-center text-sm text-slate-500 dark:text-blue-300/70">
-        © 2025 Utopia. {language === 'sk' ? 'Všetky práva vyhradené.' : 'All rights reserved.'}
+        © 2025 Utopia. {t('all.rights.reserved')}
       </footer>
     </div>
   );

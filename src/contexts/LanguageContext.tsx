@@ -108,6 +108,7 @@ const translations: Record<string, Record<string, string>> = {
     'hungary': 'Maďarsko',
     'poland': 'Poľsko',
     'germany': 'Nemecko',
+    'united.kingdom': 'Spojené kráľovstvo',
     'business.name': 'Názov prevádzky',
     'business.address': 'Adresa prevádzky',
     'opening.hours': 'Otváracie hodiny',
@@ -128,7 +129,38 @@ const translations: Record<string, Record<string, string>> = {
     'brick.and.mortar': 'Kamenná',
     'mobile': 'Mobilná',
     'seasonal_business': 'Sezónna',
-    'other': 'Iné'
+    'other': 'Iné',
+    'devices': 'Zariadenia',
+    'licences': 'Licencie',
+    'services': 'Služby',
+    'quantity': 'Počet kusov',
+    'purchase.type': 'Typ nákupu',
+    'rental': 'Prenájom',
+    'purchase': 'Kúpa',
+    'commitment': 'Viazanosť',
+    'payment.frequency': 'Frekvencia platby',
+    'monthly': 'Mesačne',
+    'yearly': 'Ročne',
+    'seasonal': 'Sezónne',
+    'from.turnover': 'Z obratu',
+    'payment.methods': 'Platobné metódy',
+    'additional.services': 'Doplnkové služby',
+    'additional.info': 'Dodatočné informácie',
+    'months': 'mesiacov',
+    'payment.terminal.description': 'Terminál pre akceptáciu platobných kariet priamo na predajni',
+    'payment.gateway.description': 'Riešenie pre online platby na vašom e-shope',
+    'pos.system.description': 'Kompletný pokladničný systém s eKasou',
+    'charging.station.description': 'Nabíjacia stanica pre elektromobily',
+    'monthly.transactions': 'Mesačné transakcie',
+    'devices.status': 'Stav zariadení',
+    'last.active': 'Posledná aktivita',
+    'contact.support': 'Kontaktovať podporu',
+    'remaining.tasks': 'Zostávajúce úlohy',
+    'continue.onboarding': 'Pokračovať v onboardingu',
+    'onboarding.complete': 'Onboarding dokončený!',
+    'onboarding.complete.subtitle': 'Môžete začať používať všetky funkcie platformy.',
+    'user': 'Používateľ',
+    'view.all.notifications': 'Zobraziť všetky notifikácie'
   },
   en: {
     'save.later': 'Save and continue later',
@@ -226,6 +258,7 @@ const translations: Record<string, Record<string, string>> = {
     'hungary': 'Hungary',
     'poland': 'Poland',
     'germany': 'Germany',
+    'united.kingdom': 'United Kingdom',
     'business.name': 'Business name',
     'business.address': 'Business address',
     'opening.hours': 'Opening hours',
@@ -246,28 +279,60 @@ const translations: Record<string, Record<string, string>> = {
     'brick.and.mortar': 'Brick and mortar',
     'mobile': 'Mobile',
     'seasonal_business': 'Seasonal',
-    'other': 'Other'
+    'other': 'Other',
+    'devices': 'Devices',
+    'licences': 'Licenses',
+    'services': 'Services',
+    'quantity': 'Quantity',
+    'purchase.type': 'Purchase type',
+    'rental': 'Rental',
+    'purchase': 'Purchase',
+    'commitment': 'Commitment',
+    'payment.frequency': 'Payment frequency',
+    'monthly': 'Monthly',
+    'yearly': 'Yearly',
+    'seasonal': 'Seasonal',
+    'from.turnover': 'From turnover',
+    'payment.methods': 'Payment methods',
+    'additional.services': 'Additional services',
+    'additional.info': 'Additional information',
+    'months': 'months',
+    'payment.terminal.description': 'Terminal for accepting payment cards directly in your store',
+    'payment.gateway.description': 'Solution for online payments on your e-commerce site',
+    'pos.system.description': 'Complete point of sale system with electronic cash register',
+    'charging.station.description': 'Charging station for electric vehicles',
+    'monthly.transactions': 'Monthly Transactions',
+    'devices.status': 'Devices Status',
+    'last.active': 'Last active',
+    'contact.support': 'Contact Support',
+    'remaining.tasks': 'Remaining Tasks',
+    'continue.onboarding': 'Continue onboarding',
+    'onboarding.complete': 'Onboarding complete!',
+    'onboarding.complete.subtitle': 'You can now use all platform features.',
+    'user': 'User',
+    'view.all.notifications': 'View all notifications'
   }
 };
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [language, setLanguage] = useState<Language>('sk');
 
-  // Load language preference from localStorage if available
+  // Load language from localStorage
   useEffect(() => {
-    const savedLanguage = localStorage.getItem('utopiaLanguage');
+    const savedLanguage = localStorage.getItem('utopiaLanguage') as Language;
     if (savedLanguage && (savedLanguage === 'sk' || savedLanguage === 'en')) {
       setLanguage(savedLanguage);
     }
   }, []);
 
-  // Save language preference when changed
+  // Save language to localStorage
   useEffect(() => {
     localStorage.setItem('utopiaLanguage', language);
+    document.documentElement.lang = language;
   }, [language]);
 
   const t = (key: string): string => {
-    return translations[language]?.[key] || key;
+    return translations[language][key] || key;
   };
 
   return (
@@ -279,7 +344,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
 export const useLanguage = () => {
   const context = useContext(LanguageContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useLanguage must be used within a LanguageProvider');
   }
   return context;

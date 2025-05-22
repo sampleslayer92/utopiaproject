@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { StepContainer } from '../StepContainer';
 import { useOnboarding } from '@/contexts/OnboardingContext';
@@ -9,7 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Plus, Minus, Wifi, SimCard } from 'lucide-react';
+import { Plus, Minus, Wifi, Smartphone } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -296,7 +295,7 @@ export const StepBusiness: React.FC = () => {
                   onClick={handleSimToggle}
                 >
                   <div className={`p-2 rounded-full ${connectivity.sim ? 'bg-emerald-100 dark:bg-emerald-900/40' : 'bg-gray-100 dark:bg-slate-700'}`}>
-                    <SimCard className={`h-4 w-4 ${connectivity.sim ? 'text-emerald-500' : ''}`} />
+                    <Smartphone className={`h-4 w-4 ${connectivity.sim ? 'text-emerald-500' : ''}`} />
                   </div>
                   <span>{t('sim.card')}</span>
                 </div>
