@@ -73,8 +73,8 @@ export const OnboardingSidebar: React.FC = () => {
       </div>
       
       <div className="flex flex-col space-y-2 relative">
-        {/* Vertical line connecting steps */}
-        <div className="absolute top-0 bottom-0 left-4 w-0.5 bg-slate-700 z-0"></div>
+        {/* Vertical line connecting steps - modified to not intersect with step indicators */}
+        <div className="absolute top-3 bottom-3 left-4 w-0.5 bg-slate-700 z-0 ml-[12px]"></div>
         
         {steps.map((step, index) => {
           const status = getStepStatus(step.id);
@@ -90,15 +90,15 @@ export const OnboardingSidebar: React.FC = () => {
                 status === 'disabled' ? "opacity-50 cursor-not-allowed" : "hover:bg-slate-700/50"
               )}
             >
-              <div className="mr-4 flex-shrink-0">
+              <div className="mr-4 flex-shrink-0 z-20">
                 {status === 'complete' ? (
-                  <div className="w-8 h-8 rounded-full bg-emerald-600/20 flex items-center justify-center transition-all duration-300 border border-emerald-500/30">
+                  <div className="w-8 h-8 rounded-full bg-emerald-600/20 flex items-center justify-center transition-all duration-300 border border-emerald-500/30 bg-slate-800">
                     <CheckCircle className="h-5 w-5 text-emerald-400" />
                   </div>
                 ) : (
                   <div className={cn(
                     "w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300",
-                    status === 'active' ? "border-blue-500 bg-blue-800/30 text-blue-300" : 
+                    status === 'active' ? "border-blue-500 bg-blue-800 text-blue-300" : 
                     status === 'next' ? "border-slate-500 bg-slate-800 text-slate-300" :
                     "border-slate-600 bg-slate-800 text-slate-400"
                   )}>

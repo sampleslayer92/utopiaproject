@@ -27,7 +27,22 @@ export interface BusinessInfo {
   ocakavanyObratKariet: number;
   hasWifi: boolean;
   hasSimCard: boolean;
+  hasEthernet?: boolean;
   poznamka?: string;
+}
+
+export interface Prevadzka extends BusinessInfo {
+  id: string;
+  pouzitFiremneUdaje: boolean;
+  bankovyUcet: BankovyUcet[];
+}
+
+export interface BankovyUcet {
+  id: string;
+  nazov: string;
+  iban: string;
+  mena: string;
+  swift?: string;
 }
 
 export type Zariadenie = {
@@ -67,13 +82,16 @@ export type DoplnkovaSluzba = {
 };
 
 export interface Osoba {
+  id: string;
   meno: string;
   email: string;
   telefon: string;
   funkcia?: string;
+  prevadzkaId?: string;
 }
 
 export interface OpravnenaOsoba {
+  id: string;
   meno: string;
   email: string;
   telefon: string;
@@ -87,6 +105,7 @@ export interface OpravnenaOsoba {
   platnostDokladu: Date;
   statVydania?: string;
   politickyExponovana: boolean;
+  prevadzkaId?: string;
   dokumenty?: Array<{id: string, name: string, size: number}>;
 }
 
@@ -133,13 +152,14 @@ export interface Transakcia {
 export interface OnboardingData {
   company: CompanyInfo;
   business: BusinessInfo;
+  prevadzky: Prevadzka[];
   zariadenia: Zariadenie[];
   licencie: SoftverLicencia[];
   platobneMetody: PlatobnaMetoda[];
   doplnkoveSluzby: DoplnkovaSluzba[];
-  obchodnaOsoba: Osoba;
-  technickaOsoba: Osoba;
-  opravneneOsoby: OpravnenaOsoba[]; // Changed from single to multiple
+  obchodneOsoby: Osoba[];
+  technickeOsoby: Osoba[];
+  opravneneOsoby: OpravnenaOsoba[];
   skutocniMajitelia: SkutocnyMajitel[];
   fakturacneUdaje: FakturacneUdaje;
   podpisSuhlasy: PodpisSuhlasy;
@@ -160,15 +180,33 @@ export type OnboardingContextType = {
   setStep: (step: OnboardingStep) => void;
   updateCompanyInfo: (info: Partial<CompanyInfo>) => void;
   updateBusinessInfo: (info: Partial<BusinessInfo>) => void;
+  
+  // New prevadzky methods
+  addPrevadzka: (prevadzka: Prevadzka) => void;
+  updatePrevadzka: (id: string, info: Partial<Prevadzka>) => void;
+  removePrevadzka: (id: string) => void;
+  addBankovyUcet: (prevadzkaId: string, ucet: BankovyUcet) => void;
+  updateBankovyUcet: (prevadzkaId: string, ucetId: string, info: Partial<BankovyUcet>) => void;
+  removeBankovyUcet: (prevadzkaId: string, ucetId: string) => void;
+  
   updateZariadenie: (id: string, info: Partial<Zariadenie>) => void;
   updateLicencia: (id: string, selected: boolean) => void;
   updatePlatobnaMetoda: (id: string, selected: boolean, value?: string) => void;
   updateDoplnkovaSluzba: (id: string, selected: boolean, value?: string) => void;
-  updateObchodnaOsoba: (info: Partial<Osoba>) => void;
-  updateTechnickaOsoba: (info: Partial<Osoba>) => void;
+  
+  // Updated persons methods
+  addObchodnaOsoba: (osoba: Osoba) => void;
+  updateObchodnaOsoba: (id: string, info: Partial<Osoba>) => void;
+  removeObchodnaOsoba: (id: string) => void;
+  
+  addTechnickaOsoba: (osoba: Osoba) => void;
+  updateTechnickaOsoba: (id: string, info: Partial<Osoba>) => void;
+  removeTechnickaOsoba: (id: string) => void;
+  
   addOpravnenaOsoba: (osoba: OpravnenaOsoba) => void;
-  updateOpravnenaOsoba: (index: number, info: Partial<OpravnenaOsoba>) => void;
-  removeOpravnenaOsoba: (index: number) => void;
+  updateOpravnenaOsoba: (id: string, info: Partial<OpravnenaOsoba>) => void;
+  removeOpravnenaOsoba: (id: string) => void;
+  
   addSkutocnyMajitel: (majitel: SkutocnyMajitel) => void;
   updateSkutocnyMajitel: (index: number, info: Partial<SkutocnyMajitel>) => void;
   removeSkutocnyMajitel: (index: number) => void;
@@ -210,6 +248,30 @@ export const defaultOnboardingData: OnboardingData = {
     hasSimCard: false,
     poznamka: ""
   },
+  prevadzky: [
+    {
+      id: "default-prevadzka",
+      nazovPrevadzky: "",
+      adresaPrevadzky: "",
+      mesto: "",
+      psc: "",
+      telefon: "",
+      email: "",
+      typPrevadzky: "Kamenná",
+      predmetPodnikania: "",
+      otvaracieHodiny: "Po-Pia 9:00-17:00",
+      sezonnost: false,
+      trvanieSezony: 0,
+      odhadovanyRocnyObrat: 0,
+      priemernaVyskaTransakcie: 0,
+      ocakavanyObratKariet: 0,
+      hasWifi: false,
+      hasSimCard: false,
+      hasEthernet: false,
+      pouzitFiremneUdaje: true,
+      bankovyUcet: []
+    }
+  ],
   zariadenia: [
     { id: "a920-gprs", nazov: "A920 GPRS", pocetKs: 1, typNakupu: "Prenájom", viazanost: 24, frekvenciaPlatby: "mesačne", selected: false },
     { id: "a920-wifi", nazov: "A920 WIFI", pocetKs: 1, typNakupu: "Prenájom", viazanost: 24, frekvenciaPlatby: "mesačne", selected: false },
@@ -260,33 +322,43 @@ export const defaultOnboardingData: OnboardingData = {
     { id: "technicka-podpora", nazov: "24/7 technická podpora", selected: false },
     { id: "deinstalacia", nazov: "Deinštalácia", selected: false }
   ],
-  obchodnaOsoba: {
-    meno: "",
-    email: "",
-    telefon: "",
-    funkcia: ""
-  },
-  technickaOsoba: {
-    meno: "",
-    email: "",
-    telefon: "",
-    funkcia: ""
-  },
-  opravneneOsoby: [
+  obchodneOsoby: [
     {
+      id: "default-obchodna-osoba",
       meno: "",
       email: "",
       telefon: "",
       funkcia: "",
+      prevadzkaId: "default-prevadzka"
+    }
+  ],
+  technickeOsoby: [
+    {
+      id: "default-technicka-osoba",
+      meno: "",
+      email: "",
+      telefon: "",
+      funkcia: "",
+      prevadzkaId: "default-prevadzka"
+    }
+  ],
+  opravneneOsoby: [
+    {
+      id: "default-opravnena-osoba",
+      meno: "",
+      email: "",
+      telefon: "",
+      funkcia: "konateľ",
       datumNarodenia: new Date(),
       rodneCislo: "",
-      obcianstvo: "Slovenské",
+      obcianstvo: "Slovenská republika",
       adresaTrvalehoBydliska: "",
       typDokladu: "Občiansky preukaz",
       cisloDokladu: "",
       platnostDokladu: new Date(),
       statVydania: "Slovenská republika",
       politickyExponovana: false,
+      prevadzkaId: "default-prevadzka",
       dokumenty: []
     }
   ],

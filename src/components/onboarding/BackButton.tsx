@@ -7,7 +7,7 @@ import { useOnboarding } from '@/contexts/OnboardingContext';
 
 interface BackButtonProps {
   className?: string;
-  onClick?: () => void; // Added onClick prop
+  onClick?: () => void;
 }
 
 export const BackButton: React.FC<BackButtonProps> = ({ className, onClick }) => {

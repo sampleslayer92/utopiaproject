@@ -1,7 +1,7 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useParams, useNavigate as useReactRouterNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { v4 as uuidv4 } from 'uuid';
 import { 
   OnboardingContextType, 
   OnboardingData, 
@@ -14,7 +14,9 @@ import {
   FakturacneUdaje,
   PodpisSuhlasy,
   defaultOnboardingData,
-  Zariadenie
+  Zariadenie,
+  Prevadzka,
+  BankovyUcet
 } from '@/types/onboarding';
 
 const OnboardingContext = createContext<OnboardingContextType | undefined>(undefined);
@@ -69,10 +71,33 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   const updateCompanyInfo = (info: Partial<CompanyInfo>) => {
-    setData(prev => ({
-      ...prev,
-      company: { ...prev.company, ...info }
-    }));
+    setData(prev => {
+      // If company data changes and we have prevadzky that use company data, update them
+      if (prev.prevadzky && Array.isArray(prev.prevadzky)) {
+        const updatedPrevadzky = prev.prevadzky.map(prevadzka => {
+          if (prevadzka.pouzitFiremneUdaje) {
+            return {
+              ...prevadzka,
+              nazovPrevadzky: info.nazovSpolocnosti || prevadzka.nazovPrevadzky,
+              adresaPrevadzky: info.sidlo || prevadzka.adresaPrevadzky,
+              predmetPodnikania: info.predmetCinnosti || prevadzka.predmetPodnikania
+            };
+          }
+          return prevadzka;
+        });
+        
+        return {
+          ...prev,
+          company: { ...prev.company, ...info },
+          prevadzky: updatedPrevadzky
+        };
+      }
+      
+      return {
+        ...prev,
+        company: { ...prev.company, ...info }
+      };
+    });
   };
 
   const updateBusinessInfo = (info: Partial<BusinessInfo>) => {
@@ -80,6 +105,114 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       ...prev,
       business: { ...prev.business, ...info }
     }));
+  };
+  
+  // Prevadzky management
+  const addPrevadzka = (prevadzka: Prevadzka) => {
+    const newPrevadzka = {
+      ...prevadzka,
+      id: prevadzka.id || uuidv4()
+    };
+    
+    setData(prev => ({
+      ...prev,
+      prevadzky: Array.isArray(prev.prevadzky) ? [...prev.prevadzky, newPrevadzka] : [newPrevadzka]
+    }));
+  };
+  
+  const updatePrevadzka = (id: string, info: Partial<Prevadzka>) => {
+    setData(prev => {
+      const prevadzky = Array.isArray(prev.prevadzky) ? [...prev.prevadzky] : [];
+      const index = prevadzky.findIndex(p => p.id === id);
+      
+      if (index !== -1) {
+        // If pouzitFiremneUdaje is changing to true, update with company data
+        if (info.pouzitFiremneUdaje === true && !prevadzky[index].pouzitFiremneUdaje) {
+          prevadzky[index] = {
+            ...prevadzky[index],
+            ...info,
+            nazovPrevadzky: prev.company.nazovSpolocnosti,
+            adresaPrevadzky: prev.company.sidlo,
+            predmetPodnikania: prev.company.predmetCinnosti || prevadzky[index].predmetPodnikania
+          };
+        } else {
+          prevadzky[index] = { ...prevadzky[index], ...info };
+        }
+      }
+      
+      return { ...prev, prevadzky };
+    });
+  };
+  
+  const removePrevadzka = (id: string) => {
+    setData(prev => ({
+      ...prev,
+      prevadzky: Array.isArray(prev.prevadzky) 
+        ? prev.prevadzky.filter(p => p.id !== id)
+        : []
+    }));
+  };
+  
+  // Bankovy ucet management
+  const addBankovyUcet = (prevadzkaId: string, ucet: BankovyUcet) => {
+    const newUcet = {
+      ...ucet,
+      id: ucet.id || uuidv4()
+    };
+    
+    setData(prev => {
+      const prevadzky = Array.isArray(prev.prevadzky) ? [...prev.prevadzky] : [];
+      const index = prevadzky.findIndex(p => p.id === prevadzkaId);
+      
+      if (index !== -1) {
+        const bankovyUcet = Array.isArray(prevadzky[index].bankovyUcet) 
+          ? [...prevadzky[index].bankovyUcet, newUcet]
+          : [newUcet];
+          
+        prevadzky[index] = { ...prevadzky[index], bankovyUcet };
+      }
+      
+      return { ...prev, prevadzky };
+    });
+  };
+  
+  const updateBankovyUcet = (prevadzkaId: string, ucetId: string, info: Partial<BankovyUcet>) => {
+    setData(prev => {
+      const prevadzky = Array.isArray(prev.prevadzky) ? [...prev.prevadzky] : [];
+      const prevadzkaIndex = prevadzky.findIndex(p => p.id === prevadzkaId);
+      
+      if (prevadzkaIndex !== -1) {
+        const bankovyUcet = Array.isArray(prevadzky[prevadzkaIndex].bankovyUcet) 
+          ? [...prevadzky[prevadzkaIndex].bankovyUcet] 
+          : [];
+          
+        const ucetIndex = bankovyUcet.findIndex(u => u.id === ucetId);
+        
+        if (ucetIndex !== -1) {
+          bankovyUcet[ucetIndex] = { ...bankovyUcet[ucetIndex], ...info };
+          prevadzky[prevadzkaIndex] = { ...prevadzky[prevadzkaIndex], bankovyUcet };
+        }
+      }
+      
+      return { ...prev, prevadzky };
+    });
+  };
+  
+  const removeBankovyUcet = (prevadzkaId: string, ucetId: string) => {
+    setData(prev => {
+      const prevadzky = Array.isArray(prev.prevadzky) ? [...prev.prevadzky] : [];
+      const prevadzkaIndex = prevadzky.findIndex(p => p.id === prevadzkaId);
+      
+      if (prevadzkaIndex !== -1) {
+        const bankovyUcet = Array.isArray(prevadzky[prevadzkaIndex].bankovyUcet) 
+          ? prevadzky[prevadzkaIndex].bankovyUcet.filter(u => u.id !== ucetId)
+          : [];
+          
+        prevadzky[prevadzkaIndex] = { ...prevadzky[prevadzkaIndex], bankovyUcet };
+      }
+      
+      return { ...prev, prevadzky };
+    });
   };
 
   const updateZariadenie = (id: string, info: Partial<Zariadenie>) => {
@@ -118,51 +251,89 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }));
   };
 
-  const updateObchodnaOsoba = (info: Partial<Osoba>) => {
-    setData(prev => ({
-      ...prev,
-      obchodnaOsoba: { ...prev.obchodnaOsoba, ...info }
-    }));
-  };
-
-  const updateTechnickaOsoba = (info: Partial<Osoba>) => {
-    setData(prev => ({
-      ...prev,
-      technickaOsoba: { ...prev.technickaOsoba, ...info }
-    }));
-  };
-
-  // Updated to manage multiple authorized persons
-  const addOpravnenaOsoba = (osoba: OpravnenaOsoba) => {
-    setData(prev => ({
-      ...prev,
-      opravneneOsoby: Array.isArray(prev.opravneneOsoby) ? [...prev.opravneneOsoby, osoba] : [osoba]
-    }));
-  };
-
-  const updateOpravnenaOsoba = (index: number, info: Partial<OpravnenaOsoba>) => {
-    if (!Array.isArray(data.opravneneOsoby)) {
-      console.error("opravneneOsoby is not an array");
-      return;
-    }
+  // Updated person management methods
+  const addObchodnaOsoba = (osoba: Osoba) => {
+    const newOsoba = {
+      ...osoba,
+      id: osoba.id || uuidv4()
+    };
     
     setData(prev => ({
       ...prev,
-      opravneneOsoby: Array.isArray(prev.opravneneOsoby) ? prev.opravneneOsoby.map((osoba, i) => 
-        i === index ? { ...osoba, ...info } : osoba
+      obchodneOsoby: Array.isArray(prev.obchodneOsoby) ? [...prev.obchodneOsoby, newOsoba] : [newOsoba]
+    }));
+  };
+
+  const updateObchodnaOsoba = (id: string, info: Partial<Osoba>) => {
+    setData(prev => ({
+      ...prev,
+      obchodneOsoby: Array.isArray(prev.obchodneOsoby) ? prev.obchodneOsoby.map(o => 
+        o.id === id ? { ...o, ...info } : o
       ) : []
     }));
   };
 
-  const removeOpravnenaOsoba = (index: number) => {
-    if (!Array.isArray(data.opravneneOsoby)) {
-      console.error("opravneneOsoby is not an array");
-      return;
-    }
+  const removeObchodnaOsoba = (id: string) => {
+    setData(prev => ({
+      ...prev,
+      obchodneOsoby: Array.isArray(prev.obchodneOsoby) ? prev.obchodneOsoby.filter(o => o.id !== id) : []
+    }));
+  };
+
+  const addTechnickaOsoba = (osoba: Osoba) => {
+    const newOsoba = {
+      ...osoba,
+      id: osoba.id || uuidv4()
+    };
     
     setData(prev => ({
       ...prev,
-      opravneneOsoby: Array.isArray(prev.opravneneOsoby) ? prev.opravneneOsoby.filter((_, i) => i !== index) : []
+      technickeOsoby: Array.isArray(prev.technickeOsoby) ? [...prev.technickeOsoby, newOsoba] : [newOsoba]
+    }));
+  };
+
+  const updateTechnickaOsoba = (id: string, info: Partial<Osoba>) => {
+    setData(prev => ({
+      ...prev,
+      technickeOsoby: Array.isArray(prev.technickeOsoby) ? prev.technickeOsoby.map(o => 
+        o.id === id ? { ...o, ...info } : o
+      ) : []
+    }));
+  };
+
+  const removeTechnickaOsoba = (id: string) => {
+    setData(prev => ({
+      ...prev,
+      technickeOsoby: Array.isArray(prev.technickeOsoby) ? prev.technickeOsoby.filter(o => o.id !== id) : []
+    }));
+  };
+
+  // Updated opravnene osoby methods
+  const addOpravnenaOsoba = (osoba: OpravnenaOsoba) => {
+    const newOsoba = {
+      ...osoba,
+      id: osoba.id || uuidv4()
+    };
+    
+    setData(prev => ({
+      ...prev,
+      opravneneOsoby: Array.isArray(prev.opravneneOsoby) ? [...prev.opravneneOsoby, newOsoba] : [newOsoba]
+    }));
+  };
+
+  const updateOpravnenaOsoba = (id: string, info: Partial<OpravnenaOsoba>) => {
+    setData(prev => ({
+      ...prev,
+      opravneneOsoby: Array.isArray(prev.opravneneOsoby) ? prev.opravneneOsoby.map(o => 
+        o.id === id ? { ...o, ...info } : o
+      ) : []
+    }));
+  };
+
+  const removeOpravnenaOsoba = (id: string) => {
+    setData(prev => ({
+      ...prev,
+      opravneneOsoby: Array.isArray(prev.opravneneOsoby) ? prev.opravneneOsoby.filter(o => o.id !== id) : []
     }));
   };
 
@@ -283,8 +454,11 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
           : Boolean(ico && nazovSpolocnosti && dic && sidlo);
       }
       case 'business': {
-        const { nazovPrevadzky, adresaPrevadzky, mesto, psc, telefon, email } = data.business;
-        return Boolean(nazovPrevadzky && adresaPrevadzky && mesto && psc && telefon && email);
+        // Check if at least one prevadzka has required fields filled
+        return Array.isArray(data.prevadzky) && data.prevadzky.some(p => {
+          const { nazovPrevadzky, adresaPrevadzky, telefon, email } = p;
+          return Boolean(nazovPrevadzky && adresaPrevadzky && telefon && email);
+        });
       }
       case 'products': {
         const hasZariadenie = Array.isArray(data.zariadenia) && data.zariadenia.some(z => z && z.selected);
@@ -293,30 +467,30 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         return hasZariadenie || hasLicencia || hasPlatobnaMetoda;
       }
       case 'persons': {
-        const { meno: obchodne, email: obchodnyEmail, telefon: obchodnyTelefon } = data.obchodnaOsoba;
-        const { meno: technicke, email: technickyEmail, telefon: technickyTelefon } = data.technickaOsoba;
+        // Check if at least one business and one technical contact is valid
+        const hasValidObchodnaOsoba = Array.isArray(data.obchodneOsoby) && data.obchodneOsoby.some(o => {
+          return Boolean(o && o.meno && o.email && o.telefon);
+        });
         
-        // Add null check before accessing length and using some
-        const hasValidOpravnenaOsoba = Array.isArray(data.opravneneOsoby) && 
-          data.opravneneOsoby.length > 0 && 
-          data.opravneneOsoby.some(osoba => {
-            if (!osoba) return false;
-            const { 
-              meno, funkcia, datumNarodenia, rodneCislo, obcianstvo, 
-              adresaTrvalehoBydliska, cisloDokladu, platnostDokladu
-            } = osoba;
-            
-            return Boolean(
-              meno && funkcia && datumNarodenia && rodneCislo && 
-              obcianstvo && adresaTrvalehoBydliska && cisloDokladu && platnostDokladu
-            );
-          });
+        const hasValidTechnickaOsoba = Array.isArray(data.technickeOsoby) && data.technickeOsoby.some(o => {
+          return Boolean(o && o.meno && o.email && o.telefon);
+        });
         
-        return Boolean(
-          obchodne && obchodnyEmail && obchodnyTelefon &&
-          technicke && technickyEmail && technickyTelefon &&
-          hasValidOpravnenaOsoba
-        );
+        // Check if at least one authorized person is valid
+        const hasValidOpravnenaOsoba = Array.isArray(data.opravneneOsoby) && data.opravneneOsoby.some(osoba => {
+          if (!osoba) return false;
+          const { 
+            meno, funkcia, datumNarodenia, rodneCislo, obcianstvo, 
+            adresaTrvalehoBydliska, cisloDokladu, platnostDokladu
+          } = osoba;
+          
+          return Boolean(
+            meno && funkcia && datumNarodenia && rodneCislo && 
+            obcianstvo && adresaTrvalehoBydliska && cisloDokladu && platnostDokladu
+          );
+        });
+        
+        return Boolean(hasValidObchodnaOsoba && hasValidTechnickaOsoba && hasValidOpravnenaOsoba);
       }
       case 'beneficialOwners': {
         // Add null check before accessing length and using every
@@ -347,12 +521,22 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setStep,
     updateCompanyInfo,
     updateBusinessInfo,
+    addPrevadzka,
+    updatePrevadzka,
+    removePrevadzka,
+    addBankovyUcet,
+    updateBankovyUcet,
+    removeBankovyUcet,
     updateZariadenie,
     updateLicencia,
     updatePlatobnaMetoda,
     updateDoplnkovaSluzba,
+    addObchodnaOsoba,
     updateObchodnaOsoba,
+    removeObchodnaOsoba,
+    addTechnickaOsoba,
     updateTechnickaOsoba,
+    removeTechnickaOsoba,
     addOpravnenaOsoba,
     updateOpravnenaOsoba,
     removeOpravnenaOsoba,
