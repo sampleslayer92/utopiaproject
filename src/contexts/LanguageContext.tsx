@@ -11,7 +11,7 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-// Basic translations for demo purposes
+// Enhanced translations
 const translations: Record<string, Record<string, string>> = {
   sk: {
     'save.later': 'Uložiť a pokračovať neskôr',
@@ -35,6 +35,25 @@ const translations: Record<string, Record<string, string>> = {
     'activate.subtitle': 'Dokončite zostávajúce kroky pre aktiváciu',
     'back.to.dashboard': 'Späť na dashboard',
     'tasks.remaining': 'úloh zostáva',
+    'select.country': 'Vyberte krajinu',
+    'country.subtitle': 'Lokalizujeme služby podľa vašej krajiny',
+    'create.account': 'Vytvorte si účet',
+    'account.subtitle': 'Potrebujeme od vás len pár základných údajov',
+    'verify.phone': 'Overte telefónne číslo',
+    'phone.subtitle': 'Pošleme vám SMS kód pre overenie',
+    'send.code': 'Poslať kód',
+    'verification.code': 'Verifikačný kód',
+    'verify.code': 'Overiť kód',
+    'enter.code': 'Zadajte 4-miestny kód, ktorý sme vám poslali SMS správou',
+    'products.select': 'Výber riešenia',
+    'products.subtitle': 'Čo potrebujete? Vyberte si jedno alebo viac riešení',
+    'continue.to.portal': 'Pokračovať do portálu',
+    'hello': 'Dobrý deň',
+    'verify.company': 'Overenie spoločnosti',
+    'complete.profile': 'Dokončite svoj profil',
+    'back.to.business': 'Späť k podnikaniu',
+    'why.needed': 'Prečo to potrebujeme?',
+    'hide.info': 'Skryť informáciu'
   },
   en: {
     'save.later': 'Save and continue later',
@@ -58,6 +77,25 @@ const translations: Record<string, Record<string, string>> = {
     'activate.subtitle': 'Complete the remaining steps to activate',
     'back.to.dashboard': 'Back to dashboard',
     'tasks.remaining': 'tasks remaining',
+    'select.country': 'Select country',
+    'country.subtitle': 'We will localize services based on your country',
+    'create.account': 'Create an account',
+    'account.subtitle': 'We need just a few basic details from you',
+    'verify.phone': 'Verify phone number',
+    'phone.subtitle': 'We will send you an SMS code for verification',
+    'send.code': 'Send code',
+    'verification.code': 'Verification code',
+    'verify.code': 'Verify code',
+    'enter.code': 'Enter the 4-digit code we sent you by SMS',
+    'products.select': 'Select solutions',
+    'products.subtitle': 'What do you need? Select one or more solutions',
+    'continue.to.portal': 'Continue to portal',
+    'hello': 'Hello',
+    'verify.company': 'Verify company',
+    'complete.profile': 'Complete your profile',
+    'back.to.business': 'Back to business',
+    'why.needed': 'Why do we need this?',
+    'hide.info': 'Hide information'
   }
 };
 

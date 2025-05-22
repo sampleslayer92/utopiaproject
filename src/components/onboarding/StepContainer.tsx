@@ -5,7 +5,7 @@ import { BackButton } from './BackButton';
 import { NextButton } from './NextButton';
 import { SaveContinueLater } from './SaveContinueLater';
 import { motion } from 'framer-motion';
-import { HelpCircle, Info } from 'lucide-react';
+import { HelpCircle, Info, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Link } from 'react-router-dom';
@@ -60,13 +60,13 @@ export const StepContainer: React.FC<StepContainerProps> = ({
     >
       <div className="flex items-center justify-between mb-8">
         <motion.div variants={itemVariants}>
-          <h1 className="text-2xl font-bold text-slate-900">{title}</h1>
-          {subtitle && <p className="mt-2 text-gray-500">{subtitle}</p>}
+          <h1 className="text-2xl font-bold text-white">{title}</h1>
+          {subtitle && <p className="mt-2 text-blue-300">{subtitle}</p>}
         </motion.div>
         
         <motion.div variants={itemVariants} className="hidden sm:block">
           <Link to="/dashboard">
-            <Button variant="outline" size="sm" className="border-emerald-200 text-emerald-600 hover:bg-emerald-50">
+            <Button variant="outline" size="sm" className="border-emerald-500/30 text-emerald-400 bg-emerald-900/20 hover:bg-emerald-800/30">
               <ArrowLeft className="h-4 w-4 mr-2" />
               {t('back.to.dashboard')}
             </Button>
@@ -79,7 +79,7 @@ export const StepContainer: React.FC<StepContainerProps> = ({
           <Button 
             variant="outline" 
             size="sm" 
-            className="text-emerald-600 border-emerald-200 hover:bg-emerald-50"
+            className="text-blue-300 border-blue-500/30 bg-blue-900/20 hover:bg-blue-800/30"
             onClick={() => setShowHelp(!showHelp)}
           >
             <Info className="h-4 w-4 mr-2" />
@@ -88,7 +88,7 @@ export const StepContainer: React.FC<StepContainerProps> = ({
           
           {showHelp && (
             <motion.div 
-              className="mt-3 p-4 bg-emerald-50 border border-emerald-100 rounded-lg text-sm text-emerald-800"
+              className="mt-3 p-4 bg-blue-900/30 border border-blue-500/20 rounded-lg text-sm text-blue-200"
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
@@ -100,27 +100,26 @@ export const StepContainer: React.FC<StepContainerProps> = ({
         </motion.div>
       )}
 
-      <motion.div className="space-y-6 mt-6 bg-white p-6 rounded-xl border shadow-sm" variants={itemVariants}>
+      <motion.div className="space-y-6 mt-6 bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20 shadow-md" variants={itemVariants}>
         {children}
       </motion.div>
 
       <motion.div 
         variants={itemVariants}
-        className="mt-12 pt-4 border-t flex items-center justify-between"
+        className="mt-12 pt-4 border-t border-slate-700/50 flex items-center justify-between"
       >
         <SaveContinueLater />
         
         <div className="flex items-center gap-4">
           {actionBar}
+          <BackButton className="border-blue-500/30 bg-blue-900/20 hover:bg-blue-800/30 text-blue-300" />
           <NextButton 
             disabled={nextButtonDisabled}
             onBeforeNext={onBeforeNext}
+            className="bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600"
           />
         </div>
       </motion.div>
     </motion.div>
   );
 };
-
-// Need to add the ArrowLeft import
-import { ArrowLeft } from 'lucide-react';

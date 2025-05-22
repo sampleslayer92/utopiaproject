@@ -63,31 +63,31 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onNext }) => {
             
             <div className="flex justify-center items-center space-x-6 py-3">
               <div className="flex flex-col items-center">
-                <div className="w-10 h-10 rounded-full bg-blue-600/50 flex items-center justify-center mb-1">
+                <div className="w-10 h-10 rounded-full bg-emerald-600/30 border border-emerald-500/30 flex items-center justify-center mb-1">
                   <span role="img" aria-label="account" className="text-lg">👤</span>
                 </div>
                 <span className="text-xs text-blue-200">Účet</span>
               </div>
-              <div className="flex-grow h-0.5 bg-blue-600/30"></div>
+              <div className="flex-grow h-0.5 bg-emerald-600/20"></div>
               <div className="flex flex-col items-center">
-                <div className="w-10 h-10 rounded-full bg-blue-600/50 flex items-center justify-center mb-1">
+                <div className="w-10 h-10 rounded-full bg-emerald-600/30 border border-emerald-500/30 flex items-center justify-center mb-1">
+                  <span role="img" aria-label="country" className="text-lg">🌍</span>
+                </div>
+                <span className="text-xs text-blue-200">Krajina</span>
+              </div>
+              <div className="flex-grow h-0.5 bg-emerald-600/20"></div>
+              <div className="flex flex-col items-center">
+                <div className="w-10 h-10 rounded-full bg-emerald-600/30 border border-emerald-500/30 flex items-center justify-center mb-1">
                   <span role="img" aria-label="company" className="text-lg">🏢</span>
                 </div>
                 <span className="text-xs text-blue-200">Firma</span>
               </div>
-              <div className="flex-grow h-0.5 bg-blue-600/30"></div>
+              <div className="flex-grow h-0.5 bg-emerald-600/20"></div>
               <div className="flex flex-col items-center">
-                <div className="w-10 h-10 rounded-full bg-blue-600/50 flex items-center justify-center mb-1">
+                <div className="w-10 h-10 rounded-full bg-emerald-600/30 border border-emerald-500/30 flex items-center justify-center mb-1">
                   <span role="img" aria-label="services" className="text-lg">🛍️</span>
                 </div>
                 <span className="text-xs text-blue-200">Služby</span>
-              </div>
-              <div className="flex-grow h-0.5 bg-blue-600/30"></div>
-              <div className="flex flex-col items-center">
-                <div className="w-10 h-10 rounded-full bg-blue-600/50 flex items-center justify-center mb-1">
-                  <span role="img" aria-label="contract" className="text-lg">📄</span>
-                </div>
-                <span className="text-xs text-blue-200">Zmluva</span>
               </div>
             </div>
             

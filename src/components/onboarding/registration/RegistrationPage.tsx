@@ -9,31 +9,49 @@ import { useNavigate } from 'react-router-dom';
 import { WelcomeScreen } from './WelcomeScreen';
 import { BusinessTypeScreen } from './BusinessTypeScreen';
 import { ProductSelectionScreen } from './ProductSelectionScreen';
+import { CountrySelectionScreen } from './CountrySelectionScreen';
+import { PhoneVerificationScreen } from './PhoneVerificationScreen';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { toast } from 'sonner';
 
 interface UserData {
+  country: string;
   fullName: string;
   email: string;
   phone: string;
   businessType: string;
   selectedProducts: string[];
+  verificationCode: string;
 }
 
 export const RegistrationPage: React.FC = () => {
   const navigate = useNavigate();
-  const [step, setStep] = useState(0); // 0: Welcome, 1: Account Creation, 2: Business Type, 3: Product Selection
+  const { t } = useLanguage();
+  const [step, setStep] = useState(0); // 0: Welcome, 1: Country Selection, 2: Account Info, 3: Phone Verification, 4: Business Type, 5: Product Selection
   const [userData, setUserData] = useState<UserData>({
+    country: 'SK',
     fullName: '',
     email: '',
     phone: '+421',
     businessType: '',
-    selectedProducts: []
+    selectedProducts: [],
+    verificationCode: ''
   });
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUserData({
       ...userData,
       [e.target.name]: e.target.value
+    });
+  };
+  
+  const handleCountrySelect = (country: string) => {
+    const phonePrefix = country === 'SK' ? '+421' : (country === 'CZ' ? '+420' : '+44');
+    setUserData({
+      ...userData,
+      country,
+      phone: phonePrefix
     });
   };
   
@@ -49,6 +67,22 @@ export const RegistrationPage: React.FC = () => {
       ...userData,
       selectedProducts: products
     });
+  };
+
+  const verifyPhone = (code: string) => {
+    setUserData({
+      ...userData,
+      verificationCode: code
+    });
+    
+    // In a real app, we would verify the code with an API
+    // For now, we'll just accept any 4-digit code
+    if (code.length === 4) {
+      toast.success("Telefónne číslo overené!");
+      nextStep();
+    } else {
+      toast.error("Neplatný kód!");
+    }
   };
   
   const handleSubmit = (e: React.FormEvent) => {
@@ -72,13 +106,22 @@ export const RegistrationPage: React.FC = () => {
   }
   
   if (step === 1) {
+    return <CountrySelectionScreen 
+      selectedCountry={userData.country} 
+      onSelect={handleCountrySelect}
+      onNext={nextStep}
+      onBack={prevStep}
+    />;
+  }
+
+  if (step === 2) {
     return (
-      <div className="min-h-screen flex flex-col bg-gradient-to-br from-white to-emerald-50">
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-900 to-blue-900">
         <header className="flex justify-between items-center p-4">
           <Button
             variant="ghost"
             onClick={prevStep}
-            className="flex items-center gap-2 text-gray-600 hover:bg-emerald-50"
+            className="flex items-center gap-2 text-blue-300 hover:bg-blue-900/20"
           >
             <ArrowLeft className="h-4 w-4" />
             Späť
@@ -97,21 +140,20 @@ export const RegistrationPage: React.FC = () => {
           >
             <div className="w-full max-w-lg">
               <div className="text-center mb-8">
-                <h1 className="text-3xl font-bold text-gray-900">
+                <h1 className="text-3xl font-bold text-white">
                   Vytvorte si účet
                 </h1>
-                <p className="mt-2 text-gray-600">
+                <p className="mt-2 text-blue-300">
                   Potrebujeme od vás len pár základných údajov pre vytvorenie účtu
                 </p>
               </div>
               
-              <div className="glass-card p-8 space-y-6">
+              <div className="bg-white/10 backdrop-blur-md p-8 space-y-6 rounded-2xl border border-white/20 shadow-xl">
                 <form onSubmit={(e) => { e.preventDefault(); nextStep(); }} className="space-y-6">
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="fullName" className="text-base">
+                      <Label htmlFor="fullName" className="text-base text-white">
                         Meno a priezvisko
-                        <span className="text-sm text-gray-400 ml-1">(Voliteľné)</span>
                       </Label>
                       <Input
                         id="fullName"
@@ -119,14 +161,14 @@ export const RegistrationPage: React.FC = () => {
                         value={userData.fullName}
                         onChange={handleChange}
                         placeholder="Zadajte vaše meno a priezvisko"
-                        className="mt-1 glass-input rounded-xl py-6 text-lg"
+                        className="mt-1 glass-input rounded-xl py-6 text-lg bg-white/20 text-white placeholder:text-blue-300/70"
+                        required
                       />
                     </div>
                     
                     <div>
-                      <Label htmlFor="email" className="text-base">
+                      <Label htmlFor="email" className="text-base text-white">
                         E-mailová adresa
-                        <span className="text-sm text-gray-400 ml-1">(Voliteľné)</span>
                       </Label>
                       <Input
                         id="email"
@@ -135,22 +177,8 @@ export const RegistrationPage: React.FC = () => {
                         value={userData.email}
                         onChange={handleChange}
                         placeholder="vasa@adresa.sk"
-                        className="mt-1 glass-input rounded-xl py-6 text-lg"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="phone" className="text-base">
-                        Telefónne číslo
-                        <span className="text-sm text-gray-400 ml-1">(Voliteľné)</span>
-                      </Label>
-                      <Input
-                        id="phone"
-                        name="phone"
-                        value={userData.phone}
-                        onChange={handleChange}
-                        placeholder="+421"
-                        className="mt-1 glass-input rounded-xl py-6 text-lg"
+                        className="mt-1 glass-input rounded-xl py-6 text-lg bg-white/20 text-white placeholder:text-blue-300/70"
+                        required
                       />
                     </div>
                   </div>
@@ -170,26 +198,37 @@ export const RegistrationPage: React.FC = () => {
           </motion.main>
         </AnimatePresence>
         
-        <footer className="py-4 text-center text-sm text-gray-500">
+        <footer className="py-4 text-center text-sm text-blue-300/70">
           © 2025 Utopia. Všetky práva vyhradené.
         </footer>
       </div>
     );
   }
-  
-  if (step === 2) {
-    return <BusinessTypeScreen 
-      onSelect={handleBusinessTypeSelect} 
-      selectedType={userData.businessType}
-      onNext={nextStep} 
+
+  if (step === 3) {
+    return <PhoneVerificationScreen 
+      phone={userData.phone}
+      onChangePhone={(phone) => setUserData({...userData, phone})}
+      onVerify={verifyPhone}
+      onBack={prevStep}
     />;
   }
   
-  if (step === 3) {
+  if (step === 4) {
+    return <BusinessTypeScreen 
+      onSelect={handleBusinessTypeSelect} 
+      selectedType={userData.businessType}
+      onNext={nextStep}
+      onBack={prevStep}
+    />;
+  }
+  
+  if (step === 5) {
     return <ProductSelectionScreen 
       onSelect={handleProductSelect} 
       selectedProducts={userData.selectedProducts}
       onSubmit={handleSubmit}
+      onBack={prevStep}
     />;
   }
 

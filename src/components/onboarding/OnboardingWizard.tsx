@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { LanguageProvider } from '@/contexts/LanguageContext';
 import { OnboardingSidebar } from './OnboardingSidebar';
 import { OnboardingHeader } from './OnboardingHeader';
 import { ChatSupportBubble } from './ChatSupportBubble';
@@ -51,7 +50,7 @@ const StepRenderer: React.FC = () => {
 
 export const OnboardingWizard: React.FC = () => {
   return (
-    <div className="flex h-full min-h-screen bg-gray-50">
+    <div className="flex h-full min-h-screen bg-gradient-to-br from-slate-900 to-blue-900">
       <OnboardingSidebar />
       <div className="flex-1 flex flex-col">
         <OnboardingHeader />

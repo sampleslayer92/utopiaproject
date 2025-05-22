@@ -97,14 +97,18 @@
   }
 }
 
-/* Glassmorphism components */
+/* Unified Glassmorphism components */
 @layer components {
   .glass-card {
-    @apply bg-white bg-opacity-70 backdrop-blur-glass border border-white border-opacity-20 rounded-2xl shadow-glass;
+    @apply bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl shadow-glass;
   }
   
   .glass-input {
-    @apply bg-white bg-opacity-50 backdrop-blur-sm focus:bg-opacity-80 transition-all duration-300;
+    @apply bg-white/20 backdrop-blur-sm focus:bg-white/30 transition-all duration-300;
+  }
+  
+  .dark-glass-card {
+    @apply bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl shadow-glass;
   }
   
   .soft-shadow {
@@ -137,6 +141,19 @@
     content: "";
     @apply absolute top-full left-1/2 -translate-x-1/2 border-solid border-4 border-transparent border-t-gray-900;
   }
+
+  /* Unified Button Styles */
+  .btn-gradient {
+    @apply bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600;
+  }
+  
+  .btn-rounded {
+    @apply rounded-full py-6 px-8;
+  }
+  
+  .btn-primary {
+    @apply btn-gradient btn-rounded text-white font-medium shadow-lg border border-white/10 hover:shadow-emerald-500/20;
+  }
 }
 
 /* Utopia specific styles */
@@ -159,7 +176,7 @@
   }
   
   .utopia-product-card.selected {
-    @apply border-blue-500 shadow-md bg-blue-900/30;
+    @apply border-emerald-500 shadow-md bg-emerald-900/30;
   }
   
   .utopia-service-tile {
@@ -168,7 +185,7 @@
   }
   
   .utopia-service-tile.selected {
-    @apply border-blue-500 bg-blue-900/30;
+    @apply border-emerald-500 bg-emerald-900/30;
   }
   
   .utopia-payment-tag {
@@ -177,7 +194,16 @@
   }
   
   .utopia-payment-tag.selected {
-    @apply bg-blue-900/30 border-blue-500 text-blue-300;
+    @apply bg-emerald-900/30 border-emerald-500 text-emerald-300;
+  }
+
+  /* Unified Form Styles */
+  .utopia-form-input {
+    @apply glass-input rounded-xl py-6 text-lg;
+  }
+  
+  .utopia-form-label {
+    @apply text-base font-medium text-white;
   }
 }
 
@@ -192,7 +218,7 @@
   }
   
   .hover-glow {
-    @apply transition-all duration-300 hover:shadow-lg hover:shadow-blue-900/20;
+    @apply transition-all duration-300 hover:shadow-lg hover:shadow-emerald-900/20;
   }
   
   .pulse-subtle {

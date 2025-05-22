@@ -14,26 +14,28 @@ export function LanguageSwitcher() {
         size="sm"
         onClick={() => setLanguage('sk')}
         className={cn(
-          "px-2 py-1 rounded-full h-8 transition-all duration-300",
+          "px-3 py-1 rounded-full h-8 transition-all duration-300 flex items-center gap-1.5",
           language === 'sk' 
             ? "bg-emerald-500 text-white hover:bg-emerald-600" 
             : "bg-transparent hover:bg-gray-100"
         )}
       >
-        🇸🇰 SK
+        <span className="text-base">🇸🇰</span>
+        <span className="font-medium">SK</span>
       </Button>
       <Button
         variant="ghost"
         size="sm"
         onClick={() => setLanguage('en')}
         className={cn(
-          "px-2 py-1 rounded-full h-8 transition-all duration-300",
+          "px-3 py-1 rounded-full h-8 transition-all duration-300 flex items-center gap-1.5",
           language === 'en' 
             ? "bg-emerald-500 text-white hover:bg-emerald-600" 
             : "bg-transparent hover:bg-gray-100"
         )}
       >
-        🇬🇧 EN
+        <span className="text-base">🇬🇧</span>
+        <span className="font-medium">EN</span>
       </Button>
     </div>
   );
