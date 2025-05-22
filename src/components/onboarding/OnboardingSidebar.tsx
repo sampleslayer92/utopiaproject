@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { CheckCircle, ChevronRight } from 'lucide-react';
 import { OnboardingStep } from '@/types/onboarding';
 import { motion } from 'framer-motion';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const steps: { id: OnboardingStep; label: string; description: string }[] = [
   { id: 'company', label: 'Adresa firmy', description: 'Základné informácie o vašej spoločnosti' },
@@ -18,6 +19,7 @@ const steps: { id: OnboardingStep; label: string; description: string }[] = [
 
 export const OnboardingSidebar: React.FC = () => {
   const { currentStep, setStep, isStepComplete } = useOnboarding();
+  const { t } = useLanguage();
 
   const getStepStatus = (stepId: OnboardingStep) => {
     if (currentStep === stepId) return 'active';
@@ -60,19 +62,19 @@ export const OnboardingSidebar: React.FC = () => {
 
   return (
     <motion.div 
-      className="bg-white shadow-lg rounded-r-2xl py-8 px-6 flex flex-col h-full min-h-screen w-80"
+      className="bg-slate-800 shadow-lg py-8 px-6 flex flex-col h-full min-h-screen w-80"
       initial="hidden"
       animate="visible"
       variants={sidebarVariants}
     >
       <div className="mb-10">
-        <h1 className="text-2xl font-bold text-emerald-700 mb-2">Utopia</h1>
-        <p className="text-gray-500 text-sm">Onboarding do platformy</p>
+        <h1 className="text-2xl font-bold text-white mb-2">Utopia</h1>
+        <p className="text-blue-300 text-sm">Onboarding do platformy</p>
       </div>
       
       <div className="flex flex-col space-y-2 relative">
         {/* Vertical line connecting steps */}
-        <div className="absolute top-0 bottom-0 left-4 w-0.5 bg-gray-200 z-0"></div>
+        <div className="absolute top-0 bottom-0 left-4 w-0.5 bg-slate-700 z-0"></div>
         
         {steps.map((step, index) => {
           const status = getStepStatus(step.id);
@@ -84,21 +86,21 @@ export const OnboardingSidebar: React.FC = () => {
               onClick={() => handleStepClick(step.id)}
               className={cn(
                 "relative z-10 flex items-start py-3 px-4 rounded-xl transition-all duration-300 cursor-pointer",
-                status === 'active' ? "bg-emerald-50 border border-emerald-100" : "",
-                status === 'disabled' ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-50"
+                status === 'active' ? "bg-blue-900/40 border border-blue-800/50" : "",
+                status === 'disabled' ? "opacity-50 cursor-not-allowed" : "hover:bg-slate-700/50"
               )}
             >
               <div className="mr-4 flex-shrink-0">
                 {status === 'complete' ? (
-                  <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center transition-all duration-300">
-                    <CheckCircle className="h-5 w-5 text-white" />
+                  <div className="w-8 h-8 rounded-full bg-emerald-600/20 flex items-center justify-center transition-all duration-300 border border-emerald-500/30">
+                    <CheckCircle className="h-5 w-5 text-emerald-400" />
                   </div>
                 ) : (
                   <div className={cn(
                     "w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300",
-                    status === 'active' ? "border-emerald-500 bg-emerald-50 text-emerald-700" : 
-                    status === 'next' ? "border-gray-400 bg-white text-gray-500" :
-                    "border-gray-300 bg-white text-gray-400"
+                    status === 'active' ? "border-blue-500 bg-blue-800/30 text-blue-300" : 
+                    status === 'next' ? "border-slate-500 bg-slate-800 text-slate-300" :
+                    "border-slate-600 bg-slate-800 text-slate-400"
                   )}>
                     {index + 1}
                   </div>
@@ -108,18 +110,18 @@ export const OnboardingSidebar: React.FC = () => {
               <div className="flex-grow">
                 <p className={cn(
                   "font-medium",
-                  status === 'active' ? "text-emerald-700" : 
-                  status === 'complete' ? "text-gray-700" :
-                  "text-gray-500"
+                  status === 'active' ? "text-blue-300" : 
+                  status === 'complete' ? "text-emerald-400" :
+                  "text-slate-400"
                 )}>
                   {step.label}
                 </p>
-                <p className="text-sm text-gray-500 mt-0.5">{step.description}</p>
+                <p className="text-sm text-slate-500 mt-0.5">{step.description}</p>
               </div>
               
               {status !== 'disabled' && status !== 'active' && (
                 <div className="flex items-center self-center">
-                  <ChevronRight className="h-5 w-5 text-gray-400" />
+                  <ChevronRight className="h-5 w-5 text-slate-500" />
                 </div>
               )}
             </motion.div>
@@ -128,10 +130,10 @@ export const OnboardingSidebar: React.FC = () => {
       </div>
       
       <div className="mt-auto">
-        <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-5">
-          <p className="text-sm font-medium text-emerald-800">Potrebujete pomôcť?</p>
-          <p className="text-sm text-gray-600 mt-1">
-            Kontaktujte nás na <span className="text-emerald-600 font-medium">+421 XXX XXX XXX</span>
+        <div className="bg-blue-900/30 border border-blue-800/50 rounded-xl p-5">
+          <p className="text-sm font-medium text-blue-300">{t('need.help')}</p>
+          <p className="text-sm text-slate-400 mt-1">
+            {t('contact.us')} <span className="text-blue-300 font-medium">+421 XXX XXX XXX</span>
           </p>
         </div>
       </div>

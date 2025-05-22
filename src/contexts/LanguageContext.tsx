@@ -30,6 +30,11 @@ const translations: Record<string, Record<string, string>> = {
     'select.business.type': 'Vyberte typ vášho podnikania',
     'business.type.subtitle': 'Tento výber nám pomôže prispôsobiť riešenie vašim potrebám',
     'continue': 'Pokračovať',
+    'onboarding.process': 'Proces onboardingu',
+    'activate.account': 'Aktivujte svoj účet',
+    'activate.subtitle': 'Dokončite zostávajúce kroky pre aktiváciu',
+    'back.to.dashboard': 'Späť na dashboard',
+    'tasks.remaining': 'úloh zostáva',
   },
   en: {
     'save.later': 'Save and continue later',
@@ -48,6 +53,11 @@ const translations: Record<string, Record<string, string>> = {
     'select.business.type': 'Select your business type',
     'business.type.subtitle': 'This will help us customize the solution to your needs',
     'continue': 'Continue',
+    'onboarding.process': 'Onboarding process',
+    'activate.account': 'Activate your account',
+    'activate.subtitle': 'Complete the remaining steps to activate',
+    'back.to.dashboard': 'Back to dashboard',
+    'tasks.remaining': 'tasks remaining',
   }
 };
 
