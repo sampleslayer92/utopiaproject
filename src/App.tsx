@@ -11,28 +11,31 @@ import { DashboardPage } from "./components/onboarding/dashboard/DashboardPage";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { OnboardingProvider } from "./contexts/OnboardingContext";
 import { OnboardingWizard } from "./components/onboarding/OnboardingWizard";
+import { ThemeProvider } from "next-themes";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <LanguageProvider>
-      <BrowserRouter>
-        <OnboardingProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <Routes>
-              <Route path="/" element={<RegistrationPage />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/onboarding" element={<Navigate to="/dashboard" />} />
-              <Route path="/onboarding/:step" element={<OnboardingWizard />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </TooltipProvider>
-        </OnboardingProvider>
-      </BrowserRouter>
-    </LanguageProvider>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <LanguageProvider>
+        <BrowserRouter>
+          <OnboardingProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <Routes>
+                <Route path="/" element={<RegistrationPage />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/onboarding" element={<Navigate to="/dashboard" />} />
+                <Route path="/onboarding/:step" element={<OnboardingWizard />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </TooltipProvider>
+          </OnboardingProvider>
+        </BrowserRouter>
+      </LanguageProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 

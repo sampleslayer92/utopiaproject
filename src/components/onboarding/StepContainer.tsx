@@ -60,13 +60,13 @@ export const StepContainer: React.FC<StepContainerProps> = ({
     >
       <div className="flex items-center justify-between mb-8">
         <motion.div variants={itemVariants}>
-          <h1 className="text-2xl font-bold text-white">{title}</h1>
-          {subtitle && <p className="mt-2 text-blue-300">{subtitle}</p>}
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{title}</h1>
+          {subtitle && <p className="mt-2 text-slate-600 dark:text-blue-300">{subtitle}</p>}
         </motion.div>
         
         <motion.div variants={itemVariants} className="hidden sm:block">
           <Link to="/dashboard">
-            <Button variant="outline" size="sm" className="border-emerald-500/30 text-emerald-400 bg-emerald-900/20 hover:bg-emerald-800/30">
+            <Button variant="outline" size="sm" className="border-emerald-500/30 text-emerald-700 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-900/20 hover:bg-emerald-100/80 dark:hover:bg-emerald-800/30">
               <ArrowLeft className="h-4 w-4 mr-2" />
               {t('back.to.dashboard')}
             </Button>
@@ -79,16 +79,17 @@ export const StepContainer: React.FC<StepContainerProps> = ({
           <Button 
             variant="outline" 
             size="sm" 
-            className="text-blue-300 border-blue-500/30 bg-blue-900/20 hover:bg-blue-800/30"
+            className="text-blue-700 dark:text-blue-300 border-blue-500/30 bg-blue-50/50 dark:bg-blue-900/20 hover:bg-blue-100/50 dark:hover:bg-blue-800/30"
             onClick={() => setShowHelp(!showHelp)}
+            aria-expanded={showHelp}
           >
             <Info className="h-4 w-4 mr-2" />
-            {showHelp ? "Skryť informáciu" : "Prečo to potrebujeme?"}
+            {showHelp ? t('hide.info') : t('why.needed')}
           </Button>
           
           {showHelp && (
             <motion.div 
-              className="mt-3 p-4 bg-blue-900/30 border border-blue-500/20 rounded-lg text-sm text-blue-200"
+              className="mt-3 p-4 bg-blue-50/70 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-500/20 rounded-lg text-sm text-blue-800 dark:text-blue-200"
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
@@ -100,19 +101,19 @@ export const StepContainer: React.FC<StepContainerProps> = ({
         </motion.div>
       )}
 
-      <motion.div className="space-y-6 mt-6 bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20 shadow-md" variants={itemVariants}>
+      <motion.div className="space-y-6 mt-6 bg-white/90 dark:bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-gray-200 dark:border-white/20 shadow-md" variants={itemVariants}>
         {children}
       </motion.div>
 
       <motion.div 
         variants={itemVariants}
-        className="mt-12 pt-4 border-t border-slate-700/50 flex items-center justify-between"
+        className="mt-12 pt-4 border-t border-gray-200 dark:border-slate-700/50 flex items-center justify-between"
       >
         <SaveContinueLater />
         
         <div className="flex items-center gap-4">
           {actionBar}
-          <BackButton className="border-blue-500/30 bg-blue-900/20 hover:bg-blue-800/30 text-blue-300" />
+          <BackButton className="border-blue-500/30 bg-blue-50/50 dark:bg-blue-900/20 hover:bg-blue-100/50 dark:hover:bg-blue-800/30 text-blue-700 dark:text-blue-300" />
           <NextButton 
             disabled={nextButtonDisabled}
             onBeforeNext={onBeforeNext}

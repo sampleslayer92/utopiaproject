@@ -5,8 +5,8 @@
 
 @layer base {
   :root {
-    --background: 222 47% 10%;
-    --foreground: 210 40% 98%;
+    --background: 0 0% 100%;
+    --foreground: 222 47% 10%;
 
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
@@ -21,7 +21,7 @@
     --secondary-foreground: 222.2 47.4% 11.2%;
 
     --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted-foreground: 215.4 16.3% 56.9%; /* Improved contrast */
 
     --accent: 160 84% 95%;  /* Light emerald for accents */
     --accent-foreground: 222.2 47.4% 11.2%;
@@ -29,8 +29,8 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
+    --border: 214.3 31.8% 85.4%; /* Improved contrast */
+    --input: 214.3 31.8% 85.4%;  /* Improved contrast */
     --ring: 160 84% 39%;    /* Emerald for ring focus */
 
     --radius: 1rem;         /* Increased border radius */
@@ -62,7 +62,7 @@
     --secondary-foreground: 210 40% 98%;
 
     --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted-foreground: 215 20.2% 75.1%; /* Improved contrast */
 
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
@@ -70,8 +70,8 @@
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
+    --border: 217.2 32.6% 22.5%; /* Improved contrast */
+    --input: 217.2 32.6% 22.5%;  /* Improved contrast */
     --ring: 160 84% 39%;            /* Emerald for ring focus in dark mode */
 
     --sidebar-background: 240 5.9% 10%;
@@ -95,16 +95,21 @@
     font-feature-settings: "rlig" 1, "calt" 1;
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   }
+
+  /* Improved focus styles for accessibility */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2;
+  }
 }
 
-/* Unified Glassmorphism components */
+/* Unified Glassmorphism components with improved contrast */
 @layer components {
   .glass-card {
-    @apply bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl shadow-glass;
+    @apply bg-white/20 dark:bg-slate-800/30 backdrop-blur-sm border border-white/20 dark:border-white/10 rounded-2xl shadow-glass;
   }
   
   .glass-input {
-    @apply bg-white/20 backdrop-blur-sm focus:bg-white/30 transition-all duration-300;
+    @apply bg-white/30 dark:bg-slate-800/40 backdrop-blur-sm focus:bg-white/40 dark:focus:bg-slate-700/50 transition-all duration-300;
   }
   
   .dark-glass-card {
@@ -121,7 +126,7 @@
   
   .optional-field::after {
     content: " (Voliteľné)";
-    @apply text-sm text-gray-400 ml-1;
+    @apply text-sm text-gray-500 dark:text-gray-400 ml-1;
   }
   
   .micro-tooltip {
@@ -133,13 +138,13 @@
   }
   
   .tooltip-text {
-    @apply invisible absolute z-10 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg 
+    @apply invisible absolute z-10 w-48 p-2 bg-gray-900 dark:bg-gray-800 text-white text-xs rounded-lg 
            opacity-0 transition-opacity duration-300 bottom-full left-1/2 -translate-x-1/2 mb-2;
   }
   
   .tooltip-text::after {
     content: "";
-    @apply absolute top-full left-1/2 -translate-x-1/2 border-solid border-4 border-transparent border-t-gray-900;
+    @apply absolute top-full left-1/2 -translate-x-1/2 border-solid border-4 border-transparent border-t-gray-900 dark:border-t-gray-800;
   }
 
   /* Unified Button Styles */
@@ -154,12 +159,25 @@
   .btn-primary {
     @apply btn-gradient btn-rounded text-white font-medium shadow-lg border border-white/10 hover:shadow-emerald-500/20;
   }
+
+  /* Improved form controls for better accessibility */
+  .form-control {
+    @apply flex flex-col space-y-1.5;
+  }
+
+  .form-label {
+    @apply text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70;
+  }
+
+  .form-input {
+    @apply flex h-10 w-full rounded-md border border-input bg-background dark:bg-slate-800/60 px-3 py-2 text-sm text-foreground shadow-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+  }
 }
 
-/* Utopia specific styles */
+/* Utopia specific styles with improved contrast */
 @layer components {
   .utopia-card {
-    @apply bg-slate-800/50 rounded-xl shadow-sm border border-slate-700/50 p-6 transition-all duration-200 hover:shadow-md;
+    @apply bg-white/80 dark:bg-slate-800/50 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700/50 p-6 transition-all duration-200 hover:shadow-md;
   }
   
   .utopia-badge {
@@ -167,43 +185,43 @@
   }
   
   .utopia-label {
-    @apply text-sm font-medium text-blue-100 mb-1 block;
+    @apply text-sm font-medium text-slate-700 dark:text-blue-100 mb-1 block;
   }
   
   .utopia-product-card {
-    @apply border border-slate-700/50 rounded-xl p-4 transition-all duration-200 
-           hover:border-blue-500 hover:shadow-md cursor-pointer relative bg-slate-800/30;
+    @apply border border-gray-200 dark:border-slate-700/50 rounded-xl p-4 transition-all duration-200 
+           hover:border-blue-500 hover:shadow-md cursor-pointer relative bg-white/80 dark:bg-slate-800/30;
   }
   
   .utopia-product-card.selected {
-    @apply border-emerald-500 shadow-md bg-emerald-900/30;
+    @apply border-emerald-500 shadow-md bg-emerald-50/50 dark:bg-emerald-900/30;
   }
   
   .utopia-service-tile {
-    @apply border border-slate-700/50 rounded-lg p-3 flex flex-col items-center justify-center
-           transition-all duration-200 aspect-square hover:border-blue-500 cursor-pointer bg-slate-800/30;
+    @apply border border-gray-200 dark:border-slate-700/50 rounded-lg p-3 flex flex-col items-center justify-center
+           transition-all duration-200 aspect-square hover:border-blue-500 cursor-pointer bg-white/80 dark:bg-slate-800/30;
   }
   
   .utopia-service-tile.selected {
-    @apply border-emerald-500 bg-emerald-900/30;
+    @apply border-emerald-500 bg-emerald-50/50 dark:bg-emerald-900/30;
   }
   
   .utopia-payment-tag {
-    @apply px-3 py-1 rounded-full text-sm border border-slate-700/50
-           transition-all duration-200 cursor-pointer hover:border-blue-500 bg-slate-800/30;
+    @apply px-3 py-1 rounded-full text-sm border border-gray-200 dark:border-slate-700/50
+           transition-all duration-200 cursor-pointer hover:border-blue-500 bg-white/80 dark:bg-slate-800/30;
   }
   
   .utopia-payment-tag.selected {
-    @apply bg-emerald-900/30 border-emerald-500 text-emerald-300;
+    @apply bg-emerald-50/70 dark:bg-emerald-900/30 border-emerald-500 text-emerald-700 dark:text-emerald-300;
   }
 
   /* Unified Form Styles */
   .utopia-form-input {
-    @apply glass-input rounded-xl py-6 text-lg;
+    @apply form-input glass-input rounded-xl py-6 text-lg;
   }
   
   .utopia-form-label {
-    @apply text-base font-medium text-white;
+    @apply text-base font-medium text-slate-800 dark:text-white;
   }
 }
 

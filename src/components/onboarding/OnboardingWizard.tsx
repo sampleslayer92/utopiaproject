@@ -50,7 +50,7 @@ const StepRenderer: React.FC = () => {
 
 export const OnboardingWizard: React.FC = () => {
   return (
-    <div className="flex h-full min-h-screen bg-gradient-to-br from-slate-900 to-blue-900">
+    <div className="flex h-full min-h-screen bg-gradient-to-br from-slate-50 to-blue-100 dark:from-slate-900 dark:to-blue-900">
       <OnboardingSidebar />
       <div className="flex-1 flex flex-col">
         <OnboardingHeader />

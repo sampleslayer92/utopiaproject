@@ -11,7 +11,7 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-// Enhanced translations
+// Enhanced translations with more keys
 const translations: Record<string, Record<string, string>> = {
   sk: {
     'save.later': 'Uložiť a pokračovať neskôr',
@@ -53,7 +53,34 @@ const translations: Record<string, Record<string, string>> = {
     'complete.profile': 'Dokončite svoj profil',
     'back.to.business': 'Späť k podnikaniu',
     'why.needed': 'Prečo to potrebujeme?',
-    'hide.info': 'Skryť informáciu'
+    'hide.info': 'Skryť informáciu',
+    'light.mode': 'Svetlý režim',
+    'dark.mode': 'Tmavý režim',
+    'light': 'Svetlý',
+    'dark': 'Tmavý',
+    'all.rights.reserved': 'Všetky práva vyhradené',
+    'first.name': 'Meno',
+    'last.name': 'Priezvisko',
+    'email': 'Email',
+    'phone': 'Telefónne číslo',
+    'password': 'Heslo',
+    'confirm.password': 'Potvrďte heslo',
+    'agree.terms': 'Súhlasím s podmienkami',
+    'personal.info': 'Osobné údaje',
+    'company.info': 'Firemné údaje',
+    'beneficial.owners': 'Koneční užívatelia výhod',
+    'billing': 'Fakturačné údaje',
+    'sign': 'Podpis',
+    'company.name': 'Názov spoločnosti',
+    'company.id': 'IČO',
+    'tax.id': 'DIČ',
+    'vat.id': 'IČ DPH',
+    'address': 'Adresa',
+    'city': 'Mesto',
+    'postal.code': 'PSČ',
+    'country': 'Krajina',
+    'chat.with.us': 'Chatujte s nami',
+    'how.can.we.help': 'Ako Vám môžeme pomôcť?'
   },
   en: {
     'save.later': 'Save and continue later',
@@ -95,7 +122,34 @@ const translations: Record<string, Record<string, string>> = {
     'complete.profile': 'Complete your profile',
     'back.to.business': 'Back to business',
     'why.needed': 'Why do we need this?',
-    'hide.info': 'Hide information'
+    'hide.info': 'Hide information',
+    'light.mode': 'Light mode',
+    'dark.mode': 'Dark mode',
+    'light': 'Light',
+    'dark': 'Dark',
+    'all.rights.reserved': 'All rights reserved',
+    'first.name': 'First name',
+    'last.name': 'Last name',
+    'email': 'Email',
+    'phone': 'Phone number',
+    'password': 'Password',
+    'confirm.password': 'Confirm password',
+    'agree.terms': 'I agree to the terms',
+    'personal.info': 'Personal information',
+    'company.info': 'Company information',
+    'beneficial.owners': 'Beneficial owners',
+    'billing': 'Billing information',
+    'sign': 'Signature',
+    'company.name': 'Company name',
+    'company.id': 'Company ID',
+    'tax.id': 'Tax ID',
+    'vat.id': 'VAT ID',
+    'address': 'Address',
+    'city': 'City',
+    'postal.code': 'Postal code',
+    'country': 'Country',
+    'chat.with.us': 'Chat with us',
+    'how.can.we.help': 'How can we help you?'
   }
 };
 
