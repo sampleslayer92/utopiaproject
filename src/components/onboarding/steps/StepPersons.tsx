@@ -1,479 +1,486 @@
 
 import React, { useState } from 'react';
-import { StepContainer } from '../StepContainer';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useOnboarding } from '@/contexts/OnboardingContext';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Trash2, Upload, File } from 'lucide-react';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  RadioGroup,
-  RadioGroupItem
-} from "@/components/ui/radio-group";
+import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
+import { CalendarIcon, Plus, Trash2, Upload } from 'lucide-react';
+import { StepContainer } from '../StepContainer';
+import { cn } from '@/lib/utils';
+import { BackButton } from '../BackButton';
+import { NextButton } from '../NextButton';
+import { SaveContinueLater } from '../SaveContinueLater';
+import { OpravnenaOsoba, Osoba } from '@/types/onboarding';
+import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
-import { OpravnenaOsoba } from '@/types/onboarding';
 
 export const StepPersons: React.FC = () => {
-  const { data, updateObchodnaOsoba, updateTechnickaOsoba, addOpravnenaOsoba, updateOpravnenaOsoba, removeOpravnenaOsoba } = useOnboarding();
-  const { obchodnaOsoba, technickaOsoba, opravneneOsoby } = data;
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  const handleObchodnaOsobaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateObchodnaOsoba({
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleTechnickaOsobaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateTechnickaOsoba({
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleOpravnenaOsobaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateOpravnenaOsoba(activeIndex, {
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleTypDokladuChange = (value: string) => {
-    updateOpravnenaOsoba(activeIndex, {
-      typDokladu: value as "Občiansky preukaz" | "Pas"
-    });
-  };
-
-  const handlePolitickyExponovana = (checked: boolean) => {
-    updateOpravnenaOsoba(activeIndex, {
-      politickyExponovana: checked
-    });
-  };
-
+  const { t } = useLanguage();
+  const { 
+    data, 
+    updateObchodnaOsoba, 
+    updateTechnickaOsoba, 
+    addOpravnenaOsoba,
+    updateOpravnenaOsoba,
+    removeOpravnenaOsoba,
+    nextStep, 
+    prevStep, 
+    isStepComplete 
+  } = useOnboarding();
+  
+  const [activeTab, setActiveTab] = useState('obchodne');
+  const [newDokument, setNewDokument] = useState<{ name: string, size: number } | null>(null);
+  const [documentUploads, setDocumentUploads] = useState<Record<number, { id: string, name: string, size: number }[]>>({});
+  
   const handleAddOpravnenaOsoba = () => {
-    if (opravneneOsoby.length >= 4) {
-      toast.error("Maximálny počet oprávnených osôb je 4");
-      return;
-    }
-
-    const newOpravnenaOsoba: OpravnenaOsoba = {
-      meno: "",
-      email: "",
-      telefon: "",
-      funkcia: "",
-      datumNarodenia: "",
-      rodneCislo: "",
-      obcianstvo: "Slovenské",
-      adresaTrvalehoBydliska: "",
-      typDokladu: "Občiansky preukaz",
-      cisloDokladu: "",
-      platnostDokladu: "",
-      statVydania: "Slovenská republika",
-      politickyExponovana: false
-    };
-    
-    addOpravnenaOsoba(newOpravnenaOsoba);
-    setActiveIndex(opravneneOsoby.length);
-  };
-
-  const handleRemoveOpravnenaOsoba = (index: number) => {
-    if (opravneneOsoby.length <= 1) {
-      toast.error("Musí zostať aspoň jedna oprávnená osoba");
+    // Check if we already have the maximum number of authorized persons (4)
+    if (data.opravneneOsoby && data.opravneneOsoby.length >= 4) {
+      toast.error("Môžete pridať maximálne 4 oprávnené osoby");
       return;
     }
     
-    removeOpravnenaOsoba(index);
-    setActiveIndex(Math.max(0, index - 1));
-  };
-
-  const handleFileUpload = (type: 'dokumentId' | 'dokumentVypis') => {
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = 'image/png, image/jpeg, application/pdf';
-    
-    fileInput.onchange = (e) => {
-      const target = e.target as HTMLInputElement;
-      if (target.files && target.files.length > 0) {
-        const file = target.files[0];
-        
-        // In a real app, you would upload this file to a server
-        // For this demo, we'll just store the file name
-        updateOpravnenaOsoba(activeIndex, {
-          [type]: file.name
-        });
-        
-        toast.success(`Dokument ${file.name} bol nahratý`);
-      }
+    const newOsoba: OpravnenaOsoba = {
+      meno: '',
+      funkcia: 'konateľ',
+      datumNarodenia: new Date(),
+      rodneCislo: '',
+      obcianstvo: 'Slovenská republika',
+      adresaTrvalehoBydliska: '',
+      cisloDokladu: '',
+      platnostDokladu: new Date(),
+      typDokladu: 'obciansky-preukaz',
+      politickyExponovana: false,
+      dokumenty: []
     };
     
-    fileInput.click();
+    addOpravnenaOsoba(newOsoba);
   };
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, index: number, type: string) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      const newDocument = { id: type, name: file.name, size: file.size };
+      
+      // Update document uploads state
+      setDocumentUploads(prev => ({
+        ...prev,
+        [index]: [...(prev[index] || []), newDocument]
+      }));
+      
+      // In a real app, you would upload the file to a server here
+      toast.success(`Dokument ${file.name} bol úspešne nahraný`);
+      
+      // Reset file input
+      event.target.value = '';
+    }
+  };
+  
+  const removeDocument = (index: number, docIndex: number) => {
+    setDocumentUploads(prev => {
+      const updatedDocs = [...(prev[index] || [])];
+      updatedDocs.splice(docIndex, 1);
+      return { ...prev, [index]: updatedDocs };
+    });
+  };
+  
   return (
-    <StepContainer
-      title="Osoby"
-      subtitle="Zadajte informácie o osobách spojených s vašou firmou."
-    >
-      <Card className="mb-6">
-        <CardContent className="p-6">
-          <h3 className="text-lg font-medium mb-4">Obchodná osoba</h3>
+    <StepContainer>
+      <Card className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-slate-200 dark:border-slate-700">
+        <CardContent className="pt-6">
+          <h2 className="text-2xl font-semibold mb-6">Kontaktné osoby</h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="meno-obchodna">Meno a priezvisko</Label>
-              <Input
-                id="meno-obchodna"
-                name="meno"
-                value={obchodnaOsoba.meno}
-                onChange={handleObchodnaOsobaChange}
-                placeholder="Zadajte meno a priezvisko"
-                className="mt-1"
-              />
-            </div>
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="mb-6">
+              <TabsTrigger value="obchodne">Obchodná kontaktná osoba</TabsTrigger>
+              <TabsTrigger value="technicke">Technická kontaktná osoba</TabsTrigger>
+              <TabsTrigger value="opravnene">Oprávnené osoby na podpis</TabsTrigger>
+            </TabsList>
             
-            <div>
-              <Label htmlFor="email-obchodna">E-mail</Label>
-              <Input
-                id="email-obchodna"
-                name="email"
-                type="email"
-                value={obchodnaOsoba.email}
-                onChange={handleObchodnaOsobaChange}
-                placeholder="Zadajte e-mailovú adresu"
-                className="mt-1"
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="telefon-obchodna">Telefón</Label>
-              <Input
-                id="telefon-obchodna"
-                name="telefon"
-                value={obchodnaOsoba.telefon}
-                onChange={handleObchodnaOsobaChange}
-                placeholder="Zadajte telefónne číslo"
-                className="mt-1"
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card className="mb-6">
-        <CardContent className="p-6">
-          <h3 className="text-lg font-medium mb-4">Technická osoba</h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="meno-technicka">Meno a priezvisko</Label>
-              <Input
-                id="meno-technicka"
-                name="meno"
-                value={technickaOsoba.meno}
-                onChange={handleTechnickaOsobaChange}
-                placeholder="Zadajte meno a priezvisko"
-                className="mt-1"
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="email-technicka">E-mail</Label>
-              <Input
-                id="email-technicka"
-                name="email"
-                type="email"
-                value={technickaOsoba.email}
-                onChange={handleTechnickaOsobaChange}
-                placeholder="Zadajte e-mailovú adresu"
-                className="mt-1"
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="telefon-technicka">Telefón</Label>
-              <Input
-                id="telefon-technicka"
-                name="telefon"
-                value={technickaOsoba.telefon}
-                onChange={handleTechnickaOsobaChange}
-                placeholder="Zadajte telefónne číslo"
-                className="mt-1"
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <div className="mb-6 flex flex-wrap gap-2">
-        {opravneneOsoby.map((_, index) => (
-          <Button
-            key={index}
-            variant={activeIndex === index ? "default" : "outline"}
-            onClick={() => setActiveIndex(index)}
-            className="flex-grow-0"
-          >
-            Oprávnená osoba {index + 1}
-          </Button>
-        ))}
-        
-        {opravneneOsoby.length < 4 && (
-          <Button 
-            variant="outline" 
-            onClick={handleAddOpravnenaOsoba}
-            className="flex items-center gap-1"
-          >
-            <PlusCircle size={16} />
-            Pridať osobu
-          </Button>
-        )}
-      </div>
-      
-      {opravneneOsoby.length > 0 && (
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium">Oprávnená osoba {activeIndex + 1} (na podpis)</h3>
-              {opravneneOsoby.length > 1 && (
-                <Button
-                  variant="outline"
-                  onClick={() => handleRemoveOpravnenaOsoba(activeIndex)}
-                  className="text-red-500 border-red-200 hover:bg-red-50"
-                >
-                  <Trash2 size={16} className="mr-1" />
-                  Odstrániť
-                </Button>
-              )}
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="meno">Meno a priezvisko</Label>
-                <Input
-                  id="meno"
-                  name="meno"
-                  value={opravneneOsoby[activeIndex]?.meno || ""}
-                  onChange={handleOpravnenaOsobaChange}
-                  placeholder="Zadajte meno a priezvisko"
-                  className="mt-1"
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="funkcia">Funkcia</Label>
-                <Input
-                  id="funkcia"
-                  name="funkcia"
-                  value={opravneneOsoby[activeIndex]?.funkcia || ""}
-                  onChange={handleOpravnenaOsobaChange}
-                  placeholder="Napr. konateľ, predseda predstavenstva"
-                  className="mt-1"
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="email">E-mail</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={opravneneOsoby[activeIndex]?.email || ""}
-                  onChange={handleOpravnenaOsobaChange}
-                  placeholder="Zadajte e-mailovú adresu"
-                  className="mt-1"
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="telefon">Telefón</Label>
-                <Input
-                  id="telefon"
-                  name="telefon"
-                  value={opravneneOsoby[activeIndex]?.telefon || ""}
-                  onChange={handleOpravnenaOsobaChange}
-                  placeholder="Zadajte telefónne číslo"
-                  className="mt-1"
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="datumNarodenia">Dátum narodenia</Label>
-                <Input
-                  id="datumNarodenia"
-                  name="datumNarodenia"
-                  type="date"
-                  value={opravneneOsoby[activeIndex]?.datumNarodenia || ""}
-                  onChange={handleOpravnenaOsobaChange}
-                  className="mt-1"
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="rodneCislo">Rodné číslo</Label>
-                <Input
-                  id="rodneCislo"
-                  name="rodneCislo"
-                  value={opravneneOsoby[activeIndex]?.rodneCislo || ""}
-                  onChange={handleOpravnenaOsobaChange}
-                  placeholder="Zadajte rodné číslo"
-                  className="mt-1"
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="obcianstvo">Občianstvo</Label>
-                <Input
-                  id="obcianstvo"
-                  name="obcianstvo"
-                  value={opravneneOsoby[activeIndex]?.obcianstvo || ""}
-                  onChange={handleOpravnenaOsobaChange}
-                  placeholder="Zadajte občianstvo"
-                  className="mt-1"
-                />
-              </div>
-              
-              <div className="col-span-2">
-                <Label htmlFor="adresaTrvalehoBydliska">Adresa trvalého pobytu</Label>
-                <Input
-                  id="adresaTrvalehoBydliska"
-                  name="adresaTrvalehoBydliska"
-                  value={opravneneOsoby[activeIndex]?.adresaTrvalehoBydliska || ""}
-                  onChange={handleOpravnenaOsobaChange}
-                  placeholder="Zadajte adresu trvalého pobytu"
-                  className="mt-1"
-                />
-              </div>
-              
-              <div>
-                <Label>Typ dokladu</Label>
-                <RadioGroup
-                  value={opravneneOsoby[activeIndex]?.typDokladu || "Občiansky preukaz"}
-                  onValueChange={handleTypDokladuChange}
-                  className="mt-1 flex space-x-4"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Občiansky preukaz" id="obciansky" />
-                    <Label htmlFor="obciansky" className="font-normal">Občiansky preukaz</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Pas" id="pas" />
-                    <Label htmlFor="pas" className="font-normal">Pas</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-              
-              <div>
-                <Label htmlFor="cisloDokladu">Číslo dokladu</Label>
-                <Input
-                  id="cisloDokladu"
-                  name="cisloDokladu"
-                  value={opravneneOsoby[activeIndex]?.cisloDokladu || ""}
-                  onChange={handleOpravnenaOsobaChange}
-                  placeholder="Zadajte číslo dokladu"
-                  className="mt-1"
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="platnostDokladu">Platnosť dokladu</Label>
-                <Input
-                  id="platnostDokladu"
-                  name="platnostDokladu"
-                  type="date"
-                  value={opravneneOsoby[activeIndex]?.platnostDokladu || ""}
-                  onChange={handleOpravnenaOsobaChange}
-                  className="mt-1"
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="statVydania">Štát vydania</Label>
-                <Input
-                  id="statVydania"
-                  name="statVydania"
-                  value={opravneneOsoby[activeIndex]?.statVydania || ""}
-                  onChange={handleOpravnenaOsobaChange}
-                  placeholder="Zadajte štát vydania"
-                  className="mt-1"
-                />
-              </div>
-
-              {/* Document Upload Section */}
-              <div className="col-span-3 mt-4 border-t pt-4">
-                <h4 className="font-medium mb-3">Nahrať doklady</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label className="mb-2 block">Doklad totožnosti</Label>
-                    <div className="flex items-center gap-2">
-                      <Button 
-                        type="button" 
-                        variant="outline" 
-                        onClick={() => handleFileUpload('dokumentId')}
-                        className="flex items-center gap-2"
-                      >
-                        <Upload size={16} />
-                        Nahrať doklad
-                      </Button>
-                      {opravneneOsoby[activeIndex]?.dokumentId && (
-                        <div className="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded text-sm">
-                          <File size={16} />
-                          <span>{opravneneOsoby[activeIndex].dokumentId}</span>
-                        </div>
-                      )}
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">Povolené formáty: JPG, PNG, PDF</p>
+            <TabsContent value="obchodne">
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="obchodne-meno">Meno a priezvisko</Label>
+                    <Input 
+                      id="obchodne-meno"
+                      value={data.obchodnaOsoba.meno}
+                      onChange={(e) => updateObchodnaOsoba({ meno: e.target.value })}
+                      placeholder="Meno a priezvisko"
+                    />
                   </div>
                   
-                  <div>
-                    <Label className="mb-2 block">Výpis z obchodného registra</Label>
-                    <div className="flex items-center gap-2">
-                      <Button 
-                        type="button" 
-                        variant="outline" 
-                        onClick={() => handleFileUpload('dokumentVypis')}
-                        className="flex items-center gap-2"
-                      >
-                        <Upload size={16} />
-                        Nahrať výpis
-                      </Button>
-                      {opravneneOsoby[activeIndex]?.dokumentVypis && (
-                        <div className="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded text-sm">
-                          <File size={16} />
-                          <span>{opravneneOsoby[activeIndex].dokumentVypis}</span>
-                        </div>
-                      )}
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">Povolené formáty: JPG, PNG, PDF</p>
+                  <div className="space-y-2">
+                    <Label htmlFor="obchodne-funkcia">Funkcia</Label>
+                    <Input 
+                      id="obchodne-funkcia"
+                      value={data.obchodnaOsoba.funkcia}
+                      onChange={(e) => updateObchodnaOsoba({ funkcia: e.target.value })}
+                      placeholder="Pozícia v spoločnosti"
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="obchodne-telefon">Telefónne číslo</Label>
+                    <Input 
+                      id="obchodne-telefon"
+                      value={data.obchodnaOsoba.telefon}
+                      onChange={(e) => updateObchodnaOsoba({ telefon: e.target.value })}
+                      placeholder="+421"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="obchodne-email">E-mail</Label>
+                    <Input 
+                      id="obchodne-email"
+                      type="email"
+                      value={data.obchodnaOsoba.email}
+                      onChange={(e) => updateObchodnaOsoba({ email: e.target.value })}
+                      placeholder="email@spolocnost.sk"
+                    />
                   </div>
                 </div>
               </div>
-              
-              <div className="col-span-3">
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="politickyExponovana"
-                    checked={opravneneOsoby[activeIndex]?.politickyExponovana || false}
-                    onCheckedChange={handlePolitickyExponovana}
-                  />
-                  <Label htmlFor="politickyExponovana">Politicky exponovaná osoba</Label>
+            </TabsContent>
+            
+            <TabsContent value="technicke">
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="technicke-meno">Meno a priezvisko</Label>
+                    <Input 
+                      id="technicke-meno"
+                      value={data.technickaOsoba.meno}
+                      onChange={(e) => updateTechnickaOsoba({ meno: e.target.value })}
+                      placeholder="Meno a priezvisko"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="technicke-funkcia">Funkcia</Label>
+                    <Input 
+                      id="technicke-funkcia"
+                      value={data.technickaOsoba.funkcia}
+                      onChange={(e) => updateTechnickaOsoba({ funkcia: e.target.value })}
+                      placeholder="Pozícia v spoločnosti"
+                    />
+                  </div>
                 </div>
                 
-                {opravneneOsoby[activeIndex]?.politickyExponovana && (
-                  <p className="mt-2 text-sm text-amber-600 bg-amber-50 p-2 rounded">
-                    Keďže oprávnená osoba je politicky exponovaná, v ďalšom kroku bude potrebné zadať skutočného majiteľa.
-                  </p>
-                )}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="technicke-telefon">Telefónne číslo</Label>
+                    <Input 
+                      id="technicke-telefon"
+                      value={data.technickaOsoba.telefon}
+                      onChange={(e) => updateTechnickaOsoba({ telefon: e.target.value })}
+                      placeholder="+421"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="technicke-email">E-mail</Label>
+                    <Input 
+                      id="technicke-email"
+                      type="email"
+                      value={data.technickaOsoba.email}
+                      onChange={(e) => updateTechnickaOsoba({ email: e.target.value })}
+                      placeholder="email@spolocnost.sk"
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+            </TabsContent>
+            
+            <TabsContent value="opravnene">
+              <div className="space-y-6">
+                {data.opravneneOsoby && data.opravneneOsoby.length > 0 ? (
+                  data.opravneneOsoby.map((osoba, index) => (
+                    <Card key={index} className="border-slate-300 dark:border-slate-700 p-4 mb-6">
+                      <div className="flex justify-between items-start mb-4">
+                        <h3 className="font-medium">Oprávnená osoba {index + 1}</h3>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => removeOpravnenaOsoba(index)}
+                          className="text-slate-400 hover:text-red-500"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                          <Label htmlFor={`opravnene-${index}-meno`}>Meno a priezvisko</Label>
+                          <Input 
+                            id={`opravnene-${index}-meno`}
+                            value={osoba.meno}
+                            onChange={(e) => updateOpravnenaOsoba(index, { meno: e.target.value })}
+                            placeholder="Meno a priezvisko"
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor={`opravnene-${index}-funkcia`}>Funkcia</Label>
+                          <Select 
+                            value={osoba.funkcia} 
+                            onValueChange={(value) => updateOpravnenaOsoba(index, { funkcia: value })}
+                          >
+                            <SelectTrigger id={`opravnene-${index}-funkcia`}>
+                              <SelectValue placeholder="Vyberte funkciu" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="konateľ">Konateľ</SelectItem>
+                              <SelectItem value="predseda predstavenstva">Predseda predstavenstva</SelectItem>
+                              <SelectItem value="člen predstavenstva">Člen predstavenstva</SelectItem>
+                              <SelectItem value="prokurista">Prokurista</SelectItem>
+                              <SelectItem value="splnomocnená osoba">Splnomocnená osoba</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                        <div className="space-y-2">
+                          <Label htmlFor={`opravnene-${index}-datum`}>Dátum narodenia</Label>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                id={`opravnene-${index}-datum`}
+                                variant={"outline"}
+                                className={cn(
+                                  "w-full justify-start text-left font-normal",
+                                  !osoba.datumNarodenia && "text-muted-foreground"
+                                )}
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {osoba.datumNarodenia ? format(osoba.datumNarodenia, "dd.MM.yyyy") : <span>Vyberte dátum</span>}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={osoba.datumNarodenia}
+                                onSelect={(date) => date && updateOpravnenaOsoba(index, { datumNarodenia: date })}
+                                initialFocus
+                                className="pointer-events-auto"
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor={`opravnene-${index}-rodne`}>Rodné číslo</Label>
+                          <Input 
+                            id={`opravnene-${index}-rodne`}
+                            value={osoba.rodneCislo}
+                            onChange={(e) => updateOpravnenaOsoba(index, { rodneCislo: e.target.value })}
+                            placeholder="Napr. 123456/7890"
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                        <div className="space-y-2">
+                          <Label htmlFor={`opravnene-${index}-obcianstvo`}>Občianstvo</Label>
+                          <Select 
+                            value={osoba.obcianstvo} 
+                            onValueChange={(value) => updateOpravnenaOsoba(index, { obcianstvo: value })}
+                          >
+                            <SelectTrigger id={`opravnene-${index}-obcianstvo`}>
+                              <SelectValue placeholder="Vyberte občianstvo" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Slovenská republika">Slovenská republika</SelectItem>
+                              <SelectItem value="Česká republika">Česká republika</SelectItem>
+                              <SelectItem value="Maďarsko">Maďarsko</SelectItem>
+                              <SelectItem value="Poľsko">Poľsko</SelectItem>
+                              <SelectItem value="Rakúsko">Rakúsko</SelectItem>
+                              <SelectItem value="Nemecko">Nemecko</SelectItem>
+                              <SelectItem value="Veľká Británia">Veľká Británia</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor={`opravnene-${index}-adresa`}>Adresa trvalého bydliska</Label>
+                          <Input 
+                            id={`opravnene-${index}-adresa`}
+                            value={osoba.adresaTrvalehoBydliska}
+                            onChange={(e) => updateOpravnenaOsoba(index, { adresaTrvalehoBydliska: e.target.value })}
+                            placeholder="Ulica, číslo, mesto, PSČ"
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+                        <div className="space-y-2">
+                          <Label htmlFor={`opravnene-${index}-typ-dokladu`}>Typ dokladu</Label>
+                          <Select 
+                            value={osoba.typDokladu} 
+                            onValueChange={(value) => updateOpravnenaOsoba(index, { typDokladu: value })}
+                          >
+                            <SelectTrigger id={`opravnene-${index}-typ-dokladu`}>
+                              <SelectValue placeholder="Typ dokladu" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="obciansky-preukaz">Občiansky preukaz</SelectItem>
+                              <SelectItem value="cestovny-pas">Cestovný pas</SelectItem>
+                              <SelectItem value="povolenie-na-pobyt">Povolenie na pobyt</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor={`opravnene-${index}-cislo-dokladu`}>Číslo dokladu</Label>
+                          <Input 
+                            id={`opravnene-${index}-cislo-dokladu`}
+                            value={osoba.cisloDokladu}
+                            onChange={(e) => updateOpravnenaOsoba(index, { cisloDokladu: e.target.value })}
+                            placeholder="Číslo dokladu totožnosti"
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor={`opravnene-${index}-platnost-dokladu`}>Platnosť dokladu</Label>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                id={`opravnene-${index}-platnost-dokladu`}
+                                variant={"outline"}
+                                className={cn(
+                                  "w-full justify-start text-left font-normal",
+                                  !osoba.platnostDokladu && "text-muted-foreground"
+                                )}
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {osoba.platnostDokladu ? format(osoba.platnostDokladu, "dd.MM.yyyy") : <span>Vyberte dátum</span>}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={osoba.platnostDokladu}
+                                onSelect={(date) => date && updateOpravnenaOsoba(index, { platnostDokladu: date })}
+                                initialFocus
+                                className="pointer-events-auto"
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-6">
+                        <Label>Nahrať doklady</Label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                          <div className="border rounded-lg p-4 border-dashed border-slate-300 dark:border-slate-700">
+                            <Label htmlFor={`opravnene-${index}-doklad-id`} className="cursor-pointer flex flex-col items-center justify-center space-y-2 py-4">
+                              <Upload className="h-8 w-8 text-slate-400" />
+                              <span className="text-sm font-medium">Doklad totožnosti</span>
+                              <span className="text-xs text-slate-500">Nahrajte sken alebo fotku dokladu</span>
+                            </Label>
+                            <Input 
+                              id={`opravnene-${index}-doklad-id`}
+                              type="file"
+                              className="hidden"
+                              onChange={(e) => handleFileChange(e, index, "id")}
+                              accept="image/jpeg,image/png,application/pdf"
+                            />
+                          </div>
+                          
+                          <div className="border rounded-lg p-4 border-dashed border-slate-300 dark:border-slate-700">
+                            <Label htmlFor={`opravnene-${index}-vypis-OR`} className="cursor-pointer flex flex-col items-center justify-center space-y-2 py-4">
+                              <Upload className="h-8 w-8 text-slate-400" />
+                              <span className="text-sm font-medium">Výpis z obchodného registra</span>
+                              <span className="text-xs text-slate-500">Nahrajte aktuálny výpis z OR</span>
+                            </Label>
+                            <Input 
+                              id={`opravnene-${index}-vypis-OR`}
+                              type="file"
+                              className="hidden"
+                              onChange={(e) => handleFileChange(e, index, "or")}
+                              accept="image/jpeg,image/png,application/pdf"
+                            />
+                          </div>
+                        </div>
+                        
+                        {/* Display uploaded documents */}
+                        {documentUploads[index] && documentUploads[index].length > 0 && (
+                          <div className="mt-4">
+                            <Label className="mb-2 block">Nahrané dokumenty</Label>
+                            <div className="space-y-2">
+                              {documentUploads[index].map((doc, docIndex) => (
+                                <div key={docIndex} className="flex items-center justify-between bg-slate-50 dark:bg-slate-800 p-2 rounded-md">
+                                  <div>
+                                    <span className="text-sm font-medium">{doc.name}</span>
+                                    <span className="text-xs text-slate-500 ml-2">
+                                      ({(doc.size / 1024).toFixed(1)} KB)
+                                    </span>
+                                  </div>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon" 
+                                    onClick={() => removeDocument(index, docIndex)}
+                                    className="text-slate-400 hover:text-red-500"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="flex items-center space-x-2 mt-6">
+                        <Switch
+                          id={`opravnene-${index}-politicky`}
+                          checked={osoba.politickyExponovana}
+                          onCheckedChange={(checked) => updateOpravnenaOsoba(index, { politickyExponovana: checked })}
+                        />
+                        <Label htmlFor={`opravnene-${index}-politicky`}>Politicky exponovaná osoba</Label>
+                      </div>
+                    </Card>
+                  ))
+                ) : (
+                  <div className="text-center py-8 border border-dashed rounded-lg border-slate-300 dark:border-slate-700">
+                    <p className="text-slate-500 mb-4">Zatiaľ nie sú pridané žiadne oprávnené osoby</p>
+                  </div>
+                )}
+                
+                <Button 
+                  type="button" 
+                  variant="outline"
+                  className="flex items-center border-dashed border-slate-300 dark:border-slate-700 hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 dark:hover:text-emerald-300"
+                  onClick={handleAddOpravnenaOsoba}
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Pridať oprávnenú osobu
+                </Button>
+              </div>
+            </TabsContent>
+          </Tabs>
+          
+          <div className="flex justify-between mt-10">
+            <BackButton onClick={prevStep} />
+            <SaveContinueLater />
+            <NextButton 
+              onClick={nextStep}
+              disabled={!isStepComplete('persons')}
+            />
+          </div>
+        </CardContent>
+      </Card>
     </StepContainer>
   );
 };

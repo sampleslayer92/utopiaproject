@@ -85,36 +85,36 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const updateZariadenie = (id: string, info: Partial<Zariadenie>) => {
     setData(prev => ({
       ...prev,
-      zariadenia: prev.zariadenia.map(z => 
+      zariadenia: Array.isArray(prev.zariadenia) ? prev.zariadenia.map(z => 
         z.id === id ? { ...z, ...info } : z
-      )
+      ) : []
     }));
   };
 
   const updateLicencia = (id: string, selected: boolean) => {
     setData(prev => ({
       ...prev,
-      licencie: prev.licencie.map(l => 
+      licencie: Array.isArray(prev.licencie) ? prev.licencie.map(l => 
         l.id === id ? { ...l, selected } : l
-      )
+      ) : []
     }));
   };
 
   const updatePlatobnaMetoda = (id: string, selected: boolean, value?: string) => {
     setData(prev => ({
       ...prev,
-      platobneMetody: prev.platobneMetody.map(p => 
+      platobneMetody: Array.isArray(prev.platobneMetody) ? prev.platobneMetody.map(p => 
         p.id === id ? { ...p, selected, value: value || p.value } : p
-      )
+      ) : []
     }));
   };
 
   const updateDoplnkovaSluzba = (id: string, selected: boolean, value?: string) => {
     setData(prev => ({
       ...prev,
-      doplnkoveSluzby: prev.doplnkoveSluzby.map(d => 
+      doplnkoveSluzby: Array.isArray(prev.doplnkoveSluzby) ? prev.doplnkoveSluzby.map(d => 
         d.id === id ? { ...d, selected, value: value || d.value } : d
-      )
+      ) : []
     }));
   };
 
@@ -136,46 +136,66 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const addOpravnenaOsoba = (osoba: OpravnenaOsoba) => {
     setData(prev => ({
       ...prev,
-      opravneneOsoby: [...prev.opravneneOsoby, osoba]
+      opravneneOsoby: Array.isArray(prev.opravneneOsoby) ? [...prev.opravneneOsoby, osoba] : [osoba]
     }));
   };
 
   const updateOpravnenaOsoba = (index: number, info: Partial<OpravnenaOsoba>) => {
+    if (!Array.isArray(data.opravneneOsoby)) {
+      console.error("opravneneOsoby is not an array");
+      return;
+    }
+    
     setData(prev => ({
       ...prev,
-      opravneneOsoby: prev.opravneneOsoby.map((osoba, i) => 
+      opravneneOsoby: Array.isArray(prev.opravneneOsoby) ? prev.opravneneOsoby.map((osoba, i) => 
         i === index ? { ...osoba, ...info } : osoba
-      )
+      ) : []
     }));
   };
 
   const removeOpravnenaOsoba = (index: number) => {
+    if (!Array.isArray(data.opravneneOsoby)) {
+      console.error("opravneneOsoby is not an array");
+      return;
+    }
+    
     setData(prev => ({
       ...prev,
-      opravneneOsoby: prev.opravneneOsoby.filter((_, i) => i !== index)
+      opravneneOsoby: Array.isArray(prev.opravneneOsoby) ? prev.opravneneOsoby.filter((_, i) => i !== index) : []
     }));
   };
 
   const addSkutocnyMajitel = (majitel: SkutocnyMajitel) => {
     setData(prev => ({
       ...prev,
-      skutocniMajitelia: [...prev.skutocniMajitelia, majitel]
+      skutocniMajitelia: Array.isArray(prev.skutocniMajitelia) ? [...prev.skutocniMajitelia, majitel] : [majitel]
     }));
   };
 
   const updateSkutocnyMajitel = (index: number, info: Partial<SkutocnyMajitel>) => {
+    if (!Array.isArray(data.skutocniMajitelia)) {
+      console.error("skutocniMajitelia is not an array");
+      return;
+    }
+    
     setData(prev => ({
       ...prev,
-      skutocniMajitelia: prev.skutocniMajitelia.map((m, i) => 
+      skutocniMajitelia: Array.isArray(prev.skutocniMajitelia) ? prev.skutocniMajitelia.map((m, i) => 
         i === index ? { ...m, ...info } : m
-      )
+      ) : []
     }));
   };
 
   const removeSkutocnyMajitel = (index: number) => {
+    if (!Array.isArray(data.skutocniMajitelia)) {
+      console.error("skutocniMajitelia is not an array");
+      return;
+    }
+    
     setData(prev => ({
       ...prev,
-      skutocniMajitelia: prev.skutocniMajitelia.filter((_, i) => i !== index)
+      skutocniMajitelia: Array.isArray(prev.skutocniMajitelia) ? prev.skutocniMajitelia.filter((_, i) => i !== index) : []
     }));
   };
 
@@ -208,7 +228,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         break;
       case 'persons':
         // Check if any authorized person is politically exposed
-        const hasPoliticallyExposed = data.opravneneOsoby.some(osoba => osoba.politickyExponovana);
+        const hasPoliticallyExposed = Array.isArray(data.opravneneOsoby) && data.opravneneOsoby.some(osoba => osoba && osoba.politickyExponovana);
         setStep(hasPoliticallyExposed ? 'beneficialOwners' : 'billing');
         break;
       case 'beneficialOwners':
@@ -245,7 +265,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         break;
       case 'billing':
         // Check if any authorized person is politically exposed
-        const hasPoliticallyExposed = data.opravneneOsoby.some(osoba => osoba.politickyExponovana);
+        const hasPoliticallyExposed = Array.isArray(data.opravneneOsoby) && data.opravneneOsoby.some(osoba => osoba && osoba.politickyExponovana);
         setStep(hasPoliticallyExposed ? 'beneficialOwners' : 'persons');
         break;
       case 'sign':
@@ -267,9 +287,9 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         return Boolean(nazovPrevadzky && adresaPrevadzky && mesto && psc && telefon && email);
       }
       case 'products': {
-        const hasZariadenie = Array.isArray(data.zariadenia) && data.zariadenia.some(z => z.selected);
-        const hasLicencia = Array.isArray(data.licencie) && data.licencie.some(l => l.selected);
-        const hasPlatobnaMetoda = Array.isArray(data.platobneMetody) && data.platobneMetody.some(p => p.selected);
+        const hasZariadenie = Array.isArray(data.zariadenia) && data.zariadenia.some(z => z && z.selected);
+        const hasLicencia = Array.isArray(data.licencie) && data.licencie.some(l => l && l.selected);
+        const hasPlatobnaMetoda = Array.isArray(data.platobneMetody) && data.platobneMetody.some(p => p && p.selected);
         return hasZariadenie || hasLicencia || hasPlatobnaMetoda;
       }
       case 'persons': {
@@ -314,8 +334,10 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       }
       case 'sign': {
         const { gdpr, obchodnePodmienky, dorucovanieElektronicky } = data.podpisSuhlasy;
-        return gdpr && obchodnePodmienky && dorucovanieElektronicky;
+        return Boolean(gdpr && obchodnePodmienky && dorucovanieElektronicky);
       }
+      default:
+        return false;
     }
   };
 

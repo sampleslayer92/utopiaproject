@@ -1,224 +1,180 @@
 
 import React, { useState } from 'react';
-import { StepContainer } from '../StepContainer';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useOnboarding } from '@/contexts/OnboardingContext';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Check, Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Loader2, Search } from 'lucide-react';
 import { toast } from 'sonner';
+import { StepContainer } from '../StepContainer';
+import { BackButton } from '../BackButton';
+import { NextButton } from '../NextButton';
+import { SaveContinueLater } from '../SaveContinueLater';
 
 export const StepCompany: React.FC = () => {
-  const { data, updateCompanyInfo } = useOnboarding();
-  const { company } = data;
-  const [loading, setLoading] = useState(false);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateCompanyInfo({
-      [e.target.name]: e.target.value
-    });
-  };
-
+  const { t } = useLanguage();
+  const { data, updateCompanyInfo, nextStep, prevStep, isStepComplete } = useOnboarding();
+  const [isLoading, setIsLoading] = useState(false);
+  
   const handleSearch = () => {
-    if (!company.ico.trim()) {
-      toast.error("Zadajte IČO pre vyhľadanie");
+    if (!data.company.ico) {
+      toast.error("Zadajte prosím IČO spoločnosti");
       return;
     }
-
-    setLoading(true);
     
-    // Simulate API call delay
+    setIsLoading(true);
+    
+    // Simulate API call
     setTimeout(() => {
-      // Mock data for demo purposes
-      if (company.ico === "12345678") {
-        updateCompanyInfo({
-          nazovSpolocnosti: "UKÁŽKOVÁ SPOLOČNOSŤ, s.r.o.",
-          dic: "2023456789",
-          icDph: "SK2023456789",
-          sidlo: "Hlavná 123, 831 01 Bratislava",
-          zapisVOrsr: "Obchodný register Okresného súdu Bratislava I, oddiel: Sro, vložka č. 12345/B"
-        });
-        toast.success("Spoločnosť nájdená");
-      } else {
-        toast.error("Spoločnosť s týmto IČO nebola nájdená");
-      }
-      setLoading(false);
-    }, 800);
+      // Mock data for demo
+      const mockData = {
+        nazovSpolocnosti: "EXAMPLE s.r.o.",
+        dic: "2023456789",
+        sidlo: "Hlavná 123, 831 01 Bratislava"
+      };
+      
+      updateCompanyInfo(mockData);
+      setIsLoading(false);
+      toast.success("Spoločnosť bola úspešne nájdená");
+    }, 1500);
   };
-
-  const toggleManualInput = (checked: boolean) => {
-    updateCompanyInfo({ 
-      manualInput: checked,
-      // Clear read-only fields when switching to manual input
-      ...(checked ? {
-        nazovSpolocnosti: "",
-        dic: "",
-        icDph: "",
-        sidlo: "",
-        zapisVOrsr: ""
-      } : {})
-    });
-  };
-
+  
   return (
-    <StepContainer
-      title="Výber firmy"
-      subtitle="Zadajte IČO firmy pre automatické vyplnenie údajov alebo vyplňte údaje manuálne."
-    >
-      <Card>
-        <CardContent className="p-6">
+    <StepContainer>
+      <Card className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-slate-200 dark:border-slate-700">
+        <CardContent className="pt-6">
+          <h2 className="text-2xl font-semibold mb-6">Údaje o spoločnosti</h2>
+          
           <div className="space-y-6">
-            {!company.manualInput ? (
-              <div className="space-y-4">
-                <div className="flex flex-col md:flex-row gap-3">
-                  <div className="flex-grow">
-                    <Label htmlFor="ico">IČO spoločnosti</Label>
-                    <Input
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="manualInput"
+                checked={data.company.manualInput}
+                onCheckedChange={(checked) => updateCompanyInfo({ manualInput: checked })}
+              />
+              <Label htmlFor="manualInput">Zadať údaje manuálne</Label>
+            </div>
+            
+            {!data.company.manualInput ? (
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="ico">IČO spoločnosti</Label>
+                  <div className="flex space-x-2">
+                    <Input 
                       id="ico"
-                      name="ico"
-                      value={company.ico}
-                      onChange={handleChange}
-                      placeholder="Zadajte 8-miestne IČO"
-                      className="mt-1"
+                      value={data.company.ico}
+                      onChange={(e) => updateCompanyInfo({ ico: e.target.value })}
+                      className="flex-1"
+                      placeholder="Napr. 12345678"
                     />
-                  </div>
-                  <div className="flex items-end md:self-end mt-1 md:mt-0">
                     <Button 
-                      onClick={handleSearch} 
-                      disabled={loading || !company.ico.trim()}
-                      className="bg-utopia-600 hover:bg-utopia-700 w-full md:w-auto"
+                      onClick={handleSearch}
+                      disabled={isLoading}
+                      className="bg-emerald-600 hover:bg-emerald-700"
                     >
-                      {loading ? (
-                        <span className="flex items-center gap-2">
-                          <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-                          Hľadám...
-                        </span>
+                      {isLoading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
-                        <span className="flex items-center gap-2">
-                          <Search className="h-4 w-4" />
-                          Vyhľadať podľa IČO
-                        </span>
+                        <Search className="h-4 w-4 mr-1" />
                       )}
+                      Vyhľadať
                     </Button>
                   </div>
                 </div>
                 
-                {company.nazovSpolocnosti && (
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-4 animate-scale-in">
-                    <div className="flex items-center gap-2 text-green-600 mb-3">
-                      <Check className="h-5 w-5" />
-                      <span className="font-medium">Spoločnosť nájdená</span>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label className="text-xs text-gray-500">Názov spoločnosti</Label>
-                        <p className="font-medium">{company.nazovSpolocnosti}</p>
-                      </div>
-                      <div>
-                        <Label className="text-xs text-gray-500">DIČ</Label>
-                        <p className="font-medium">{company.dic}</p>
-                      </div>
-                      <div>
-                        <Label className="text-xs text-gray-500">IČ DPH</Label>
-                        <p className="font-medium">{company.icDph}</p>
-                      </div>
-                      <div>
-                        <Label className="text-xs text-gray-500">Sídlo spoločnosti</Label>
-                        <p className="font-medium">{company.sidlo}</p>
-                      </div>
-                      <div className="col-span-2">
-                        <Label className="text-xs text-gray-500">Zapísaná v ORSR</Label>
-                        <p className="font-medium">{company.zapisVOrsr}</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div>
+                <div className="space-y-2">
                   <Label htmlFor="nazovSpolocnosti">Názov spoločnosti</Label>
-                  <Input
+                  <Input 
                     id="nazovSpolocnosti"
-                    name="nazovSpolocnosti"
-                    value={company.nazovSpolocnosti}
-                    onChange={handleChange}
-                    placeholder="Zadajte názov spoločnosti"
-                    className="mt-1"
+                    value={data.company.nazovSpolocnosti}
+                    onChange={(e) => updateCompanyInfo({ nazovSpolocnosti: e.target.value })}
+                    placeholder="Názov vašej spoločnosti"
+                    readOnly={!data.company.manualInput}
+                    className={!data.company.manualInput ? "bg-slate-50" : ""}
                   />
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="ico">IČO</Label>
-                    <Input
-                      id="ico"
-                      name="ico"
-                      value={company.ico}
-                      onChange={handleChange}
-                      placeholder="Zadajte IČO"
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="dic">DIČ</Label>
-                    <Input
-                      id="dic"
-                      name="dic"
-                      value={company.dic}
-                      onChange={handleChange}
-                      placeholder="Zadajte DIČ"
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="icDph">IČ DPH</Label>
-                    <Input
-                      id="icDph"
-                      name="icDph"
-                      value={company.icDph}
-                      onChange={handleChange}
-                      placeholder="Zadajte IČ DPH"
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="sidlo">Sídlo spoločnosti</Label>
-                    <Input
-                      id="sidlo"
-                      name="sidlo"
-                      value={company.sidlo}
-                      onChange={handleChange}
-                      placeholder="Zadajte sídlo spoločnosti"
-                      className="mt-1"
-                    />
-                  </div>
-                  <div className="col-span-2">
-                    <Label htmlFor="zapisVOrsr">Zapísaná v ORSR</Label>
-                    <Input
-                      id="zapisVOrsr"
-                      name="zapisVOrsr"
-                      value={company.zapisVOrsr}
-                      onChange={handleChange}
-                      placeholder="Napr. Obchodný register Okresného súdu Bratislava I, oddiel: Sro, vložka č. 12345/B"
-                      className="mt-1"
-                    />
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="dic">DIČ</Label>
+                  <Input 
+                    id="dic"
+                    value={data.company.dic}
+                    onChange={(e) => updateCompanyInfo({ dic: e.target.value })}
+                    placeholder="Napr. 2023456789"
+                    readOnly={!data.company.manualInput}
+                    className={!data.company.manualInput ? "bg-slate-50" : ""}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="sidlo">Sídlo spoločnosti</Label>
+                  <Input 
+                    id="sidlo"
+                    value={data.company.sidlo}
+                    onChange={(e) => updateCompanyInfo({ sidlo: e.target.value })}
+                    placeholder="Ulica, číslo, PSČ, mesto"
+                    readOnly={!data.company.manualInput}
+                    className={!data.company.manualInput ? "bg-slate-50" : ""}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="nazovSpolocnosti">Názov spoločnosti</Label>
+                  <Input 
+                    id="nazovSpolocnosti"
+                    value={data.company.nazovSpolocnosti}
+                    onChange={(e) => updateCompanyInfo({ nazovSpolocnosti: e.target.value })}
+                    placeholder="Názov vašej spoločnosti"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="dic">DIČ</Label>
+                  <Input 
+                    id="dic"
+                    value={data.company.dic}
+                    onChange={(e) => updateCompanyInfo({ dic: e.target.value })}
+                    placeholder="Napr. 2023456789"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="sidlo">Sídlo spoločnosti</Label>
+                  <Input 
+                    id="sidlo"
+                    value={data.company.sidlo}
+                    onChange={(e) => updateCompanyInfo({ sidlo: e.target.value })}
+                    placeholder="Ulica, číslo, PSČ, mesto"
+                  />
                 </div>
               </div>
             )}
             
-            <div className="flex items-center space-x-2 pt-4 border-t">
-              <Switch
-                id="manual-input"
-                checked={company.manualInput}
-                onCheckedChange={toggleManualInput}
+            <div className="flex items-center space-x-2 pt-4">
+              <Checkbox 
+                id="suhlasZOU" 
+                checked={data.company.suhlasZOU}
+                onCheckedChange={(checked) => updateCompanyInfo({ suhlasZOU: checked === true })}
               />
-              <Label htmlFor="manual-input">Zadať firmu manuálne</Label>
+              <Label htmlFor="suhlasZOU" className="text-sm text-slate-700 dark:text-slate-300">
+                Súhlasím so spracovaním osobných údajov v zmysle zákona o ochrane osobných údajov
+              </Label>
             </div>
+          </div>
+          
+          <div className="flex justify-between mt-10">
+            <BackButton onClick={prevStep} />
+            <SaveContinueLater />
+            <NextButton 
+              onClick={nextStep}
+              disabled={!isStepComplete('company')}
+            />
           </div>
         </CardContent>
       </Card>
