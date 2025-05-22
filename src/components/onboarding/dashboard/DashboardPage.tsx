@@ -104,8 +104,8 @@ export const DashboardPage: React.FC = () => {
   };
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-100 dark:from-slate-900 dark:to-blue-900">
-      <div className="h-1 bg-gray-200">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+      <div className="h-1 bg-gray-200 dark:bg-slate-700">
         <div 
           className="h-1 bg-emerald-600" 
           style={{ width: `${progressPercentage}%` }}
@@ -121,12 +121,12 @@ export const DashboardPage: React.FC = () => {
           className="w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 h-screen p-4 flex flex-col shadow-md"
         >
           <div className="mb-6 flex items-center">
-            <div className="w-10 h-10 rounded-full bg-blue-600/50 flex items-center justify-center mr-3">
+            <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center mr-3">
               <span className="text-2xl font-bold text-white">U</span>
             </div>
             <div>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">Utopia</h2>
-              <p className="text-xs text-gray-500 dark:text-blue-300">Merchant Portal</p>
+              <p className="text-xs text-gray-600 dark:text-blue-300">Merchant Portal</p>
             </div>
           </div>
           
@@ -136,7 +136,7 @@ export const DashboardPage: React.FC = () => {
               className={`w-full justify-start font-medium ${
                 activeMenuItem === 'dashboard' 
                   ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-white border-l-2 border-blue-500'
-                  : 'text-gray-500 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white'
+                  : 'text-gray-700 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white'
               }`}
               onClick={() => handleMenuClick('dashboard')}
             >
@@ -225,11 +225,7 @@ export const DashboardPage: React.FC = () => {
           
           <div className="mt-auto">
             <div className="flex items-center justify-between mb-4">
-              <div className="text-sm text-gray-400 dark:text-slate-400">© 2025 Utopia</div>
-              <div className="flex items-center space-x-2">
-                <ThemeToggle />
-                <LanguageSwitcher />
-              </div>
+              <div className="text-sm text-gray-600 dark:text-slate-400">© 2025 Utopia</div>
             </div>
           </div>
         </motion.div>
@@ -291,42 +287,104 @@ export const DashboardPage: React.FC = () => {
                   </div>
                 )}
               </div>
+              
+              <div className="flex items-center space-x-3">
+                <ThemeToggle />
+                <LanguageSwitcher />
+              </div>
             </div>
           </div>
           
-          {/* Dashboard content */}
-          {completedTasks < totalTasks && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            {/* Activation card - moved to left */}
+            {completedTasks < totalTasks && (
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="lg:col-span-2"
+              >
+                <Card className="overflow-hidden bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700">
+                  <CardContent className="p-6 text-center">
+                    <div className="max-w-md mx-auto py-4">
+                      <div className="w-20 h-20 bg-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4 border border-blue-700/30">
+                        <span className="text-3xl font-bold text-white">U</span>
+                      </div>
+                      
+                      <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">{t('activate.account')}</h2>
+                      <p className="text-gray-700 dark:text-blue-300 mb-6">{t('activate.subtitle')}</p>
+                      
+                      <div className="flex justify-center items-center gap-2 mb-6">
+                        <div className="w-10 h-10 rounded-full bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center">
+                          <span className="text-lg font-bold text-gray-800 dark:text-white">{totalTasks - completedTasks}</span>
+                        </div>
+                        <span className="text-gray-700 dark:text-blue-200">{t('tasks.remaining')}</span>
+                      </div>
+                      
+                      <Button
+                        onClick={() => navigate('/onboarding/company')}
+                        className="rounded-full py-6 px-8 bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 font-medium shadow-lg border border-white/10 hover:shadow-emerald-500/20"
+                      >
+                        {t('continue.onboarding')}
+                        <ArrowRight className="ml-2 h-5 w-5" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+            
+            {/* Tasks list - moved to right */}
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="mb-10 text-center py-10"
+              transition={{ duration: 0.5, delay: 0.5 }}
+              className="lg:col-span-1"
             >
-              <div className="max-w-md mx-auto">
-                <div className="w-24 h-24 bg-blue-600/30 rounded-xl flex items-center justify-center mx-auto mb-6 border border-blue-500/30">
-                  <span className="text-4xl font-bold text-white">U</span>
-                </div>
-                
-                <h2 className="text-3xl font-bold mb-2">{t('activate.account')}</h2>
-                <p className="text-gray-600 dark:text-blue-300 mb-6">{t('activate.subtitle')}</p>
-                
-                <div className="flex justify-center items-center gap-2 mb-6">
-                  <div className="w-10 h-10 rounded-full bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center">
-                    <span className="text-lg font-bold text-gray-700 dark:text-white">{totalTasks - completedTasks}</span>
+              <Card className="h-full bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700">
+                <CardContent className="p-6">
+                  <h2 className="text-lg font-medium mb-4 flex items-center text-gray-900 dark:text-white">
+                    <Clock className="h-4 w-4 mr-2 text-emerald-500" />
+                    {t('remaining.tasks')}
+                  </h2>
+                  
+                  <div className="space-y-2">
+                    {tasks.map((task, index) => (
+                      <motion.div
+                        key={task.id}
+                        initial={{ x: -20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ duration: 0.3, delay: 0.1 + index * 0.05 }}
+                      >
+                        <TaskCard
+                          title={task.title}
+                          completed={task.completed}
+                          timeEstimate={task.timeEstimate}
+                          onClick={() => handleTaskClick(task.step)}
+                        />
+                      </motion.div>
+                    ))}
                   </div>
-                  <span className="text-gray-600 dark:text-blue-200">{t('tasks.remaining')}</span>
-                </div>
-                
-                <Button
-                  onClick={() => navigate('/onboarding/company')}
-                  className="rounded-full py-6 px-8 bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 font-medium shadow-lg border border-white/10 hover:shadow-emerald-500/20"
-                >
-                  {t('continue.onboarding')}
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-              </div>
+                  
+                  {completedTasks === totalTasks && (
+                    <div className="mt-4 p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-200 dark:border-emerald-800/50 flex items-center">
+                      <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-800/50 flex items-center justify-center mr-3">
+                        <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-emerald-800 dark:text-emerald-300">
+                          {t('onboarding.complete')}
+                        </p>
+                        <p className="text-sm text-emerald-700 dark:text-emerald-400/70">
+                          {t('onboarding.complete.subtitle')}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             </motion.div>
-          )}
+          </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Transaction chart */}
@@ -336,9 +394,9 @@ export const DashboardPage: React.FC = () => {
               transition={{ duration: 0.5, delay: 0.3 }}
               className="lg:col-span-2"
             >
-              <Card className="overflow-hidden">
+              <Card className="overflow-hidden bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700">
                 <CardContent className="p-6">
-                  <h2 className="text-lg font-medium mb-4">{t('monthly.transactions')}</h2>
+                  <h2 className="text-lg font-medium mb-4 text-gray-900 dark:text-white">{t('monthly.transactions')}</h2>
                   <div className="h-64">
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart
@@ -355,9 +413,9 @@ export const DashboardPage: React.FC = () => {
                         <XAxis 
                           dataKey="date" 
                           tickFormatter={date => formatDate(date).split(' ')[0]}
-                          stroke="#9ca3af" 
+                          stroke="#64748b" 
                         />
-                        <YAxis stroke="#9ca3af" tickFormatter={value => `€${value}`} />
+                        <YAxis stroke="#64748b" tickFormatter={value => `€${value}`} />
                         <Tooltip 
                           formatter={(value: any) => formatCurrency(value)} 
                           labelFormatter={value => formatDate(value.toString())} 
@@ -382,26 +440,26 @@ export const DashboardPage: React.FC = () => {
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.4 }}
             >
-              <Card className="h-full">
+              <Card className="h-full bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700">
                 <CardContent className="p-6">
-                  <h2 className="text-lg font-medium mb-4">{t('devices.status')}</h2>
+                  <h2 className="text-lg font-medium mb-4 text-gray-900 dark:text-white">{t('devices.status')}</h2>
                   <div className="space-y-4">
                     {demoDevices.map(device => (
-                      <div key={device.id} className="p-3 border rounded-lg bg-gray-50 dark:bg-slate-900/50">
+                      <div key={device.id} className="p-3 border rounded-lg bg-gray-50 dark:bg-slate-900/50 border-gray-200 dark:border-slate-700">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center">
                             <div className={`w-2 h-2 rounded-full mr-2 ${
                               device.status === 'online' ? 'bg-green-500' : 'bg-red-500'
                             }`}></div>
-                            <span className="font-medium">{device.name}</span>
+                            <span className="font-medium text-gray-900 dark:text-white">{device.name}</span>
                           </div>
                           <span className={`text-xs ${
-                            device.batteryLevel > 20 ? 'text-green-500' : 'text-red-500'
+                            device.batteryLevel > 20 ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'
                           }`}>
                             {device.batteryLevel}%
                           </span>
                         </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        <div className="text-xs text-gray-700 dark:text-gray-400 mt-1">
                           {t('last.active')}: {device.lastActivity}
                         </div>
                       </div>
@@ -409,7 +467,7 @@ export const DashboardPage: React.FC = () => {
                   </div>
                   
                   <div className="mt-6 pt-4 border-t border-gray-200 dark:border-slate-700/50">
-                    <h3 className="font-medium mb-3">{t('need.help')}</h3>
+                    <h3 className="font-medium mb-3 text-gray-900 dark:text-white">{t('need.help')}</h3>
                     <Button variant="outline" className="w-full rounded-lg">
                       {t('contact.support')}
                     </Button>
@@ -418,57 +476,6 @@ export const DashboardPage: React.FC = () => {
               </Card>
             </motion.div>
           </div>
-          
-          {/* Tasks list */}
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-            className="mt-6"
-          >
-            <Card>
-              <CardContent className="p-6">
-                <h2 className="text-lg font-medium mb-4 flex items-center">
-                  <Clock className="h-4 w-4 mr-2 text-emerald-500" />
-                  {t('remaining.tasks')}
-                </h2>
-                
-                <div className="space-y-2">
-                  {tasks.map((task, index) => (
-                    <motion.div
-                      key={task.id}
-                      initial={{ x: -20, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      transition={{ duration: 0.3, delay: 0.1 + index * 0.05 }}
-                    >
-                      <TaskCard
-                        title={task.title}
-                        completed={task.completed}
-                        timeEstimate={task.timeEstimate}
-                        onClick={() => handleTaskClick(task.step)}
-                      />
-                    </motion.div>
-                  ))}
-                </div>
-                
-                {completedTasks === totalTasks && (
-                  <div className="mt-4 p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-200 dark:border-emerald-800/50 flex items-center">
-                    <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-800/50 flex items-center justify-center mr-3">
-                      <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-emerald-800 dark:text-emerald-300">
-                        {t('onboarding.complete')}
-                      </p>
-                      <p className="text-sm text-emerald-700/70 dark:text-emerald-400/70">
-                        {t('onboarding.complete.subtitle')}
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </motion.div>
         </div>
       </div>
       
