@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Card, CardContent } from '@/components/ui/card';
@@ -10,10 +9,19 @@ import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { useOnboarding } from '@/contexts/OnboardingContext';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
+import { Zariadenie } from '@/types/onboarding';
 
 interface ProductWizardProps {
   onNext: () => void;
   onBack: () => void;
+}
+
+// Extended device type with UI specific properties
+type ExtendedDevice = Zariadenie & {
+  hasWifi: boolean;
+  hasSim: boolean;
+  imageUrl?: string;
+  hasDiscount?: boolean;
 }
 
 export const ProductWizard: React.FC<ProductWizardProps> = ({ onNext, onBack }) => {
@@ -23,8 +31,29 @@ export const ProductWizard: React.FC<ProductWizardProps> = ({ onNext, onBack }) 
   const [activeStep, setActiveStep] = useState<'solutions' | 'devices' | 'licences' | 'services'>('solutions');
   const [selectedSolutions, setSelectedSolutions] = useState<string[]>([]);
   
-  // Filter out standalone SIM card
-  const devicesList = data.zariadenia.filter(device => device.id !== 'sim');
+  // Map original devices to extended devices with UI properties
+  const devicesList = data.zariadenia
+    .filter(device => device.id !== 'sim')
+    .map(device => ({
+      ...device,
+      hasWifi: false,
+      hasSim: false,
+      imageUrl: getDefaultImage(device.id),
+      hasDiscount: device.id === 'terminal-a920'
+    })) as ExtendedDevice[];
+
+  // Default device images based on device ID
+  function getDefaultImage(id: string) {
+    const imageMap: Record<string, string> = {
+      'a920-gprs': 'https://www.mobilnaterminaly.sk/wp-content/uploads/2021/05/a920-3-uhl-1.jpg',
+      'a920-wifi': 'https://www.mobilnaterminaly.sk/wp-content/uploads/2021/05/a920-3-uhl-1.jpg',
+      'a80-eth': 'https://b2bchannels.co.uk/wp-content/uploads/2021/03/PAXA80.jpg',
+      's800-eth': 'https://www.mobilnaterminaly.sk/wp-content/uploads/2022/01/s800-1.png',
+      'pax-a920': 'https://www.mobilnaterminaly.sk/wp-content/uploads/2021/05/a920-3-uhl-1.jpg',
+      'pax-a80': 'https://b2bchannels.co.uk/wp-content/uploads/2021/03/PAXA80.jpg',
+    };
+    return imageMap[id] || 'https://placehold.co/600x400?text=Terminal';
+  }
 
   const handleSolutionSelect = (solutionId: string) => {
     setSelectedSolutions(prev => {
@@ -37,7 +66,7 @@ export const ProductWizard: React.FC<ProductWizardProps> = ({ onNext, onBack }) 
   };
 
   const handleDeviceSelect = (deviceId: string) => {
-    const device = data.zariadenia.find(z => z.id === deviceId);
+    const device = devicesList.find(z => z.id === deviceId);
     if (device) {
       updateZariadenie(deviceId, { selected: !device.selected });
     }
@@ -60,9 +89,8 @@ export const ProductWizard: React.FC<ProductWizardProps> = ({ onNext, onBack }) 
   };
 
   const handleConnectivityChange = (deviceId: string, type: 'wifi' | 'sim', value: boolean) => {
-    // This would need to be stored in the device configuration
+    // Just log the change for now - no direct updating to context
     console.log(`${type} option for device ${deviceId}: ${value ? 'selected' : 'deselected'}`);
-    // In a real implementation, you would update the device with this information
   };
 
   const handleLicenceSelect = (licenceId: string) => {

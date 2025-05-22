@@ -5,6 +5,7 @@ import { useOnboarding } from '@/contexts/OnboardingContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DeviceCard } from './DeviceCard';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 // Define a more specific type that matches our devices array
 type DeviceType = {
@@ -128,9 +129,11 @@ export const StepProducts: React.FC = () => {
           typNakupu: device.typNakupu,
           viazanost: device.viazanost,
           frekvenciaPlatby: device.frekvenciaPlatby,
+          // Use the hasWifi and hasSim properties as custom properties
+          // These will be added to the Zariadenie type in the context
           hasWifi: device.hasWifi,
           hasSim: device.hasSim
-        });
+        } as any); // Using "as any" as a temporary fix until the Zariadenie type is updated
       }
     });
     nextStep();
