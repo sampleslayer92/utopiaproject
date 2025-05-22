@@ -7,10 +7,10 @@ import { DeviceCard } from './DeviceCard';
 import { Button } from '@/components/ui/button';
 
 export const StepProducts: React.FC = () => {
-  const { nextStep, prevStep, updateProductsInfo, data } = useOnboarding();
+  const { nextStep, prevStep, updateZariadenie, data } = useOnboarding();
   const { t } = useLanguage();
   
-  // Sample devices data
+  // Initial devices with correct types
   const [devices, setDevices] = useState([
     {
       id: 'terminal-a920',
@@ -39,9 +39,9 @@ export const StepProducts: React.FC = () => {
       nazov: 'Terminal PAX A80',
       selected: false,
       pocetKs: 1,
-      typNakupu: 'Kúpa' as const,
-      viazanost: 12 as const,
-      frekvenciaPlatby: 'ročne' as const,
+      typNakupu: 'Prenájom' as const,
+      viazanost: 24 as const,
+      frekvenciaPlatby: 'mesačne' as const,
       hasWifi: false,
       hasSim: false
     }
@@ -90,7 +90,18 @@ export const StepProducts: React.FC = () => {
   };
 
   const handleContinue = () => {
-    updateProductsInfo({ devices });
+    // Update devices in the onboarding context
+    devices.forEach(device => {
+      if (device.selected) {
+        updateZariadenie(device.id, {
+          selected: device.selected,
+          pocetKs: device.pocetKs,
+          typNakupu: device.typNakupu,
+          viazanost: device.viazanost,
+          frekvenciaPlatby: device.frekvenciaPlatby
+        });
+      }
+    });
     nextStep();
   };
 

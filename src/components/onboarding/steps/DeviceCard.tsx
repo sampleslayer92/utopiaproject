@@ -32,6 +32,7 @@ interface DeviceCardProps {
   onCommitmentChange: (id: string, months: 12 | 24 | 36) => void;
   onPaymentFrequencyChange: (id: string, frequency: 'mesačne' | 'ročne' | 'sezónne' | 'z obratu') => void;
   onConnectivityChange?: (id: string, type: 'wifi' | 'sim', value: boolean) => void;
+  onSimOptionChange?: (id: string, selected: boolean) => void; // Add this new prop
 }
 
 export const DeviceCard: React.FC<DeviceCardProps> = ({
@@ -41,9 +42,19 @@ export const DeviceCard: React.FC<DeviceCardProps> = ({
   onPurchaseTypeChange,
   onCommitmentChange,
   onPaymentFrequencyChange,
-  onConnectivityChange
+  onConnectivityChange,
+  onSimOptionChange
 }) => {
   const { t } = useLanguage();
+
+  // Handle SIM option change, using either dedicated function or fallback to connectivity change
+  const handleSimOptionChange = (id: string, selected: boolean) => {
+    if (onSimOptionChange) {
+      onSimOptionChange(id, selected);
+    } else if (onConnectivityChange) {
+      onConnectivityChange(id, 'sim', selected);
+    }
+  };
 
   return (
     <div className="relative p-4 border rounded-lg bg-gray-50 dark:bg-slate-900/50 transition-all hover:shadow-md">
@@ -146,7 +157,7 @@ export const DeviceCard: React.FC<DeviceCardProps> = ({
                 className={`flex items-center gap-2 p-3 border rounded-lg transition-all cursor-pointer ${
                   device.hasSim ? 'bg-emerald-50 border-emerald-500 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300' : 'hover:bg-gray-50 dark:hover:bg-slate-800'
                 }`}
-                onClick={() => onConnectivityChange && onConnectivityChange(device.id, 'sim', !device.hasSim)}
+                onClick={() => handleSimOptionChange(device.id, !device.hasSim)}
               >
                 <div className={`p-2 rounded-full ${device.hasSim ? 'bg-emerald-100 dark:bg-emerald-900/40' : 'bg-gray-100 dark:bg-slate-700'}`}>
                   <Smartphone className={`h-4 w-4 ${device.hasSim ? 'text-emerald-500' : ''}`} />

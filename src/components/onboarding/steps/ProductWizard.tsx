@@ -23,23 +23,8 @@ export const ProductWizard: React.FC<ProductWizardProps> = ({ onNext, onBack }) 
   const [activeStep, setActiveStep] = useState<'solutions' | 'devices' | 'licences' | 'services'>('solutions');
   const [selectedSolutions, setSelectedSolutions] = useState<string[]>([]);
   
-  const deviceImages = {
-    'term1': 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&auto=format',
-    'term2': 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&auto=format',
-    'term3': 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=600&auto=format',
-  };
-  
-  // Enhanced devices with image URLs and flags
-  const enhancedDevices = data.zariadenia.map(device => ({
-    ...device,
-    imageUrl: deviceImages[device.id as keyof typeof deviceImages] || 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=600&auto=format',
-    hasDiscount: Math.random() > 0.5, // Random discount flag for demo
-    hasSim: device.id !== 'sim', // All devices except the SIM card itself can have a SIM option
-    simSelected: false
-  }));
-  
   // Filter out standalone SIM card
-  const devicesList = enhancedDevices.filter(device => device.id !== 'sim');
+  const devicesList = data.zariadenia.filter(device => device.id !== 'sim');
 
   const handleSolutionSelect = (solutionId: string) => {
     setSelectedSolutions(prev => {
@@ -74,9 +59,9 @@ export const ProductWizard: React.FC<ProductWizardProps> = ({ onNext, onBack }) 
     updateZariadenie(deviceId, { frekvenciaPlatby: frequency });
   };
 
-  const handleSimOptionChange = (deviceId: string, selected: boolean) => {
+  const handleConnectivityChange = (deviceId: string, type: 'wifi' | 'sim', value: boolean) => {
     // This would need to be stored in the device configuration
-    console.log(`SIM option for device ${deviceId}: ${selected ? 'selected' : 'deselected'}`);
+    console.log(`${type} option for device ${deviceId}: ${value ? 'selected' : 'deselected'}`);
     // In a real implementation, you would update the device with this information
   };
 
@@ -191,7 +176,7 @@ export const ProductWizard: React.FC<ProductWizardProps> = ({ onNext, onBack }) 
                 onPurchaseTypeChange={handleDevicePurchaseTypeChange}
                 onCommitmentChange={handleDeviceCommitmentChange}
                 onPaymentFrequencyChange={handleDevicePaymentFrequencyChange}
-                onSimOptionChange={handleSimOptionChange}
+                onConnectivityChange={handleConnectivityChange}
               />
             ))}
           </div>
