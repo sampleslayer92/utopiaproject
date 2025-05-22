@@ -1,0 +1,166 @@
+
+import React from 'react';
+import { Card } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useLanguage } from '@/contexts/LanguageContext';
+import { Badge } from '@/components/ui/badge';
+
+interface DeviceCardProps {
+  device: {
+    id: string;
+    nazov: string;
+    selected: boolean;
+    pocetKs: number;
+    typNakupu: 'Prenájom' | 'Kúpa';
+    viazanost: 12 | 24 | 36;
+    frekvenciaPlatby: 'mesačne' | 'ročne' | 'sezónne' | 'z obratu';
+    imageUrl?: string;
+    hasDiscount?: boolean;
+    hasSim?: boolean;
+    simSelected?: boolean;
+  };
+  onSelect: (id: string) => void;
+  onQtyChange: (id: string, qty: number) => void;
+  onPurchaseTypeChange: (id: string, type: 'Prenájom' | 'Kúpa') => void;
+  onCommitmentChange: (id: string, months: 12 | 24 | 36) => void;
+  onPaymentFrequencyChange: (id: string, frequency: 'mesačne' | 'ročne' | 'sezónne' | 'z obratu') => void;
+  onSimOptionChange?: (id: string, selected: boolean) => void;
+}
+
+export const DeviceCard: React.FC<DeviceCardProps> = ({
+  device,
+  onSelect,
+  onQtyChange,
+  onPurchaseTypeChange,
+  onCommitmentChange,
+  onPaymentFrequencyChange,
+  onSimOptionChange
+}) => {
+  const { t } = useLanguage();
+
+  return (
+    <div className="relative p-4 border rounded-lg bg-gray-50 dark:bg-slate-900/50 transition-all hover:shadow-md">
+      {device.hasDiscount && (
+        <Badge className="absolute right-2 top-2 bg-red-500 hover:bg-red-600">
+          20% {t('discount')}
+        </Badge>
+      )}
+      
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center">
+          <Switch 
+            checked={device.selected}
+            onCheckedChange={() => onSelect(device.id)}
+            className="mr-3"
+          />
+          <Label htmlFor={`device-${device.id}`} className="text-base font-medium">
+            {device.nazov}
+          </Label>
+        </div>
+      </div>
+      
+      {device.imageUrl && (
+        <div className="mb-4 flex justify-center">
+          <img
+            src={device.imageUrl}
+            alt={device.nazov}
+            className="h-32 object-contain rounded-md"
+          />
+        </div>
+      )}
+      
+      {device.selected && (
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <Label htmlFor={`qty-${device.id}`}>{t('quantity')}</Label>
+              <Input 
+                id={`qty-${device.id}`}
+                type="number"
+                min="1"
+                value={device.pocetKs}
+                onChange={(e) => onQtyChange(device.id, parseInt(e.target.value) || 1)}
+                className="mt-1"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor={`type-${device.id}`}>{t('purchase.type')}</Label>
+              <Select 
+                value={device.typNakupu}
+                onValueChange={(value) => onPurchaseTypeChange(device.id, value as 'Prenájom' | 'Kúpa')}
+              >
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Prenájom">{t('rental')}</SelectItem>
+                  <SelectItem value="Kúpa">{t('purchase')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <Label htmlFor={`commitment-${device.id}`}>{t('commitment')}</Label>
+              <Select 
+                value={device.viazanost.toString()}
+                onValueChange={(value) => onCommitmentChange(device.id, parseInt(value) as 12 | 24 | 36)}
+              >
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="12">12 {t('months')}</SelectItem>
+                  <SelectItem value="24">24 {t('months')}</SelectItem>
+                  <SelectItem value="36">36 {t('months')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <Label htmlFor={`frequency-${device.id}`}>{t('payment.frequency')}</Label>
+              <Select 
+                value={device.frekvenciaPlatby}
+                onValueChange={(value) => onPaymentFrequencyChange(device.id, value as 'mesačne' | 'ročne' | 'sezónne' | 'z obratu')}
+              >
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="mesačne">{t('monthly')}</SelectItem>
+                  <SelectItem value="ročne">{t('yearly')}</SelectItem>
+                  <SelectItem value="sezónne">{t('seasonal')}</SelectItem>
+                  <SelectItem value="z obratu">{t('from.turnover')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          {device.hasSim && (
+            <div className="border-t pt-3 mt-3">
+              <div className="flex items-center">
+                <Switch
+                  checked={device.simSelected}
+                  onCheckedChange={(checked) => onSimOptionChange && onSimOptionChange(device.id, checked)}
+                  className="mr-3"
+                />
+                <Label htmlFor={`sim-${device.id}`} className="cursor-pointer">
+                  {t('include.sim.card')}
+                </Label>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
