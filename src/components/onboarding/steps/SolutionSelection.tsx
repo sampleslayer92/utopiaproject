@@ -1,10 +1,11 @@
 
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { CreditCard, Monitor, BatteryCharging, Smartphone, Check, Store, Globe } from 'lucide-react';
+import { CreditCard, Monitor, BatteryCharging, Smartphone, Check, Store, Globe, HelpCircle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 type Solution = {
   id: string;
@@ -62,60 +63,76 @@ export const SolutionSelection: React.FC<SolutionSelectionProps> = ({
       title: t('retail.solution'),
       icon: <Store className="h-6 w-6" />,
       description: t('retail.solution.description')
+    },
+    {
+      id: 'not-sure',
+      title: t('not.sure.yet'),
+      icon: <HelpCircle className="h-6 w-6" />,
+      description: t('not.sure.description')
     }
   ];
 
   return (
-    <div className={cn("grid grid-cols-1 md:grid-cols-2 gap-4", className)}>
-      {solutions.map((solution, index) => {
-        const isSelected = selectedSolutions.includes(solution.id);
-        
-        return (
-          <motion.div
-            key={solution.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: index * 0.1 }}
-          >
-            <Card
-              className={cn(
-                "cursor-pointer transition-all border-2 hover:shadow-md",
-                isSelected
-                  ? "border-emerald-500 bg-emerald-50/50 dark:bg-emerald-900/20"
-                  : "border-gray-200 hover:border-blue-300 dark:border-slate-700 dark:hover:border-blue-600"
-              )}
-              onClick={() => onSelect(solution.id)}
+    <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4", className)}>
+      <TooltipProvider>
+        {solutions.map((solution, index) => {
+          const isSelected = selectedSolutions.includes(solution.id);
+          
+          return (
+            <motion.div
+              key={solution.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
+              className="h-full"
             >
-              <CardContent className="p-6">
-                <div className="flex items-start space-x-4">
-                  <div className={cn(
-                    "p-3 rounded-full",
-                    isSelected 
-                      ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/70 dark:text-emerald-300" 
-                      : "bg-gray-100 text-gray-600 dark:bg-slate-800 dark:text-gray-300"
-                  )}>
-                    {solution.icon}
-                  </div>
-                  
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-medium text-lg">{solution.title}</h3>
-                      {isSelected && (
-                        <span className="text-emerald-500 dark:text-emerald-400">
-                          <Check className="h-5 w-5" />
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-                      {solution.description}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        );
-      })}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Card
+                    className={cn(
+                      "cursor-pointer transition-all h-full border-2 hover:shadow-lg transform hover:-translate-y-1",
+                      isSelected
+                        ? "border-emerald-500 bg-emerald-50/50 dark:bg-emerald-900/20"
+                        : "border-gray-200 hover:border-blue-300 dark:border-slate-700 dark:hover:border-blue-600"
+                    )}
+                    onClick={() => onSelect(solution.id)}
+                  >
+                    <CardContent className="p-6">
+                      <div className="flex items-start space-x-4">
+                        <div className={cn(
+                          "p-3 rounded-full",
+                          isSelected 
+                            ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/70 dark:text-emerald-300" 
+                            : "bg-gray-100 text-gray-600 dark:bg-slate-800 dark:text-gray-300"
+                        )}>
+                          {solution.icon}
+                        </div>
+                        
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <h3 className="font-medium text-lg">{solution.title}</h3>
+                            {isSelected && (
+                              <span className="text-emerald-500 dark:text-emerald-400">
+                                <Check className="h-5 w-5" />
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
+                            {solution.description}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  <p className="max-w-xs">{solution.description}</p>
+                </TooltipContent>
+              </Tooltip>
+            </motion.div>
+          );
+        })}
+      </TooltipProvider>
     </div>
   );
 };

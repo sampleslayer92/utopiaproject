@@ -1,11 +1,12 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowRight, ArrowLeft, Send } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { LanguageSwitcher } from '@/components/ui/language-switcher';
-import { motion } from 'framer-motion';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
 
@@ -22,141 +23,167 @@ export const PhoneVerificationScreen: React.FC<PhoneVerificationScreenProps> = (
   onVerify,
   onBack
 }) => {
-  const { language } = useLanguage();
+  const { t } = useLanguage();
   const [codeSent, setCodeSent] = useState(false);
-  const [verificationCode, setVerificationCode] = useState('');
+  const [verificationCode, setVerificationCode] = useState(['', '', '', '']); // 4-digit code
+  const inputRefs = [
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+  ];
 
   const handleSendCode = () => {
-    // In a real app, we would send the code via SMS API
-    // For now, we'll just simulate it
     if (phone.length < 10) {
-      toast.error(language === 'sk' ? "Zadajte platné telefónne číslo" : "Please enter a valid phone number");
+      toast.error(t('language') === 'sk' ? "Zadajte platné telefónne číslo" : "Enter a valid phone number");
       return;
     }
     
-    toast.success(
-      language === 'sk' 
-        ? "SMS kód bol odoslaný na číslo " + phone
-        : "SMS code was sent to " + phone
-    );
+    toast.success(t('language') === 'sk' ? "Kód bol odoslaný" : "Code has been sent");
     setCodeSent(true);
   };
 
-  const handleSubmitCode = () => {
-    if (verificationCode.length !== 4) {
-      toast.error(language === 'sk' ? "Kód musí mať 4 číslice" : "Code must be 4 digits");
-      return;
+  const handleCodeChange = (index: number, value: string) => {
+    if (value.match(/^[0-9]?$/) || value === '') {
+      const newCode = [...verificationCode];
+      newCode[index] = value;
+      setVerificationCode(newCode);
+      
+      // Auto-focus next input
+      if (value && index < 3) {
+        inputRefs[index + 1].current?.focus();
+      }
     }
-    
-    onVerify(verificationCode);
+  };
+
+  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Handle backspace
+    if (e.key === 'Backspace' && !verificationCode[index] && index > 0) {
+      inputRefs[index - 1].current?.focus();
+    }
+  };
+
+  const handleVerify = () => {
+    const code = verificationCode.join('');
+    if (code.length === 4) {
+      onVerify(code);
+    } else {
+      toast.error(t('language') === 'sk' ? "Zadajte 4-miestny kód" : "Enter a 4-digit code");
+    }
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-900 to-blue-900">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 to-blue-100 dark:from-slate-900 dark:to-blue-900">
       <header className="flex justify-between items-center p-4">
         <Button
           variant="ghost"
           onClick={onBack}
-          className="flex items-center gap-2 text-blue-300 hover:bg-blue-900/20"
+          className="flex items-center gap-2 text-slate-600 dark:text-blue-300 hover:bg-slate-200/50 dark:hover:bg-blue-900/20"
         >
           <ArrowLeft className="h-4 w-4" />
-          {language === 'sk' ? 'Späť' : 'Back'}
+          {t('back')}
         </Button>
-        <LanguageSwitcher />
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
+          <LanguageSwitcher />
+        </div>
       </header>
       
-      <motion.main 
-        className="flex-1 flex flex-col items-center justify-center px-6 py-8"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="w-full max-w-lg">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-white">
-              {language === 'sk' ? 'Overenie telefónneho čísla' : 'Phone Verification'}
-            </h1>
-            <p className="mt-2 text-blue-300">
-              {language === 'sk' ? 'Pre overenie vašej identity potrebujeme overiť telefónne číslo' : 'To verify your identity, we need to verify your phone number'}
-            </p>
-          </div>
-          
-          <div className="bg-white/10 backdrop-blur-md p-8 space-y-6 rounded-2xl border border-white/20 shadow-xl">
-            <div className="space-y-6">
-              <div>
-                <Label htmlFor="phone" className="text-base text-white">
-                  {language === 'sk' ? 'Telefónne číslo' : 'Phone Number'}
-                </Label>
-                <div className="flex mt-1">
-                  <Input
-                    id="phone"
-                    value={phone}
-                    onChange={(e) => onChangePhone(e.target.value)}
-                    placeholder="+421 9XX XXX XXX"
-                    className="rounded-l-xl py-6 text-lg flex-1 bg-white/20 text-white border-r-0 placeholder:text-blue-300/70"
-                  />
-                  <Button
-                    type="button"
-                    onClick={handleSendCode}
-                    disabled={codeSent}
-                    className="rounded-r-xl bg-emerald-500 hover:bg-emerald-600 text-white px-4 min-h-[3.5rem] flex items-center"
-                  >
-                    <Send className="h-5 w-5 mr-2" />
-                    {language === 'sk' ? 'Poslať kód' : 'Send Code'}
-                  </Button>
-                </div>
-              </div>
-
-              {codeSent && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <Label htmlFor="code" className="text-base text-white">
-                    {language === 'sk' ? 'Verifikačný kód' : 'Verification Code'}
-                  </Label>
-                  <div className="mt-1 flex justify-center">
-                    <Input
-                      id="code"
-                      value={verificationCode}
-                      onChange={(e) => setVerificationCode(e.target.value.replace(/[^0-9]/g, '').slice(0, 4))}
-                      placeholder="0000"
-                      className="py-6 text-center text-3xl tracking-widest w-40 bg-white/20 text-white placeholder:text-blue-300/70"
-                      maxLength={4}
-                    />
-                  </div>
-                  <p className="mt-2 text-center text-sm text-blue-300">
-                    {language === 'sk' ? 'Zadajte 4-miestny kód, ktorý sme vám poslali SMS správou' : 'Enter the 4-digit code we sent you by SMS'}
-                  </p>
-                </motion.div>
-              )}
+      <AnimatePresence mode="wait">
+        <motion.main 
+          className="flex-1 flex flex-col items-center justify-center px-6 py-8"
+          key={codeSent ? "code-verification" : "phone-input"}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.3 }}
+        >
+          <div className="w-full max-w-lg">
+            <div className="text-center mb-8">
+              <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
+                {t('verify.phone')}
+              </h1>
+              <p className="mt-2 text-slate-600 dark:text-blue-300">
+                {codeSent ? t('enter.code') : t('phone.subtitle')}
+              </p>
             </div>
             
-            <div className="flex justify-center pt-4">
-              {codeSent ? (
-                <Button 
-                  type="button"
-                  onClick={handleSubmitCode}
-                  disabled={verificationCode.length < 4}
-                  className="px-8 py-6 text-lg bg-emerald-500 hover:bg-emerald-600 rounded-full hover-lift"
-                >
-                  <span>{language === 'sk' ? 'Overiť kód' : 'Verify Code'}</span>
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
+            <div className="bg-white/80 dark:bg-white/10 backdrop-blur-md p-8 space-y-6 rounded-2xl border border-slate-200 dark:border-white/20 shadow-xl">
+              {!codeSent ? (
+                <div className="space-y-6">
+                  <div>
+                    <Label htmlFor="phone" className="text-base text-slate-800 dark:text-white">
+                      {t('phone')}
+                    </Label>
+                    <Input
+                      id="phone"
+                      value={phone}
+                      onChange={(e) => onChangePhone(e.target.value)}
+                      placeholder="+421 XXX XXX XXX"
+                      className="mt-2 glass-input rounded-xl py-6 text-lg bg-white/50 dark:bg-white/20 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-blue-300/70"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="flex justify-center pt-4">
+                    <Button 
+                      onClick={handleSendCode}
+                      className="px-8 py-6 text-lg bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 rounded-full hover:scale-[1.02] transition-all duration-300"
+                    >
+                      {t('send.code')}
+                    </Button>
+                  </div>
+                </div>
               ) : (
-                <p className="text-blue-300 text-center">
-                  {language === 'sk' ? 'Pre pokračovanie si nechajte poslať overovací kód' : 'Get your verification code to continue'}
-                </p>
+                <div className="space-y-8">
+                  <p className="text-center text-slate-600 dark:text-blue-300">
+                    {t('language') === 'sk' 
+                      ? `Kód sme poslali na číslo ${phone}`
+                      : `We've sent a code to ${phone}`
+                    }
+                  </p>
+                  
+                  <div className="flex justify-center gap-4 my-6">
+                    {verificationCode.map((digit, index) => (
+                      <Input
+                        key={index}
+                        ref={inputRefs[index]}
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={1}
+                        value={digit}
+                        onChange={(e) => handleCodeChange(index, e.target.value)}
+                        onKeyDown={(e) => handleKeyDown(index, e)}
+                        className="w-14 h-14 text-center text-xl font-bold bg-white/50 dark:bg-white/20 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white rounded-xl focus:ring-2 focus:ring-emerald-500"
+                      />
+                    ))}
+                  </div>
+                  
+                  <div className="flex justify-center gap-4 pt-4">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setCodeSent(false)}
+                      className="px-6 py-5 text-slate-700 dark:text-blue-300 border-slate-300 dark:border-slate-600"
+                    >
+                      {t('language') === 'sk' ? 'Zmeniť číslo' : 'Change number'}
+                    </Button>
+                    <Button 
+                      onClick={handleVerify}
+                      className="px-8 py-5 bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 rounded-xl hover:scale-[1.02] transition-all duration-300"
+                      disabled={verificationCode.join('').length !== 4}
+                    >
+                      {t('verify.code')}
+                    </Button>
+                  </div>
+                </div>
               )}
             </div>
           </div>
-        </div>
-      </motion.main>
+        </motion.main>
+      </AnimatePresence>
       
-      <footer className="py-4 text-center text-sm text-blue-300/70">
-        © 2025 Utopia. Všetky práva vyhradené.
+      <footer className="py-4 text-center text-sm text-slate-500 dark:text-blue-300/70">
+        © 2025 Utopia. {t('all.rights.reserved')}
       </footer>
     </div>
   );

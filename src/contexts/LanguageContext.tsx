@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 type Language = 'sk' | 'en';
@@ -161,7 +160,16 @@ const translations: Record<string, Record<string, string>> = {
     'onboarding.complete': 'Onboarding dokončený!',
     'onboarding.complete.subtitle': 'Môžete začať používať všetky funkcie platformy.',
     'user': 'Používateľ',
-    'view.all.notifications': 'Zobraziť všetky notifikácie'
+    'view.all.notifications': 'Zobraziť všetky notifikácie',
+    'mobile.pos': 'Mobilná pokladňa',
+    'mobile.pos.description': 'Aplikácia pre predaj kdekoľvek ste, bez potreby fixného terminálu',
+    'retail.solution': 'Maloobchodné riešenie',
+    'retail.solution.description': 'Kompletné riešenie pre maloobchodné prevádzky zahŕňajúce pokladňu a sklad',
+    'not.sure.yet': 'Ešte neviem',
+    'not.sure.description': 'Pomôžeme vám s výberom riešenia neskôr',
+    'enter.full.name': 'Vaše meno a priezvisko',
+    'email.placeholder': 'Váš email',
+    'full.name': 'Meno a priezvisko',
   },
   en: {
     'save.later': 'Save and continue later',
@@ -311,7 +319,16 @@ const translations: Record<string, Record<string, string>> = {
     'onboarding.complete': 'Onboarding complete!',
     'onboarding.complete.subtitle': 'You can now use all platform features.',
     'user': 'User',
-    'view.all.notifications': 'View all notifications'
+    'view.all.notifications': 'View all notifications',
+    'mobile.pos': 'Mobile POS',
+    'mobile.pos.description': 'Application for selling wherever you are, without a fixed terminal',
+    'retail.solution': 'Retail Solution',
+    'retail.solution.description': 'Complete solution for retail operations including POS and inventory',
+    'not.sure.yet': 'Not sure yet',
+    'not.sure.description': 'We\'ll help you choose later',
+    'enter.full.name': 'Your full name',
+    'email.placeholder': 'Your email',
+    'full.name': 'Full name',
   }
 };
 

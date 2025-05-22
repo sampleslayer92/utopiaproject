@@ -123,12 +123,12 @@ export const RegistrationPage: React.FC = () => {
 
   if (step === 2) {
     return (
-      <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-900 to-blue-900">
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 to-blue-100 dark:from-slate-900 dark:to-blue-900">
         <header className="flex justify-between items-center p-4">
           <Button
             variant="ghost"
             onClick={prevStep}
-            className="flex items-center gap-2 text-blue-300 hover:bg-blue-900/20"
+            className="flex items-center gap-2 text-slate-600 dark:text-blue-300 hover:bg-slate-200/50 dark:hover:bg-blue-900/20"
           >
             <ArrowLeft className="h-4 w-4" />
             {t('back')}
@@ -150,19 +150,19 @@ export const RegistrationPage: React.FC = () => {
           >
             <div className="w-full max-w-lg">
               <div className="text-center mb-8">
-                <h1 className="text-3xl font-bold text-white">
+                <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
                   {t('create.account')}
                 </h1>
-                <p className="mt-2 text-blue-300">
+                <p className="mt-2 text-slate-600 dark:text-blue-300">
                   {t('account.subtitle')}
                 </p>
               </div>
               
-              <div className="bg-white/10 backdrop-blur-md p-8 space-y-6 rounded-2xl border border-white/20 shadow-xl">
+              <div className="bg-white/80 dark:bg-white/10 backdrop-blur-md p-8 space-y-6 rounded-2xl border border-slate-200 dark:border-white/20 shadow-xl">
                 <form onSubmit={(e) => { e.preventDefault(); nextStep(); }} className="space-y-6">
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="fullName" className="text-base text-white">
+                      <Label htmlFor="fullName" className="text-base text-slate-800 dark:text-white">
                         {t('full.name')}
                       </Label>
                       <Input
@@ -171,13 +171,13 @@ export const RegistrationPage: React.FC = () => {
                         value={userData.fullName}
                         onChange={handleChange}
                         placeholder={t('enter.full.name')}
-                        className="mt-1 glass-input rounded-xl py-6 text-lg bg-white/20 text-white placeholder:text-blue-300/70"
+                        className="mt-1 glass-input rounded-xl py-6 text-lg bg-white/50 dark:bg-white/20 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-blue-300/70"
                         required
                       />
                     </div>
                     
                     <div>
-                      <Label htmlFor="email" className="text-base text-white">
+                      <Label htmlFor="email" className="text-base text-slate-800 dark:text-white">
                         {t('email')}
                       </Label>
                       <Input
@@ -187,7 +187,7 @@ export const RegistrationPage: React.FC = () => {
                         value={userData.email}
                         onChange={handleChange}
                         placeholder={t('email.placeholder')}
-                        className="mt-1 glass-input rounded-xl py-6 text-lg bg-white/20 text-white placeholder:text-blue-300/70"
+                        className="mt-1 glass-input rounded-xl py-6 text-lg bg-white/50 dark:bg-white/20 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-blue-300/70"
                         required
                       />
                     </div>
@@ -196,7 +196,7 @@ export const RegistrationPage: React.FC = () => {
                   <div className="flex justify-center pt-4">
                     <Button 
                       type="submit" 
-                      className="px-8 py-6 text-lg bg-emerald-500 hover:bg-emerald-600 rounded-full hover-lift"
+                      className="px-8 py-6 text-lg bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 rounded-full hover:scale-[1.02] transition-all duration-300"
                     >
                       <span>{t('continue')}</span>
                       <ArrowRight className="ml-2 h-5 w-5" />
@@ -208,7 +208,7 @@ export const RegistrationPage: React.FC = () => {
           </motion.main>
         </AnimatePresence>
         
-        <footer className="py-4 text-center text-sm text-blue-300/70">
+        <footer className="py-4 text-center text-sm text-slate-500 dark:text-blue-300/70">
           © 2025 Utopia. {t('all.rights.reserved')}
         </footer>
       </div>

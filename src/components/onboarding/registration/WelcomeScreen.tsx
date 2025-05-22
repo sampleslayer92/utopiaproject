@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { LanguageSwitcher } from '@/components/ui/language-switcher';
+import { ThemeToggle } from '@/components/ui/theme-toggle'; 
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -14,8 +15,9 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onNext }) => {
   const { t } = useLanguage();
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-900 to-blue-900 text-white">
-      <header className="flex justify-end p-4">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-900 to-blue-900 dark:from-slate-950 dark:to-blue-950 text-white">
+      <header className="flex justify-end p-4 gap-3">
+        <ThemeToggle />
         <LanguageSwitcher />
       </header>
       
@@ -52,13 +54,13 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onNext }) => {
           </motion.div>
           
           <motion.div
-            className="glass-card p-8 max-w-lg mx-auto space-y-6 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl"
+            className="glass-card p-8 max-w-lg mx-auto space-y-6 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl shadow-[0_0_15px_rgba(79,209,197,0.15)]"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
           >
             <p className="text-blue-100">
-              Zistíme, čo potrebujete. Pomôžeme vám vybrať riešenie, prispôsobíme služby a vybavíme všetko za vás.
+              {t('language') === 'sk' ? 'Zistíme, čo potrebujete. Pomôžeme vám vybrať riešenie, prispôsobíme služby a vybavíme všetko za vás.' : 'We\'ll find out what you need. We\'ll help you choose a solution, customize services, and take care of everything for you.'}
             </p>
             
             <div className="flex justify-center items-center space-x-6 py-3">
@@ -66,36 +68,36 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onNext }) => {
                 <div className="w-10 h-10 rounded-full bg-emerald-600/30 border border-emerald-500/30 flex items-center justify-center mb-1">
                   <span role="img" aria-label="account" className="text-lg">👤</span>
                 </div>
-                <span className="text-xs text-blue-200">Účet</span>
+                <span className="text-xs text-blue-200">{t('language') === 'sk' ? 'Účet' : 'Account'}</span>
               </div>
               <div className="flex-grow h-0.5 bg-emerald-600/20"></div>
               <div className="flex flex-col items-center">
                 <div className="w-10 h-10 rounded-full bg-emerald-600/30 border border-emerald-500/30 flex items-center justify-center mb-1">
                   <span role="img" aria-label="country" className="text-lg">🌍</span>
                 </div>
-                <span className="text-xs text-blue-200">Krajina</span>
+                <span className="text-xs text-blue-200">{t('language') === 'sk' ? 'Krajina' : 'Country'}</span>
               </div>
               <div className="flex-grow h-0.5 bg-emerald-600/20"></div>
               <div className="flex flex-col items-center">
                 <div className="w-10 h-10 rounded-full bg-emerald-600/30 border border-emerald-500/30 flex items-center justify-center mb-1">
                   <span role="img" aria-label="company" className="text-lg">🏢</span>
                 </div>
-                <span className="text-xs text-blue-200">Firma</span>
+                <span className="text-xs text-blue-200">{t('language') === 'sk' ? 'Firma' : 'Company'}</span>
               </div>
               <div className="flex-grow h-0.5 bg-emerald-600/20"></div>
               <div className="flex flex-col items-center">
                 <div className="w-10 h-10 rounded-full bg-emerald-600/30 border border-emerald-500/30 flex items-center justify-center mb-1">
                   <span role="img" aria-label="services" className="text-lg">🛍️</span>
                 </div>
-                <span className="text-xs text-blue-200">Služby</span>
+                <span className="text-xs text-blue-200">{t('language') === 'sk' ? 'Služby' : 'Services'}</span>
               </div>
             </div>
             
             <Button 
               onClick={onNext}
-              className="w-full rounded-full py-6 bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 text-lg font-medium shadow-lg border border-white/10 hover:shadow-emerald-500/20"
+              className="w-full rounded-full py-6 bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 text-lg font-medium shadow-lg border border-white/10 hover:shadow-emerald-500/20 transition-all duration-300 hover:scale-[1.02]"
             >
-              <span>Začať onboarding</span>
+              <span>{t('language') === 'sk' ? 'Začať onboarding' : 'Start onboarding'}</span>
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </motion.div>
@@ -103,7 +105,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onNext }) => {
       </motion.main>
       
       <footer className="py-4 text-center text-sm text-blue-300/70">
-        © 2025 Utopia. Všetky práva vyhradené.
+        © 2025 Utopia. {t('all.rights.reserved')}
       </footer>
     </div>
   );

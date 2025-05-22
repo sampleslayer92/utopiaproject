@@ -3,6 +3,7 @@ import React from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from './button';
 import { cn } from '@/lib/utils';
+import { CountryFlag } from './country-flag';
 
 export function LanguageSwitcher() {
   const { language, setLanguage, t } = useLanguage();
@@ -21,17 +22,7 @@ export function LanguageSwitcher() {
         )}
         aria-label={t('slovak.language')}
       >
-        <img 
-          src="/flags/sk.svg" 
-          alt="Slovakia flag" 
-          className="w-5 h-4 object-cover rounded"
-          onError={(e) => {
-            // Fallback to emoji if image fails to load
-            const target = e.target as HTMLImageElement;
-            target.onerror = null;
-            target.nextSibling!.textContent = "🇸🇰 ";
-          }}
-        />
+        <CountryFlag countryCode="SK" className="w-5 h-4 object-cover rounded" />
         <span className="font-medium">SK</span>
       </Button>
       <Button
@@ -46,17 +37,7 @@ export function LanguageSwitcher() {
         )}
         aria-label={t('english.language')}
       >
-        <img 
-          src="/flags/gb.svg" 
-          alt="United Kingdom flag" 
-          className="w-5 h-4 object-cover rounded"
-          onError={(e) => {
-            // Fallback to emoji if image fails to load
-            const target = e.target as HTMLImageElement;
-            target.onerror = null;
-            target.nextSibling!.textContent = "🇬🇧 ";
-          }}
-        />
+        <CountryFlag countryCode="GB" className="w-5 h-4 object-cover rounded" />
         <span className="font-medium">EN</span>
       </Button>
     </div>
