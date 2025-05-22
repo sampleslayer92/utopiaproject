@@ -7,9 +7,10 @@ import { useOnboarding } from '@/contexts/OnboardingContext';
 
 interface BackButtonProps {
   className?: string;
+  onClick?: () => void; // Added onClick prop
 }
 
-export const BackButton: React.FC<BackButtonProps> = ({ className }) => {
+export const BackButton: React.FC<BackButtonProps> = ({ className, onClick }) => {
   const { prevStep, currentStep } = useOnboarding();
 
   // First step doesn't need a back button
@@ -17,10 +18,18 @@ export const BackButton: React.FC<BackButtonProps> = ({ className }) => {
     return null;
   }
 
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    } else {
+      prevStep();
+    }
+  };
+
   return (
     <Button
       variant="ghost"
-      onClick={prevStep}
+      onClick={handleClick}
       className={cn("gap-2", className)}
     >
       <ArrowLeft className="h-4 w-4" />

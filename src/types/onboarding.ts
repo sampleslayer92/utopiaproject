@@ -1,4 +1,3 @@
-
 export interface CompanyInfo {
   ico: string;
   nazovSpolocnosti: string;
@@ -8,6 +7,7 @@ export interface CompanyInfo {
   zapisVOrsr: string;
   manualInput: boolean;
   predmetCinnosti?: string;
+  suhlasZOU?: boolean;
 }
 
 export interface BusinessInfo {
@@ -27,6 +27,7 @@ export interface BusinessInfo {
   ocakavanyObratKariet: number;
   hasWifi: boolean;
   hasSimCard: boolean;
+  poznamka?: string;
 }
 
 export type Zariadenie = {
@@ -69,21 +70,24 @@ export interface Osoba {
   meno: string;
   email: string;
   telefon: string;
+  funkcia?: string;
 }
 
-export interface OpravnenaOsoba extends Osoba {
+export interface OpravnenaOsoba {
+  meno: string;
+  email: string;
+  telefon: string;
   funkcia: string;
-  datumNarodenia: string;
+  datumNarodenia: Date;
   rodneCislo: string;
   obcianstvo: string;
   adresaTrvalehoBydliska: string;
   typDokladu: "Občiansky preukaz" | "Pas";
   cisloDokladu: string;
-  platnostDokladu: string;
-  statVydania: string;
+  platnostDokladu: Date;
+  statVydania?: string;
   politickyExponovana: boolean;
-  dokumentId?: string; // ID card document
-  dokumentVypis?: string; // Business registry document
+  dokumenty?: Array<{id: string, name: string, size: number}>;
 }
 
 export interface SkutocnyMajitel {
@@ -184,7 +188,8 @@ export const defaultOnboardingData: OnboardingData = {
     icDph: "",
     sidlo: "",
     zapisVOrsr: "",
-    manualInput: false
+    manualInput: false,
+    suhlasZOU: false
   },
   business: {
     nazovPrevadzky: "",
@@ -202,7 +207,8 @@ export const defaultOnboardingData: OnboardingData = {
     priemernaVyskaTransakcie: 0,
     ocakavanyObratKariet: 0,
     hasWifi: false,
-    hasSimCard: false
+    hasSimCard: false,
+    poznamka: ""
   },
   zariadenia: [
     { id: "a920-gprs", nazov: "A920 GPRS", pocetKs: 1, typNakupu: "Prenájom", viazanost: 24, frekvenciaPlatby: "mesačne", selected: false },
@@ -257,12 +263,14 @@ export const defaultOnboardingData: OnboardingData = {
   obchodnaOsoba: {
     meno: "",
     email: "",
-    telefon: ""
+    telefon: "",
+    funkcia: ""
   },
   technickaOsoba: {
     meno: "",
     email: "",
-    telefon: ""
+    telefon: "",
+    funkcia: ""
   },
   opravneneOsoby: [
     {
@@ -270,15 +278,16 @@ export const defaultOnboardingData: OnboardingData = {
       email: "",
       telefon: "",
       funkcia: "",
-      datumNarodenia: "",
+      datumNarodenia: new Date(),
       rodneCislo: "",
       obcianstvo: "Slovenské",
       adresaTrvalehoBydliska: "",
       typDokladu: "Občiansky preukaz",
       cisloDokladu: "",
-      platnostDokladu: "",
+      platnostDokladu: new Date(),
       statVydania: "Slovenská republika",
-      politickyExponovana: false
+      politickyExponovana: false,
+      dokumenty: []
     }
   ],
   skutocniMajitelia: [],

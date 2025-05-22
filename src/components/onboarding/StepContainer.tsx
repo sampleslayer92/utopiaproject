@@ -12,7 +12,7 @@ import { Link } from 'react-router-dom';
 
 interface StepContainerProps {
   children: React.ReactNode;
-  title: string;
+  title?: string; // Made optional
   subtitle?: string;
   helpText?: string;
   className?: string;
@@ -58,21 +58,23 @@ export const StepContainer: React.FC<StepContainerProps> = ({
       animate="visible"
       variants={containerVariants}
     >
-      <div className="flex items-center justify-between mb-8">
-        <motion.div variants={itemVariants}>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{title}</h1>
-          {subtitle && <p className="mt-2 text-slate-600 dark:text-blue-300">{subtitle}</p>}
-        </motion.div>
-        
-        <motion.div variants={itemVariants} className="hidden sm:block">
-          <Link to="/dashboard">
-            <Button variant="outline" size="sm" className="border-emerald-500/30 text-emerald-700 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-900/20 hover:bg-emerald-100/80 dark:hover:bg-emerald-800/30">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              {t('back.to.dashboard')}
-            </Button>
-          </Link>
-        </motion.div>
-      </div>
+      {title && (
+        <div className="flex items-center justify-between mb-8">
+          <motion.div variants={itemVariants}>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{title}</h1>
+            {subtitle && <p className="mt-2 text-slate-600 dark:text-blue-300">{subtitle}</p>}
+          </motion.div>
+          
+          <motion.div variants={itemVariants} className="hidden sm:block">
+            <Link to="/dashboard">
+              <Button variant="outline" size="sm" className="border-emerald-500/30 text-emerald-700 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-900/20 hover:bg-emerald-100/80 dark:hover:bg-emerald-800/30">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                {t('back.to.dashboard')}
+              </Button>
+            </Link>
+          </motion.div>
+        </div>
+      )}
         
       {helpText && (
         <motion.div variants={itemVariants} className="mt-4">

@@ -14,10 +14,7 @@ import { format } from 'date-fns';
 import { CalendarIcon, Plus, Trash2, Upload } from 'lucide-react';
 import { StepContainer } from '../StepContainer';
 import { cn } from '@/lib/utils';
-import { BackButton } from '../BackButton';
-import { NextButton } from '../NextButton';
-import { SaveContinueLater } from '../SaveContinueLater';
-import { OpravnenaOsoba, Osoba } from '@/types/onboarding';
+import { OpravnenaOsoba } from '@/types/onboarding';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 
@@ -30,8 +27,6 @@ export const StepPersons: React.FC = () => {
     addOpravnenaOsoba,
     updateOpravnenaOsoba,
     removeOpravnenaOsoba,
-    nextStep, 
-    prevStep, 
     isStepComplete 
   } = useOnboarding();
   
@@ -55,8 +50,10 @@ export const StepPersons: React.FC = () => {
       adresaTrvalehoBydliska: '',
       cisloDokladu: '',
       platnostDokladu: new Date(),
-      typDokladu: 'obciansky-preukaz',
+      typDokladu: 'Občiansky preukaz',
       politickyExponovana: false,
+      email: '',
+      telefon: '',
       dokumenty: []
     };
     
@@ -92,7 +89,10 @@ export const StepPersons: React.FC = () => {
   };
   
   return (
-    <StepContainer>
+    <StepContainer
+      title="Kontaktné osoby"
+      subtitle="Zadajte informácie o osobách zodpovedných za spoluprácu"
+    >
       <Card className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-slate-200 dark:border-slate-700">
         <CardContent className="pt-6">
           <h2 className="text-2xl font-semibold mb-6">Kontaktné osoby</h2>
@@ -121,7 +121,7 @@ export const StepPersons: React.FC = () => {
                     <Label htmlFor="obchodne-funkcia">Funkcia</Label>
                     <Input 
                       id="obchodne-funkcia"
-                      value={data.obchodnaOsoba.funkcia}
+                      value={data.obchodnaOsoba.funkcia || ""}
                       onChange={(e) => updateObchodnaOsoba({ funkcia: e.target.value })}
                       placeholder="Pozícia v spoločnosti"
                     />
@@ -170,7 +170,7 @@ export const StepPersons: React.FC = () => {
                     <Label htmlFor="technicke-funkcia">Funkcia</Label>
                     <Input 
                       id="technicke-funkcia"
-                      value={data.technickaOsoba.funkcia}
+                      value={data.technickaOsoba.funkcia || ""}
                       onChange={(e) => updateTechnickaOsoba({ funkcia: e.target.value })}
                       placeholder="Pozícia v spoločnosti"
                     />
@@ -264,16 +264,15 @@ export const StepPersons: React.FC = () => {
                                 )}
                               >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
-                                {osoba.datumNarodenia ? format(osoba.datumNarodenia, "dd.MM.yyyy") : <span>Vyberte dátum</span>}
+                                {osoba.datumNarodenia ? format(new Date(osoba.datumNarodenia), "dd.MM.yyyy") : <span>Vyberte dátum</span>}
                               </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-auto p-0" align="start">
                               <Calendar
                                 mode="single"
-                                selected={osoba.datumNarodenia}
+                                selected={new Date(osoba.datumNarodenia)}
                                 onSelect={(date) => date && updateOpravnenaOsoba(index, { datumNarodenia: date })}
                                 initialFocus
-                                className="pointer-events-auto"
                               />
                             </PopoverContent>
                           </Popover>
@@ -328,15 +327,14 @@ export const StepPersons: React.FC = () => {
                           <Label htmlFor={`opravnene-${index}-typ-dokladu`}>Typ dokladu</Label>
                           <Select 
                             value={osoba.typDokladu} 
-                            onValueChange={(value) => updateOpravnenaOsoba(index, { typDokladu: value })}
+                            onValueChange={(value: "Občiansky preukaz" | "Pas") => updateOpravnenaOsoba(index, { typDokladu: value })}
                           >
                             <SelectTrigger id={`opravnene-${index}-typ-dokladu`}>
                               <SelectValue placeholder="Typ dokladu" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="obciansky-preukaz">Občiansky preukaz</SelectItem>
-                              <SelectItem value="cestovny-pas">Cestovný pas</SelectItem>
-                              <SelectItem value="povolenie-na-pobyt">Povolenie na pobyt</SelectItem>
+                              <SelectItem value="Občiansky preukaz">Občiansky preukaz</SelectItem>
+                              <SelectItem value="Pas">Cestovný pas</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -364,16 +362,15 @@ export const StepPersons: React.FC = () => {
                                 )}
                               >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
-                                {osoba.platnostDokladu ? format(osoba.platnostDokladu, "dd.MM.yyyy") : <span>Vyberte dátum</span>}
+                                {osoba.platnostDokladu ? format(new Date(osoba.platnostDokladu), "dd.MM.yyyy") : <span>Vyberte dátum</span>}
                               </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-auto p-0" align="start">
                               <Calendar
                                 mode="single"
-                                selected={osoba.platnostDokladu}
+                                selected={new Date(osoba.platnostDokladu)}
                                 onSelect={(date) => date && updateOpravnenaOsoba(index, { platnostDokladu: date })}
                                 initialFocus
-                                className="pointer-events-auto"
                               />
                             </PopoverContent>
                           </Popover>
@@ -470,15 +467,6 @@ export const StepPersons: React.FC = () => {
               </div>
             </TabsContent>
           </Tabs>
-          
-          <div className="flex justify-between mt-10">
-            <BackButton onClick={prevStep} />
-            <SaveContinueLater />
-            <NextButton 
-              onClick={nextStep}
-              disabled={!isStepComplete('persons')}
-            />
-          </div>
         </CardContent>
       </Card>
     </StepContainer>

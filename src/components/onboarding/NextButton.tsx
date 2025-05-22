@@ -9,12 +9,14 @@ import { OnboardingStep } from '@/types/onboarding';
 interface NextButtonProps {
   className?: string;
   disabled?: boolean;
+  onClick?: () => void; // Added onClick prop
   onBeforeNext?: () => boolean;
 }
 
 export const NextButton: React.FC<NextButtonProps> = ({ 
   className,
   disabled: externalDisabled,
+  onClick,
   onBeforeNext
 }) => {
   const { nextStep, currentStep, isStepComplete } = useOnboarding();
@@ -31,7 +33,11 @@ export const NextButton: React.FC<NextButtonProps> = ({
       if (!canProceed) return;
     }
     
-    nextStep();
+    if (onClick) {
+      onClick();
+    } else {
+      nextStep();
+    }
   };
 
   return (

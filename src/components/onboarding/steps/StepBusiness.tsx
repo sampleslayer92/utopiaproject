@@ -7,16 +7,16 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { StepContainer } from '../StepContainer';
-import { BackButton } from '../BackButton';
-import { NextButton } from '../NextButton';
-import { SaveContinueLater } from '../SaveContinueLater';
 
 export const StepBusiness: React.FC = () => {
   const { t } = useLanguage();
-  const { data, updateBusinessInfo, nextStep, prevStep, isStepComplete } = useOnboarding();
+  const { data, updateBusinessInfo, isStepComplete } = useOnboarding();
   
   return (
-    <StepContainer>
+    <StepContainer
+      title="Údaje o prevádzke"
+      subtitle="Zadajte informácie o vašej prevádzke"
+    >
       <Card className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-slate-200 dark:border-slate-700">
         <CardContent className="pt-6">
           <h2 className="text-2xl font-semibold mb-6">Údaje o prevádzke</h2>
@@ -91,20 +91,11 @@ export const StepBusiness: React.FC = () => {
               <Label htmlFor="poznamka">Poznámka</Label>
               <Input 
                 id="poznamka"
-                value={data.business.poznamka}
+                value={data.business.poznamka || ""}
                 onChange={(e) => updateBusinessInfo({ poznamka: e.target.value })}
                 placeholder="Doplnkové informácie"
               />
             </div>
-          </div>
-          
-          <div className="flex justify-between mt-10">
-            <BackButton onClick={prevStep} />
-            <SaveContinueLater />
-            <NextButton 
-              onClick={nextStep}
-              disabled={!isStepComplete('business')}
-            />
           </div>
         </CardContent>
       </Card>

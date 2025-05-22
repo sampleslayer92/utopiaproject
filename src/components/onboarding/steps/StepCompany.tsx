@@ -11,13 +11,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Loader2, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { StepContainer } from '../StepContainer';
-import { BackButton } from '../BackButton';
-import { NextButton } from '../NextButton';
-import { SaveContinueLater } from '../SaveContinueLater';
 
 export const StepCompany: React.FC = () => {
   const { t } = useLanguage();
-  const { data, updateCompanyInfo, nextStep, prevStep, isStepComplete } = useOnboarding();
+  const { data, updateCompanyInfo, isStepComplete } = useOnboarding();
   const [isLoading, setIsLoading] = useState(false);
   
   const handleSearch = () => {
@@ -44,7 +41,10 @@ export const StepCompany: React.FC = () => {
   };
   
   return (
-    <StepContainer>
+    <StepContainer
+      title="Údaje o spoločnosti"
+      subtitle="Zadajte základné informácie o vašej spoločnosti"
+    >
       <Card className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-slate-200 dark:border-slate-700">
         <CardContent className="pt-6">
           <h2 className="text-2xl font-semibold mb-6">Údaje o spoločnosti</h2>
@@ -159,22 +159,13 @@ export const StepCompany: React.FC = () => {
             <div className="flex items-center space-x-2 pt-4">
               <Checkbox 
                 id="suhlasZOU" 
-                checked={data.company.suhlasZOU}
+                checked={data.company.suhlasZOU || false}
                 onCheckedChange={(checked) => updateCompanyInfo({ suhlasZOU: checked === true })}
               />
               <Label htmlFor="suhlasZOU" className="text-sm text-slate-700 dark:text-slate-300">
                 Súhlasím so spracovaním osobných údajov v zmysle zákona o ochrane osobných údajov
               </Label>
             </div>
-          </div>
-          
-          <div className="flex justify-between mt-10">
-            <BackButton onClick={prevStep} />
-            <SaveContinueLater />
-            <NextButton 
-              onClick={nextStep}
-              disabled={!isStepComplete('company')}
-            />
           </div>
         </CardContent>
       </Card>
