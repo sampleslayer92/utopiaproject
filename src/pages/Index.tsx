@@ -1,8 +1,9 @@
 
-import { OnboardingWizard } from "@/components/onboarding/OnboardingWizard";
+import { Navigate } from 'react-router-dom';
 
 const Index = () => {
-  return <OnboardingWizard />;
+  // Redirect to the registration page
+  return <Navigate to="/" />;
 };
 
 export default Index;

@@ -22,7 +22,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onNext }) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="w-full max-w-lg text-center space-y-8">
+        <div className="w-full max-w-2xl text-center space-y-8">
           <div className="flex justify-center">
             <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center shadow-inner">
               <img 
@@ -35,34 +35,67 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onNext }) => {
           
           <div className="space-y-3">
             <h1 className="text-4xl font-bold text-gray-900">
-              Vitajte v Utopia
+              Podnikať môže byť jednoduché
             </h1>
             <p className="text-xl text-gray-600">
-              Vaša cesta k inteligentnejšiemu predaju začína tu
+              S Utopia vybavíte zmluvu a nastavenie služieb rýchlo, moderne a bez stresu.
             </p>
           </div>
           
-          <div className="glass-card p-8 max-w-md mx-auto space-y-6">
-            <div className="h-40 flex items-center justify-center">
-              <img 
-                src="/placeholder.svg"
-                alt="Merchant illustration" 
-                className="max-h-full"
-              />
-            </div>
-            
+          <div className="glass-card p-8 max-w-lg mx-auto space-y-6">
             <p className="text-gray-600">
-              Utopia vám prináša moderné platobné a pokladničné riešenia prispôsobené vášmu podnikaniu. Začnime niekoľkými základnými krokmi.
+              Zistíme, čo potrebujete. Pomôžeme vám vybrať riešenie, prispôsobíme služby a vybavíme všetko za vás. Stačí nám pár údajov.
             </p>
+            
+            <div className="flex justify-center items-center space-x-6 py-3">
+              <div className="flex flex-col items-center">
+                <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center mb-1">
+                  <span role="img" aria-label="account" className="text-lg">👤</span>
+                </div>
+                <span className="text-xs text-gray-500">Účet</span>
+              </div>
+              <div className="flex-grow h-0.5 bg-emerald-100"></div>
+              <div className="flex flex-col items-center">
+                <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center mb-1">
+                  <span role="img" aria-label="company" className="text-lg">🏢</span>
+                </div>
+                <span className="text-xs text-gray-500">Firma</span>
+              </div>
+              <div className="flex-grow h-0.5 bg-emerald-100"></div>
+              <div className="flex flex-col items-center">
+                <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center mb-1">
+                  <span role="img" aria-label="services" className="text-lg">🛍️</span>
+                </div>
+                <span className="text-xs text-gray-500">Služby</span>
+              </div>
+              <div className="flex-grow h-0.5 bg-emerald-100"></div>
+              <div className="flex flex-col items-center">
+                <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center mb-1">
+                  <span role="img" aria-label="contract" className="text-lg">📄</span>
+                </div>
+                <span className="text-xs text-gray-500">Zmluva</span>
+              </div>
+              <div className="flex-grow h-0.5 bg-emerald-100"></div>
+              <div className="flex flex-col items-center">
+                <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center mb-1">
+                  <span role="img" aria-label="done" className="text-lg">✅</span>
+                </div>
+                <span className="text-xs text-gray-500">Hotovo</span>
+              </div>
+            </div>
             
             <Button 
               onClick={onNext}
-              className="w-full rounded-full py-6 bg-emerald-500 hover:bg-emerald-600 text-lg font-medium hover-lift"
+              className="w-full rounded-full py-6 bg-emerald-500 hover:bg-emerald-600 text-lg font-medium hover-lift shadow-md"
             >
               <span>Začať onboarding</span>
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
+          
+          <p className="text-sm text-gray-500">
+            Neviete si rady? Kliknite na chat alebo nám napíšte.
+          </p>
         </div>
       </motion.main>
       

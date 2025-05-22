@@ -19,7 +19,7 @@ export const SaveContinueLater: React.FC = () => {
     <Button 
       variant="outline" 
       onClick={handleSave}
-      className="flex items-center gap-2 rounded-full border-emerald-200 hover:bg-emerald-50 transition-all duration-300 hover-lift"
+      className="flex items-center gap-2 rounded-full border-emerald-200 bg-white/70 backdrop-blur-sm hover:bg-emerald-50 transition-all duration-300 hover-lift shadow-sm"
     >
       <Save className="h-4 w-4 text-emerald-600" />
       Uložiť a pokračovať neskôr

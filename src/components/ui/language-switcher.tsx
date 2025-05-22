@@ -13,7 +13,7 @@ export function LanguageSwitcher() {
       <div className="hidden sm:flex items-center text-sm text-gray-500 mr-2">
         <GlobeIcon className="h-4 w-4 mr-1" />
       </div>
-      <div className="flex items-center space-x-1 border rounded-full overflow-hidden shadow-sm bg-white">
+      <div className="flex items-center space-x-1 border rounded-full overflow-hidden shadow-sm bg-white/70 backdrop-blur-sm">
         <Button
           variant="ghost"
           size="sm"
