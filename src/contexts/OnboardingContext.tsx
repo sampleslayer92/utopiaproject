@@ -132,10 +132,27 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }));
   };
 
-  const updateOpravnenaOsoba = (info: Partial<OpravnenaOsoba>) => {
+  // Updated to manage multiple authorized persons
+  const addOpravnenaOsoba = (osoba: OpravnenaOsoba) => {
     setData(prev => ({
       ...prev,
-      opravnenaOsoba: { ...prev.opravnenaOsoba, ...info }
+      opravneneOsoby: [...prev.opravneneOsoby, osoba]
+    }));
+  };
+
+  const updateOpravnenaOsoba = (index: number, info: Partial<OpravnenaOsoba>) => {
+    setData(prev => ({
+      ...prev,
+      opravneneOsoby: prev.opravneneOsoby.map((osoba, i) => 
+        i === index ? { ...osoba, ...info } : osoba
+      )
+    }));
+  };
+
+  const removeOpravnenaOsoba = (index: number) => {
+    setData(prev => ({
+      ...prev,
+      opravneneOsoby: prev.opravneneOsoby.filter((_, i) => i !== index)
     }));
   };
 
@@ -190,9 +207,9 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         setStep('persons');
         break;
       case 'persons':
-        setStep(
-          data.opravnenaOsoba.politickyExponovana ? 'beneficialOwners' : 'billing'
-        );
+        // Check if any authorized person is politically exposed
+        const hasPoliticallyExposed = data.opravneneOsoby.some(osoba => osoba.politickyExponovana);
+        setStep(hasPoliticallyExposed ? 'beneficialOwners' : 'billing');
         break;
       case 'beneficialOwners':
         setStep('billing');
@@ -227,9 +244,9 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         setStep('persons');
         break;
       case 'billing':
-        setStep(
-          data.opravnenaOsoba.politickyExponovana ? 'beneficialOwners' : 'persons'
-        );
+        // Check if any authorized person is politically exposed
+        const hasPoliticallyExposed = data.opravneneOsoby.some(osoba => osoba.politickyExponovana);
+        setStep(hasPoliticallyExposed ? 'beneficialOwners' : 'persons');
         break;
       case 'sign':
         setStep('billing');
@@ -258,16 +275,24 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       case 'persons': {
         const { meno: obchodne, email: obchodnyEmail, telefon: obchodnyTelefon } = data.obchodnaOsoba;
         const { meno: technicke, email: technickyEmail, telefon: technickyTelefon } = data.technickaOsoba;
-        const { 
-          meno, funkcia, datumNarodenia, rodneCislo, obcianstvo, 
-          adresaTrvalehoBydliska, cisloDokladu, platnostDokladu 
-        } = data.opravnenaOsoba;
+        
+        // Check if we have at least one authorized person with all required fields
+        const hasValidOpravnenaOsoba = data.opravneneOsoby.length > 0 && data.opravneneOsoby.some(osoba => {
+          const { 
+            meno, funkcia, datumNarodenia, rodneCislo, obcianstvo, 
+            adresaTrvalehoBydliska, cisloDokladu, platnostDokladu
+          } = osoba;
+          
+          return Boolean(
+            meno && funkcia && datumNarodenia && rodneCislo && 
+            obcianstvo && adresaTrvalehoBydliska && cisloDokladu && platnostDokladu
+          );
+        });
         
         return Boolean(
           obchodne && obchodnyEmail && obchodnyTelefon &&
           technicke && technickyEmail && technickyTelefon &&
-          meno && funkcia && datumNarodenia && rodneCislo && 
-          obcianstvo && adresaTrvalehoBydliska && cisloDokladu && platnostDokladu
+          hasValidOpravnenaOsoba
         );
       }
       case 'beneficialOwners': {
@@ -299,7 +324,9 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     updateDoplnkovaSluzba,
     updateObchodnaOsoba,
     updateTechnickaOsoba,
+    addOpravnenaOsoba,
     updateOpravnenaOsoba,
+    removeOpravnenaOsoba,
     addSkutocnyMajitel,
     updateSkutocnyMajitel,
     removeSkutocnyMajitel,

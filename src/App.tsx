@@ -12,6 +12,8 @@ import { LanguageProvider } from "./contexts/LanguageContext";
 import { OnboardingProvider } from "./contexts/OnboardingContext";
 import { OnboardingWizard } from "./components/onboarding/OnboardingWizard";
 import { ThemeProvider } from "next-themes";
+import { TransactionsPage } from "./components/dashboard/TransactionsPage";
+import { DevicesPage } from "./components/dashboard/DevicesPage";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +31,8 @@ const App = () => (
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/onboarding" element={<Navigate to="/dashboard" />} />
                 <Route path="/onboarding/:step" element={<OnboardingWizard />} />
+                <Route path="/transactions" element={<TransactionsPage />} />
+                <Route path="/devices" element={<DevicesPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </TooltipProvider>

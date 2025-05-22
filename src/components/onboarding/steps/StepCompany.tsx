@@ -72,8 +72,8 @@ export const StepCompany: React.FC = () => {
           <div className="space-y-6">
             {!company.manualInput ? (
               <div className="space-y-4">
-                <div className="flex gap-3">
-                  <div className="flex-1">
+                <div className="flex flex-col md:flex-row gap-3">
+                  <div className="flex-grow">
                     <Label htmlFor="ico">IČO spoločnosti</Label>
                     <Input
                       id="ico"
@@ -84,11 +84,11 @@ export const StepCompany: React.FC = () => {
                       className="mt-1"
                     />
                   </div>
-                  <div className="flex items-end">
+                  <div className="flex items-end md:self-end mt-1 md:mt-0">
                     <Button 
                       onClick={handleSearch} 
                       disabled={loading || !company.ico.trim()}
-                      className="bg-utopia-600 hover:bg-utopia-700"
+                      className="bg-utopia-600 hover:bg-utopia-700 w-full md:w-auto"
                     >
                       {loading ? (
                         <span className="flex items-center gap-2">

@@ -1,3 +1,4 @@
+
 export interface CompanyInfo {
   ico: string;
   nazovSpolocnosti: string;
@@ -40,6 +41,8 @@ export type Zariadenie = {
   hasSim?: boolean;
   imageUrl?: string;
   hasDiscount?: boolean;
+  statadlo?: string;
+  seriove_cislo?: string;
 };
 
 export type SoftverLicencia = {
@@ -79,6 +82,8 @@ export interface OpravnenaOsoba extends Osoba {
   platnostDokladu: string;
   statVydania: string;
   politickyExponovana: boolean;
+  dokumentId?: string; // ID card document
+  dokumentVypis?: string; // Business registry document
 }
 
 export interface SkutocnyMajitel {
@@ -108,6 +113,19 @@ export interface PodpisSuhlasy {
   dorucovanieElektronicky: boolean;
 }
 
+export interface Transakcia {
+  id: string;
+  datum: string;
+  suma: number;
+  mena: string;
+  typ: "Platba" | "Vrátenie" | "Predautorizácia" | "Zrušenie";
+  stav: "Schválená" | "Zamietnutá" | "Čaká sa" | "Zrušená";
+  zakaznik: string;
+  karta: string;
+  zariadenie?: string;
+  poznamka?: string;
+}
+
 export interface OnboardingData {
   company: CompanyInfo;
   business: BusinessInfo;
@@ -117,7 +135,7 @@ export interface OnboardingData {
   doplnkoveSluzby: DoplnkovaSluzba[];
   obchodnaOsoba: Osoba;
   technickaOsoba: Osoba;
-  opravnenaOsoba: OpravnenaOsoba;
+  opravneneOsoby: OpravnenaOsoba[]; // Changed from single to multiple
   skutocniMajitelia: SkutocnyMajitel[];
   fakturacneUdaje: FakturacneUdaje;
   podpisSuhlasy: PodpisSuhlasy;
@@ -144,7 +162,9 @@ export type OnboardingContextType = {
   updateDoplnkovaSluzba: (id: string, selected: boolean, value?: string) => void;
   updateObchodnaOsoba: (info: Partial<Osoba>) => void;
   updateTechnickaOsoba: (info: Partial<Osoba>) => void;
-  updateOpravnenaOsoba: (info: Partial<OpravnenaOsoba>) => void;
+  addOpravnenaOsoba: (osoba: OpravnenaOsoba) => void;
+  updateOpravnenaOsoba: (index: number, info: Partial<OpravnenaOsoba>) => void;
+  removeOpravnenaOsoba: (index: number) => void;
   addSkutocnyMajitel: (majitel: SkutocnyMajitel) => void;
   updateSkutocnyMajitel: (index: number, info: Partial<SkutocnyMajitel>) => void;
   removeSkutocnyMajitel: (index: number) => void;
@@ -244,21 +264,23 @@ export const defaultOnboardingData: OnboardingData = {
     email: "",
     telefon: ""
   },
-  opravnenaOsoba: {
-    meno: "",
-    email: "",
-    telefon: "",
-    funkcia: "",
-    datumNarodenia: "",
-    rodneCislo: "",
-    obcianstvo: "Slovenské",
-    adresaTrvalehoBydliska: "",
-    typDokladu: "Občiansky preukaz",
-    cisloDokladu: "",
-    platnostDokladu: "",
-    statVydania: "Slovenská republika",
-    politickyExponovana: false
-  },
+  opravneneOsoby: [
+    {
+      meno: "",
+      email: "",
+      telefon: "",
+      funkcia: "",
+      datumNarodenia: "",
+      rodneCislo: "",
+      obcianstvo: "Slovenské",
+      adresaTrvalehoBydliska: "",
+      typDokladu: "Občiansky preukaz",
+      cisloDokladu: "",
+      platnostDokladu: "",
+      statVydania: "Slovenská republika",
+      politickyExponovana: false
+    }
+  ],
   skutocniMajitelia: [],
   fakturacneUdaje: {
     fakturacnyEmail: "",
