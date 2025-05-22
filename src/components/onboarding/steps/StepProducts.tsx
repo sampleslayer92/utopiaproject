@@ -6,20 +6,33 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { DeviceCard } from './DeviceCard';
 import { Button } from '@/components/ui/button';
 
+// Define a more specific type that matches our devices array
+type DeviceType = {
+  id: string;
+  nazov: string;
+  selected: boolean;
+  pocetKs: number;
+  typNakupu: 'Prenájom' | 'Kúpa';
+  viazanost: 12 | 24 | 36;
+  frekvenciaPlatby: 'mesačne' | 'ročne' | 'sezónne' | 'z obratu';
+  hasWifi: boolean;
+  hasSim: boolean;
+};
+
 export const StepProducts: React.FC = () => {
   const { nextStep, prevStep, updateZariadenie, data } = useOnboarding();
   const { t } = useLanguage();
   
-  // Initial devices with correct types
-  const [devices, setDevices] = useState([
+  // Initial devices with the correct type
+  const [devices, setDevices] = useState<DeviceType[]>([
     {
       id: 'terminal-a920',
       nazov: 'Terminal A920',
       selected: false,
       pocetKs: 1,
-      typNakupu: 'Prenájom' as const,
-      viazanost: 24 as const,
-      frekvenciaPlatby: 'mesačne' as const,
+      typNakupu: 'Prenájom',
+      viazanost: 24,
+      frekvenciaPlatby: 'mesačne',
       hasWifi: false,
       hasSim: false
     },
@@ -28,9 +41,9 @@ export const StepProducts: React.FC = () => {
       nazov: 'Terminal S800',
       selected: false,
       pocetKs: 1,
-      typNakupu: 'Prenájom' as const,
-      viazanost: 24 as const,
-      frekvenciaPlatby: 'mesačne' as const,
+      typNakupu: 'Prenájom',
+      viazanost: 24,
+      frekvenciaPlatby: 'mesačne',
       hasWifi: false,
       hasSim: false
     },
@@ -39,9 +52,9 @@ export const StepProducts: React.FC = () => {
       nazov: 'Terminal PAX A80',
       selected: false,
       pocetKs: 1,
-      typNakupu: 'Prenájom' as const,
-      viazanost: 24 as const,
-      frekvenciaPlatby: 'mesačne' as const,
+      typNakupu: 'Prenájom',
+      viazanost: 24,
+      frekvenciaPlatby: 'mesačne',
       hasWifi: false,
       hasSim: false
     }
@@ -59,20 +72,23 @@ export const StepProducts: React.FC = () => {
     ));
   };
 
+  // Fix the type for purchase type change
   const handlePurchaseTypeChange = (id: string, type: 'Prenájom' | 'Kúpa') => {
-    setDevices(devices.map(device => 
+    setDevices(prev => prev.map(device => 
       device.id === id ? { ...device, typNakupu: type } : device
     ));
   };
 
+  // Fix the type for commitment change
   const handleCommitmentChange = (id: string, months: 12 | 24 | 36) => {
-    setDevices(devices.map(device => 
+    setDevices(prev => prev.map(device => 
       device.id === id ? { ...device, viazanost: months } : device
     ));
   };
 
+  // Fix the type for payment frequency change
   const handlePaymentFrequencyChange = (id: string, frequency: 'mesačne' | 'ročne' | 'sezónne' | 'z obratu') => {
-    setDevices(devices.map(device => 
+    setDevices(prev => prev.map(device => 
       device.id === id ? { ...device, frekvenciaPlatby: frequency } : device
     ));
   };
@@ -87,6 +103,11 @@ export const StepProducts: React.FC = () => {
           } 
         : device
     ));
+  };
+
+  // Add an explicit function for SIM option change
+  const handleSimOptionChange = (id: string, selected: boolean) => {
+    handleConnectivityChange(id, 'sim', selected);
   };
 
   const handleContinue = () => {
@@ -121,6 +142,7 @@ export const StepProducts: React.FC = () => {
             onCommitmentChange={handleCommitmentChange}
             onPaymentFrequencyChange={handlePaymentFrequencyChange}
             onConnectivityChange={handleConnectivityChange}
+            onSimOptionChange={handleSimOptionChange}
           />
         ))}
         

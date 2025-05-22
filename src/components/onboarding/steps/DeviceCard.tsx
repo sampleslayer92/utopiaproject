@@ -32,7 +32,7 @@ interface DeviceCardProps {
   onCommitmentChange: (id: string, months: 12 | 24 | 36) => void;
   onPaymentFrequencyChange: (id: string, frequency: 'mesačne' | 'ročne' | 'sezónne' | 'z obratu') => void;
   onConnectivityChange?: (id: string, type: 'wifi' | 'sim', value: boolean) => void;
-  onSimOptionChange?: (id: string, selected: boolean) => void; // Add this new prop
+  onSimOptionChange?: (id: string, selected: boolean) => void; // Make sure this prop is included
 }
 
 export const DeviceCard: React.FC<DeviceCardProps> = ({
