@@ -31,11 +31,11 @@ interface DeviceCardProps {
     hasDiscount?: boolean;
   };
   onSelect: (id: string) => void;
-  onQtyChange: (id: string, qty: number) => void;
-  onPurchaseTypeChange: (id: string, type: 'Prenájom' | 'Kúpa') => void;
-  onCommitmentChange: (id: string, months: 12 | 24 | 36) => void;
-  onPaymentFrequencyChange: (id: string, frequency: 'mesačne' | 'ročne' | 'sezónne' | 'z obratu') => void;
-  onConnectivityChange?: (id: string, type: 'wifi' | 'sim' | 'ethernet', value: boolean) => void;
+  onQtyChange: (value: string) => void;
+  onPurchaseTypeChange: (value: string) => void;
+  onCommitmentChange: (value: string) => void;
+  onPaymentFrequencyChange: (value: string) => void;
+  onConnectivityChange?: (type: string, value: boolean) => void;
   onSimOptionChange?: (id: string, selected: boolean) => void;
 }
 
@@ -66,13 +66,13 @@ export const DeviceCard: React.FC<DeviceCardProps> = ({
     if (onSimOptionChange) {
       onSimOptionChange(id, selected);
     } else if (onConnectivityChange) {
-      onConnectivityChange(id, 'sim', selected);
+      onConnectivityChange('sim', selected);
     }
   };
 
-  const handleConnectivityChange = (id: string, type: 'wifi' | 'sim' | 'ethernet', value: boolean) => {
+  const handleConnectivityChange = (type: 'wifi' | 'sim' | 'ethernet', value: boolean) => {
     if (onConnectivityChange) {
-      onConnectivityChange(id, type, value);
+      onConnectivityChange(type, value);
     }
   };
 
@@ -128,7 +128,7 @@ export const DeviceCard: React.FC<DeviceCardProps> = ({
                 type="number"
                 min="1"
                 value={device.pocetKs}
-                onChange={(e) => onQtyChange(device.id, parseInt(e.target.value) || 1)}
+                onChange={(e) => onQtyChange(e.target.value)}
                 className="mt-1"
               />
             </div>
@@ -137,7 +137,7 @@ export const DeviceCard: React.FC<DeviceCardProps> = ({
               <Label htmlFor={`type-${device.id}`}>{t('purchase.type')}</Label>
               <Select 
                 value={device.typNakupu}
-                onValueChange={(value) => onPurchaseTypeChange(device.id, value as 'Prenájom' | 'Kúpa')}
+                onValueChange={(value) => onPurchaseTypeChange(value)}
               >
                 <SelectTrigger className="mt-1">
                   <SelectValue />
@@ -153,7 +153,7 @@ export const DeviceCard: React.FC<DeviceCardProps> = ({
               <Label htmlFor={`commitment-${device.id}`}>{t('commitment')}</Label>
               <Select 
                 value={device.viazanost.toString()}
-                onValueChange={(value) => onCommitmentChange(device.id, parseInt(value) as 12 | 24 | 36)}
+                onValueChange={(value) => onCommitmentChange(value)}
               >
                 <SelectTrigger className="mt-1">
                   <SelectValue />
@@ -170,7 +170,7 @@ export const DeviceCard: React.FC<DeviceCardProps> = ({
               <Label htmlFor={`frequency-${device.id}`}>{t('payment.frequency')}</Label>
               <Select 
                 value={device.frekvenciaPlatby}
-                onValueChange={(value) => onPaymentFrequencyChange(device.id, value as 'mesačne' | 'ročne' | 'sezónne' | 'z obratu')}
+                onValueChange={(value) => onPaymentFrequencyChange(value)}
               >
                 <SelectTrigger className="mt-1">
                   <SelectValue />
@@ -192,7 +192,7 @@ export const DeviceCard: React.FC<DeviceCardProps> = ({
                 className={`flex items-center gap-2 p-3 border rounded-lg transition-all cursor-pointer ${
                   device.hasWifi ? 'bg-emerald-50 border-emerald-500 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300' : 'hover:bg-gray-50 dark:hover:bg-slate-800'
                 }`}
-                onClick={() => handleConnectivityChange(device.id, 'wifi', !device.hasWifi)}
+                onClick={() => handleConnectivityChange('wifi', !device.hasWifi)}
               >
                 <div className={`p-2 rounded-full ${device.hasWifi ? 'bg-emerald-100 dark:bg-emerald-900/40' : 'bg-gray-100 dark:bg-slate-700'}`}>
                   <Wifi className={`h-4 w-4 ${device.hasWifi ? 'text-emerald-500' : ''}`} />
@@ -216,7 +216,7 @@ export const DeviceCard: React.FC<DeviceCardProps> = ({
                 className={`flex items-center gap-2 p-3 border rounded-lg transition-all cursor-pointer ${
                   device.hasEthernet ? 'bg-emerald-50 border-emerald-500 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300' : 'hover:bg-gray-50 dark:hover:bg-slate-800'
                 }`}
-                onClick={() => handleConnectivityChange(device.id, 'ethernet', !device.hasEthernet)}
+                onClick={() => handleConnectivityChange('ethernet', !device.hasEthernet)}
               >
                 <div className={`p-2 rounded-full ${device.hasEthernet ? 'bg-emerald-100 dark:bg-emerald-900/40' : 'bg-gray-100 dark:bg-slate-700'}`}>
                   <HardDrive className={`h-4 w-4 ${device.hasEthernet ? 'text-emerald-500' : ''}`} />

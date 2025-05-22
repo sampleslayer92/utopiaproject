@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Card, CardContent } from '@/components/ui/card';
@@ -437,6 +436,46 @@ export const ProductWizard: React.FC<ProductWizardProps> = ({ onNext, onBack }) 
     return deviceCount + licenseCount + paymentMethodCount + serviceCount;
   };
   
+  // The modified function to properly convert types before passing to handlers
+  const onQtyChange = (id: string, qtyStr: string) => {
+    const qty = parseInt(qtyStr);
+    if (!isNaN(qty) && qty > 0) {
+      handleDeviceQtyChange(id, qty);
+    }
+  };
+
+  const onPurchaseTypeChange = (id: string, typeStr: string) => {
+    // Ensure the type is one of the allowed values
+    const type = typeStr as 'Prenájom' | 'Kúpa';
+    if (type === 'Prenájom' || type === 'Kúpa') {
+      handleDevicePurchaseTypeChange(id, type);
+    }
+  };
+
+  const onCommitmentChange = (id: string, monthsStr: string) => {
+    // Convert string to number and ensure it's one of the allowed values
+    const months = parseInt(monthsStr);
+    if (months === 12 || months === 24 || months === 36) {
+      handleDeviceCommitmentChange(id, months as 12 | 24 | 36);
+    }
+  };
+
+  const onPaymentFrequencyChange = (id: string, frequencyStr: string) => {
+    // Ensure the frequency is one of the allowed values
+    const frequency = frequencyStr as 'mesačne' | 'ročne' | 'sezónne' | 'z obratu';
+    if (['mesačne', 'ročne', 'sezónne', 'z obratu'].includes(frequency)) {
+      handleDevicePaymentFrequencyChange(id, frequency);
+    }
+  };
+
+  const onConnectivityChange = (id: string, typeStr: string, value: boolean) => {
+    // Ensure the type is one of the allowed values
+    const type = typeStr as 'wifi' | 'sim' | 'ethernet';
+    if (['wifi', 'sim', 'ethernet'].includes(type)) {
+      handleConnectivityChange(id, type, value);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -511,11 +550,11 @@ export const ProductWizard: React.FC<ProductWizardProps> = ({ onNext, onBack }) 
                     key={device.id}
                     device={device}
                     onSelect={() => handleDeviceSelect(device.id)}
-                    onQtyChange={(qty) => handleDeviceQtyChange(device.id, qty)}
-                    onPurchaseTypeChange={(type) => handleDevicePurchaseTypeChange(device.id, type)}
-                    onCommitmentChange={(months) => handleDeviceCommitmentChange(device.id, months)}
-                    onPaymentFrequencyChange={(freq) => handleDevicePaymentFrequencyChange(device.id, freq)}
-                    onConnectivityChange={(type, value) => handleConnectivityChange(device.id, type, value)}
+                    onQtyChange={(qty) => onQtyChange(device.id, qty.toString())}
+                    onPurchaseTypeChange={(type) => onPurchaseTypeChange(device.id, type)}
+                    onCommitmentChange={(months) => onCommitmentChange(device.id, months.toString())}
+                    onPaymentFrequencyChange={(freq) => onPaymentFrequencyChange(device.id, freq)}
+                    onConnectivityChange={(type, value) => onConnectivityChange(device.id, type, value)}
                   />
                 ))}
               </div>
