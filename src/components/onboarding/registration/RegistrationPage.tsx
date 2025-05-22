@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +13,7 @@ import { PhoneVerificationScreen } from './PhoneVerificationScreen';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 interface UserData {
   country: string;
@@ -47,7 +47,13 @@ export const RegistrationPage: React.FC = () => {
   };
   
   const handleCountrySelect = (country: string) => {
-    const phonePrefix = country === 'SK' ? '+421' : (country === 'CZ' ? '+420' : '+44');
+    const phonePrefix = country === 'SK' ? '+421' : 
+                        country === 'CZ' ? '+420' : 
+                        country === 'GB' ? '+44' : 
+                        country === 'AT' ? '+43' : 
+                        country === 'HU' ? '+36' : 
+                        country === 'PL' ? '+48' :
+                        country === 'DE' ? '+49' : '+44';
     setUserData({
       ...userData,
       country,
@@ -78,10 +84,10 @@ export const RegistrationPage: React.FC = () => {
     // In a real app, we would verify the code with an API
     // For now, we'll just accept any 4-digit code
     if (code.length === 4) {
-      toast.success("Telefónne číslo overené!");
+      toast.success(t("phone.verified"));
       nextStep();
     } else {
-      toast.error("Neplatný kód!");
+      toast.error(t("invalid.code"));
     }
   };
   
@@ -91,6 +97,7 @@ export const RegistrationPage: React.FC = () => {
     localStorage.setItem('utopiaRegistration', JSON.stringify(userData));
     // Redirect to dashboard
     navigate('/dashboard');
+    toast.success(t("registration.complete"));
   };
   
   const nextStep = () => {
@@ -124,9 +131,12 @@ export const RegistrationPage: React.FC = () => {
             className="flex items-center gap-2 text-blue-300 hover:bg-blue-900/20"
           >
             <ArrowLeft className="h-4 w-4" />
-            Späť
+            {t('back')}
           </Button>
-          <LanguageSwitcher />
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <LanguageSwitcher />
+          </div>
         </header>
         
         <AnimatePresence mode="wait">
@@ -141,10 +151,10 @@ export const RegistrationPage: React.FC = () => {
             <div className="w-full max-w-lg">
               <div className="text-center mb-8">
                 <h1 className="text-3xl font-bold text-white">
-                  Vytvorte si účet
+                  {t('create.account')}
                 </h1>
                 <p className="mt-2 text-blue-300">
-                  Potrebujeme od vás len pár základných údajov pre vytvorenie účtu
+                  {t('account.subtitle')}
                 </p>
               </div>
               
@@ -153,14 +163,14 @@ export const RegistrationPage: React.FC = () => {
                   <div className="space-y-4">
                     <div>
                       <Label htmlFor="fullName" className="text-base text-white">
-                        Meno a priezvisko
+                        {t('full.name')}
                       </Label>
                       <Input
                         id="fullName"
                         name="fullName"
                         value={userData.fullName}
                         onChange={handleChange}
-                        placeholder="Zadajte vaše meno a priezvisko"
+                        placeholder={t('enter.full.name')}
                         className="mt-1 glass-input rounded-xl py-6 text-lg bg-white/20 text-white placeholder:text-blue-300/70"
                         required
                       />
@@ -168,7 +178,7 @@ export const RegistrationPage: React.FC = () => {
                     
                     <div>
                       <Label htmlFor="email" className="text-base text-white">
-                        E-mailová adresa
+                        {t('email')}
                       </Label>
                       <Input
                         id="email"
@@ -176,7 +186,7 @@ export const RegistrationPage: React.FC = () => {
                         type="email"
                         value={userData.email}
                         onChange={handleChange}
-                        placeholder="vasa@adresa.sk"
+                        placeholder={t('email.placeholder')}
                         className="mt-1 glass-input rounded-xl py-6 text-lg bg-white/20 text-white placeholder:text-blue-300/70"
                         required
                       />
@@ -188,7 +198,7 @@ export const RegistrationPage: React.FC = () => {
                       type="submit" 
                       className="px-8 py-6 text-lg bg-emerald-500 hover:bg-emerald-600 rounded-full hover-lift"
                     >
-                      <span>Pokračovať</span>
+                      <span>{t('continue')}</span>
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
                   </div>
@@ -199,7 +209,7 @@ export const RegistrationPage: React.FC = () => {
         </AnimatePresence>
         
         <footer className="py-4 text-center text-sm text-blue-300/70">
-          © 2025 Utopia. Všetky práva vyhradené.
+          © 2025 Utopia. {t('all.rights.reserved')}
         </footer>
       </div>
     );

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, ArrowLeft } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Check } from 'lucide-react';
 import { LanguageSwitcher } from '@/components/ui/language-switcher';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { Card, CardContent } from '@/components/ui/card';
@@ -68,6 +68,12 @@ export const CountrySelectionScreen: React.FC<CountrySelectionScreenProps> = ({
       name: t('poland'),
       englishName: 'Poland'
     },
+    {
+      id: 'DE',
+      flagSrc: '/flags/de.svg',
+      name: t('germany'),
+      englishName: 'Germany'
+    }
   ];
 
   return (
@@ -103,7 +109,12 @@ export const CountrySelectionScreen: React.FC<CountrySelectionScreenProps> = ({
             </p>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+          <motion.div 
+            className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
             {countries.map((country, index) => (
               <motion.div
                 key={country.id}
@@ -120,26 +131,36 @@ export const CountrySelectionScreen: React.FC<CountrySelectionScreenProps> = ({
                   )}
                   onClick={() => onSelect(country.id)}
                 >
-                  <CardContent className="p-6 flex items-center space-x-4">
-                    <div className="w-10 h-6 relative overflow-hidden rounded shadow-sm">
+                  <CardContent className="p-4 flex items-center space-x-4">
+                    <div className="w-12 h-8 relative overflow-hidden rounded shadow-sm flex-shrink-0">
                       <img 
                         src={country.flagSrc} 
                         alt={language === 'sk' ? country.name : country.englishName} 
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <div>
+                    <div className="flex-1">
                       <h3 className="font-medium text-slate-900 dark:text-white">
                         {language === 'sk' ? country.name : country.englishName}
                       </h3>
                     </div>
+                    {selectedCountry === country.id && (
+                      <div className="flex-shrink-0 text-emerald-500">
+                        <Check className="h-5 w-5" />
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
           
-          <div className="flex justify-center">
+          <motion.div 
+            className="flex justify-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
             <Button
               onClick={onNext}
               disabled={!selectedCountry}
@@ -148,7 +169,7 @@ export const CountrySelectionScreen: React.FC<CountrySelectionScreenProps> = ({
               <span>{t('continue')}</span>
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-          </div>
+          </motion.div>
         </div>
       </motion.main>
       
