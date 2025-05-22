@@ -4,9 +4,11 @@ import { useTheme } from 'next-themes';
 import { Button } from './button';
 import { Sun, Moon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export function ThemeToggle({ className }: { className?: string }) {
   const { theme, setTheme } = useTheme();
+  const { t } = useLanguage();
   
   return (
     <div className={cn("flex items-center space-x-1 rounded-full overflow-hidden shadow-sm bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm", className)}>
@@ -20,10 +22,10 @@ export function ThemeToggle({ className }: { className?: string }) {
             ? "bg-emerald-500 text-white hover:bg-emerald-600" 
             : "bg-transparent hover:bg-gray-100 dark:hover:bg-slate-700"
         )}
-        aria-label="Light mode"
+        aria-label={t('light.mode')}
       >
         <Sun className="h-4 w-4" />
-        <span className="font-medium sr-only md:not-sr-only">Light</span>
+        <span className="font-medium sr-only md:not-sr-only">{t('light')}</span>
       </Button>
       <Button
         variant="ghost"
@@ -35,10 +37,10 @@ export function ThemeToggle({ className }: { className?: string }) {
             ? "bg-emerald-500 text-white hover:bg-emerald-600" 
             : "bg-transparent hover:bg-gray-100 dark:hover:bg-slate-700"
         )}
-        aria-label="Dark mode"
+        aria-label={t('dark.mode')}
       >
         <Moon className="h-4 w-4" />
-        <span className="font-medium sr-only md:not-sr-only">Dark</span>
+        <span className="font-medium sr-only md:not-sr-only">{t('dark')}</span>
       </Button>
     </div>
   );

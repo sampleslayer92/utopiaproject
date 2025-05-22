@@ -5,7 +5,7 @@ import { Button } from './button';
 import { cn } from '@/lib/utils';
 
 export function LanguageSwitcher() {
-  const { language, setLanguage } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
 
   return (
     <div className="flex items-center space-x-1 border rounded-full overflow-hidden shadow-sm bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm">
@@ -19,9 +19,19 @@ export function LanguageSwitcher() {
             ? "bg-emerald-500 text-white hover:bg-emerald-600" 
             : "bg-transparent hover:bg-gray-100 dark:hover:bg-slate-700"
         )}
-        aria-label="Slovak language"
+        aria-label={t('slovak.language')}
       >
-        <span className="text-base" role="img" aria-label="Slovakia flag">🇸🇰</span>
+        <img 
+          src="/flags/sk.svg" 
+          alt="Slovakia flag" 
+          className="w-5 h-4 object-cover rounded"
+          onError={(e) => {
+            // Fallback to emoji if image fails to load
+            const target = e.target as HTMLImageElement;
+            target.onerror = null;
+            target.nextSibling!.textContent = "🇸🇰 ";
+          }}
+        />
         <span className="font-medium">SK</span>
       </Button>
       <Button
@@ -34,9 +44,19 @@ export function LanguageSwitcher() {
             ? "bg-emerald-500 text-white hover:bg-emerald-600" 
             : "bg-transparent hover:bg-gray-100 dark:hover:bg-slate-700"
         )}
-        aria-label="English language"
+        aria-label={t('english.language')}
       >
-        <span className="text-base" role="img" aria-label="United Kingdom flag">🇬🇧</span>
+        <img 
+          src="/flags/gb.svg" 
+          alt="United Kingdom flag" 
+          className="w-5 h-4 object-cover rounded"
+          onError={(e) => {
+            // Fallback to emoji if image fails to load
+            const target = e.target as HTMLImageElement;
+            target.onerror = null;
+            target.nextSibling!.textContent = "🇬🇧 ";
+          }}
+        />
         <span className="font-medium">EN</span>
       </Button>
     </div>
