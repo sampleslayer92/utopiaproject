@@ -256,12 +256,14 @@ export const StepBusiness: React.FC = () => {
               <Card key={location.id} className="border-slate-200 dark:border-slate-700 overflow-hidden">
                 <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
                   <div className="flex items-center gap-2">
-                    <CollapsibleTrigger 
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="rounded-full p-1 h-auto w-auto hover:bg-slate-100 dark:hover:bg-slate-700"
                       onClick={() => toggleLocationCollapse(location.id)}
-                      className="rounded-full p-1 hover:bg-slate-100 dark:hover:bg-slate-700"
                     >
                       {location.isOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
-                    </CollapsibleTrigger>
+                    </Button>
                     <h4 className="font-medium">
                       {location.name || `Prevádzka ${index + 1}`}
                     </h4>
@@ -280,7 +282,7 @@ export const StepBusiness: React.FC = () => {
                   )}
                 </div>
                 
-                <Collapsible open={location.isOpen}>
+                <Collapsible open={location.isOpen} onOpenChange={(isOpen) => updateLocation(location.id, 'isOpen', isOpen)}>
                   <CollapsibleContent>
                     <CardContent className="p-4">
                       <div className="space-y-6">
