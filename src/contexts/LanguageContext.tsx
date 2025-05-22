@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 type Language = 'sk' | 'en';
@@ -112,7 +113,7 @@ const translations: Record<string, Record<string, string>> = {
     'business.name': 'Názov prevádzky',
     'business.address': 'Adresa prevádzky',
     'opening.hours': 'Otváracie hodiny',
-    'seasonal': 'Sezónna prevádzka',
+    'is.seasonal': 'Sezónna prevádzka',
     'season.duration': 'Trvanie sezóny',
     'estimated.annual.turnover': 'Odhadovaný ročný obrat',
     'average.transaction': 'Priemerná výška transakcie',
@@ -141,7 +142,7 @@ const translations: Record<string, Record<string, string>> = {
     'payment.frequency': 'Frekvencia platby',
     'monthly': 'Mesačne',
     'yearly': 'Ročne',
-    'seasonal': 'Sezónne',
+    'seasonal.payment': 'Sezónne',
     'from.turnover': 'Z obratu',
     'payment.methods': 'Platobné metódy',
     'additional.services': 'Doplnkové služby',
@@ -262,7 +263,7 @@ const translations: Record<string, Record<string, string>> = {
     'business.name': 'Business name',
     'business.address': 'Business address',
     'opening.hours': 'Opening hours',
-    'seasonal': 'Seasonal business',
+    'is.seasonal': 'Seasonal business',
     'season.duration': 'Season duration',
     'estimated.annual.turnover': 'Estimated annual turnover',
     'average.transaction': 'Average transaction amount',
@@ -291,7 +292,7 @@ const translations: Record<string, Record<string, string>> = {
     'payment.frequency': 'Payment frequency',
     'monthly': 'Monthly',
     'yearly': 'Yearly',
-    'seasonal': 'Seasonal',
+    'seasonal.payment': 'Seasonal',
     'from.turnover': 'From turnover',
     'payment.methods': 'Payment methods',
     'additional.services': 'Additional services',

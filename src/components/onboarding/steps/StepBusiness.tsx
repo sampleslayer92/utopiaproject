@@ -29,28 +29,24 @@ export const StepBusiness: React.FC = () => {
     sim: business.hasSimCard || false
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    updateBusinessInfo({
-      [e.target.name]: e.target.value
-    });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    updateBusinessInfo({ [name]: value });
   };
 
   const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateBusinessInfo({
-      [e.target.name]: e.target.value ? parseFloat(e.target.value) : 0
-    });
+    const { name, value } = e.target;
+    updateBusinessInfo({ [name]: parseInt(value) });
   };
 
-  const handleTypChange = (value: string) => {
-    updateBusinessInfo({
-      typPrevadzky: value as any
-    });
+  const handleTypChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    updateBusinessInfo({ [name]: value });
   };
 
-  const handleSezonnostChange = (checked: boolean) => {
+  const handleSezonnostChange = (isSezonnost: boolean) => {
     updateBusinessInfo({
-      sezonnost: checked,
-      trvanieSezony: checked ? business.trvanieSezony || 12 : 0
+      sezonnost: isSezonnost
     });
   };
 
@@ -100,291 +96,208 @@ export const StepBusiness: React.FC = () => {
   return (
     <StepContainer
       title={t('business.locations')}
-      subtitle={t('select.business.type.subtitle')}
+      subtitle={t('business.subject')}
     >
-      <div className="space-y-6">
-        {/* Locations section */}
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium">{t('business.locations')}</h3>
-              <Button 
-                onClick={addLocation} 
-                size="sm" 
-                className="flex items-center gap-1.5"
-              >
-                <Plus className="w-4 h-4" />
-                {t('add.location')}
-              </Button>
-            </div>
-            
-            <div className="space-y-6">
-              {locations.map((location, index) => (
-                <div key={location.id} className="p-4 border rounded-lg bg-gray-50 dark:bg-slate-900">
-                  <div className="flex justify-between items-center mb-3">
-                    <h4 className="font-medium">{t('business.name')} #{index + 1}</h4>
-                    {locations.length > 1 && (
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
+      <div className="space-y-8">
+        {/* Business Locations */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-medium">{t('business.locations')}</h3>
+            <Button 
+              size="sm" 
+              onClick={addLocation}
+              className="gap-1"
+              variant="outline"
+            >
+              <Plus className="h-4 w-4" /> {t('add.location')}
+            </Button>
+          </div>
+          
+          <div className="space-y-4">
+            {locations.map((location, index) => (
+              <Card key={location.id} className="border-slate-200 dark:border-slate-700">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="font-medium">
+                      {index === 0 ? t('business.name') : `${t('business.name')} ${index + 1}`}
+                    </h4>
+                    
+                    {index !== 0 && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
                         onClick={() => removeLocation(location.id)}
-                        className="h-8 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
                       >
-                        <Minus className="w-4 h-4 mr-1" />
-                        {t('remove')}
+                        <Minus className="h-4 w-4 mr-1 text-red-500" />
+                        <span className="text-red-500">{t('remove.location')}</span>
                       </Button>
                     )}
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor={`location-name-${location.id}`}>{t('business.name')}</Label>
+                      <Label htmlFor={`business-name-${location.id}`}>{t('business.name')}</Label>
                       <Input
-                        id={`location-name-${location.id}`}
+                        id={`business-name-${location.id}`}
+                        placeholder={t('business.name')}
                         value={location.name}
                         onChange={(e) => updateLocation(location.id, 'name', e.target.value)}
-                        placeholder={t('business.name')}
-                        className="mt-1"
                       />
                     </div>
-                    
                     <div>
-                      <Label htmlFor={`location-address-${location.id}`}>{t('business.address')}</Label>
+                      <Label htmlFor={`business-address-${location.id}`}>{t('business.address')}</Label>
                       <Input
-                        id={`location-address-${location.id}`}
+                        id={`business-address-${location.id}`}
+                        placeholder={t('business.address')}
                         value={location.address}
                         onChange={(e) => updateLocation(location.id, 'address', e.target.value)}
-                        placeholder={t('business.address')}
-                        className="mt-1"
                       />
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Contact Information */}
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <h3 className="text-lg font-medium mb-4">{t('address')}</h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="mesto">{t('city')}</Label>
-                <Input
-                  id="mesto"
-                  name="mesto"
-                  value={business.mesto}
-                  onChange={handleChange}
-                  placeholder={t('city')}
-                  className="mt-1"
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="psc">{t('postal.code')}</Label>
-                <Input
-                  id="psc"
-                  name="psc"
-                  value={business.psc}
-                  onChange={handleChange}
-                  placeholder={t('postal.code')}
-                  className="mt-1"
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="telefon">{t('phone')}</Label>
-                <Input
-                  id="telefon"
-                  name="telefon"
-                  value={business.telefon}
-                  onChange={handleChange}
-                  placeholder={t('phone')}
-                  className="mt-1"
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="email">{t('email')}</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={business.email}
-                  onChange={handleChange}
-                  placeholder={t('email')}
-                  className="mt-1"
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
         
         {/* Business Type */}
-        <Card>
-          <CardContent className="p-6">
-            <h3 className="text-lg font-medium mb-4">{t('business.type')}</h3>
+        <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
+          <h3 className="text-lg font-medium mb-4">{t('business.type')}</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <Label htmlFor="typPrevadzky">{t('business.type')}</Label>
+              <Select 
+                value={business.typPrevadzky || 'brick-and-mortar'}
+                onValueChange={(value) => updateBusinessInfo({ typPrevadzky: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={t('business.type')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="brick-and-mortar">{t('brick.and.mortar')}</SelectItem>
+                  <SelectItem value="mobile">{t('mobile')}</SelectItem>
+                  <SelectItem value="seasonal">{t('seasonal_business')}</SelectItem>
+                  <SelectItem value="other">{t('other')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="typPrevadzky">{t('business.type')}</Label>
-                <Select 
-                  value={business.typPrevadzky} 
-                  onValueChange={handleTypChange}
-                >
-                  <SelectTrigger className="mt-1">
-                    <SelectValue placeholder={t('select.business.type')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Kamenná">{t('brick.and.mortar')}</SelectItem>
-                    <SelectItem value="Mobilná">{t('mobile')}</SelectItem>
-                    <SelectItem value="Sezónna">{t('seasonal')}</SelectItem>
-                    <SelectItem value="Iné">{t('other')}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div>
-                <Label htmlFor="predmetPodnikania">{t('business.subject')}</Label>
+            <div>
+              <Label htmlFor="otvHodiny">{t('opening.hours')}</Label>
+              <Input
+                id="otvHodiny"
+                placeholder="Po-Pia 9:00 - 17:00, So-Ne zatvorené"
+                value={business.otvHodiny || ''}
+                onChange={(e) => updateBusinessInfo({ otvHodiny: e.target.value })}
+              />
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-2 mb-4">
+            <Switch
+              id="sezonnost"
+              checked={business.sezonnost || false}
+              onCheckedChange={handleSezonnostChange}
+            />
+            <Label htmlFor="sezonnost">{t('is.seasonal')}</Label>
+          </div>
+          
+          {business.sezonnost && (
+            <div className="mb-4">
+              <Label htmlFor="trvanieSezonnosti">{t('season.duration')}</Label>
+              <div className="flex items-center gap-2">
                 <Input
-                  id="predmetPodnikania"
-                  name="predmetPodnikania"
-                  value={business.predmetPodnikania}
-                  onChange={handleChange}
-                  placeholder={t('business.subject')}
-                  className="mt-1"
+                  id="trvanieSezonnosti"
+                  type="number"
+                  min="1"
+                  max="52"
+                  className="max-w-[100px]"
+                  value={business.trvanieSezonnosti || 12}
+                  onChange={(e) => updateBusinessInfo({ trvanieSezonnosti: parseInt(e.target.value) })}
                 />
+                <span>{t('weeks')}</span>
               </div>
-              
-              <div className="col-span-2">
-                <Label htmlFor="otvaracieHodiny">{t('opening.hours')}</Label>
-                <Textarea
-                  id="otvaracieHodiny"
-                  name="otvaracieHodiny"
-                  value={business.otvaracieHodiny}
-                  onChange={handleChange}
-                  placeholder={t('opening.hours')}
-                  className="mt-1 h-24"
-                />
+            </div>
+          )}
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+            <div>
+              <Label htmlFor="rocnyObrat">{t('estimated.annual.turnover')}</Label>
+              <Input
+                id="rocnyObrat"
+                type="number"
+                min="0"
+                step="1000"
+                value={business.rocnyObrat || 0}
+                onChange={(e) => updateBusinessInfo({ rocnyObrat: parseInt(e.target.value) })}
+              />
+              <div className="text-sm text-slate-500 mt-1">
+                {formatCurrency(business.rocnyObrat || 0)}
               </div>
             </div>
             
-            {/* Connectivity Options */}
-            <div className="mt-6 border-t pt-4">
-              <h4 className="text-base font-medium mb-3">{t('connectivity')}</h4>
-              <div className="flex flex-wrap gap-3">
-                <div 
-                  className={`flex items-center gap-2 p-3 border rounded-lg transition-all cursor-pointer ${
-                    connectivity.wifi ? 'bg-emerald-50 border-emerald-500 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300' : 'hover:bg-gray-50 dark:hover:bg-slate-800'
-                  }`}
-                  onClick={handleWifiToggle}
-                >
-                  <div className={`p-2 rounded-full ${connectivity.wifi ? 'bg-emerald-100 dark:bg-emerald-900/40' : 'bg-gray-100 dark:bg-slate-700'}`}>
-                    <Wifi className={`h-4 w-4 ${connectivity.wifi ? 'text-emerald-500' : ''}`} />
-                  </div>
-                  <span>{t('wifi')}</span>
-                </div>
-                
-                <div 
-                  className={`flex items-center gap-2 p-3 border rounded-lg transition-all cursor-pointer ${
-                    connectivity.sim ? 'bg-emerald-50 border-emerald-500 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300' : 'hover:bg-gray-50 dark:hover:bg-slate-800'
-                  }`}
-                  onClick={handleSimToggle}
-                >
-                  <div className={`p-2 rounded-full ${connectivity.sim ? 'bg-emerald-100 dark:bg-emerald-900/40' : 'bg-gray-100 dark:bg-slate-700'}`}>
-                    <Smartphone className={`h-4 w-4 ${connectivity.sim ? 'text-emerald-500' : ''}`} />
-                  </div>
-                  <span>{t('sim.card')}</span>
-                </div>
+            <div>
+              <Label htmlFor="priemTransakcia">{t('average.transaction')}</Label>
+              <Input
+                id="priemTransakcia"
+                type="number"
+                min="0"
+                step="1"
+                value={business.priemTransakcia || 0}
+                onChange={(e) => updateBusinessInfo({ priemTransakcia: parseInt(e.target.value) })}
+              />
+              <div className="text-sm text-slate-500 mt-1">
+                {formatCurrency(business.priemTransakcia || 0)}
               </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Predmet Podnikania */}
+        <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
+          <h3 className="text-lg font-medium mb-4">{t('business.subject')}</h3>
+          
+          <div>
+            <Textarea
+              id="predmetPodnikania"
+              placeholder={t('business.subject')}
+              className="min-h-24"
+              value={business.predmetPodnikania || ''}
+              onChange={(e) => updateBusinessInfo({ predmetPodnikania: e.target.value })}
+            />
+          </div>
+        </div>
+        
+        {/* Connectivity Options */}
+        <div className="mt-6 border-t pt-4">
+          <h4 className="text-base font-medium mb-3">{t('connectivity')}</h4>
+          <div className="flex flex-wrap gap-3">
+            <div 
+              className={`flex items-center gap-2 p-3 border rounded-lg transition-all cursor-pointer ${
+                connectivity.wifi ? 'bg-emerald-50 border-emerald-500 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300' : 'hover:bg-gray-50 dark:hover:bg-slate-800'
+              }`}
+              onClick={handleWifiToggle}
+            >
+              <div className={`p-2 rounded-full ${connectivity.wifi ? 'bg-emerald-100 dark:bg-emerald-900/40' : 'bg-gray-100 dark:bg-slate-700'}`}>
+                <Wifi className={`h-4 w-4 ${connectivity.wifi ? 'text-emerald-500' : ''}`} />
+              </div>
+              <span>{t('wifi')}</span>
             </div>
             
-            {/* Seasonality */}
-            <div className="mt-6 border-t pt-4">
-              <div className="flex items-center space-x-2 mb-4">
-                <Switch
-                  id="sezonnost"
-                  checked={business.sezonnost}
-                  onCheckedChange={handleSezonnostChange}
-                />
-                <Label htmlFor="sezonnost">{t('seasonal')}</Label>
+            <div 
+              className={`flex items-center gap-2 p-3 border rounded-lg transition-all cursor-pointer ${
+                connectivity.sim ? 'bg-emerald-50 border-emerald-500 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300' : 'hover:bg-gray-50 dark:hover:bg-slate-800'
+              }`}
+              onClick={handleSimToggle}
+            >
+              <div className={`p-2 rounded-full ${connectivity.sim ? 'bg-emerald-100 dark:bg-emerald-900/40' : 'bg-gray-100 dark:bg-slate-700'}`}>
+                <Smartphone className={`h-4 w-4 ${connectivity.sim ? 'text-emerald-500' : ''}`} />
               </div>
-              
-              {business.sezonnost && (
-                <div>
-                  <Label htmlFor="trvanieSezony">{t('season.duration')} ({t('weeks')})</Label>
-                  <Input
-                    id="trvanieSezony"
-                    name="trvanieSezony"
-                    type="number"
-                    min="1"
-                    max="52"
-                    value={business.trvanieSezony}
-                    onChange={handleNumberChange}
-                    className="mt-1 w-full md:w-1/3"
-                  />
-                </div>
-              )}
+              <span>{t('sim.card')}</span>
             </div>
-            
-            {/* Financial Information */}
-            <div className="mt-6 border-t pt-4">
-              <h4 className="text-base font-medium mb-3">{t('estimated.annual.turnover')}</h4>
-              <div className="bg-gray-50 rounded-lg p-4 space-y-4 dark:bg-slate-900">
-                <div>
-                  <Label htmlFor="odhadovanyRocnyObrat">{t('estimated.annual.turnover')}</Label>
-                  <Input
-                    id="odhadovanyRocnyObrat"
-                    name="odhadovanyRocnyObrat"
-                    type="number"
-                    value={business.odhadovanyRocnyObrat || ''}
-                    onChange={handleNumberChange}
-                    placeholder="0.00"
-                    className="mt-1"
-                  />
-                  {business.odhadovanyRocnyObrat > 0 && (
-                    <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">{formatCurrency(business.odhadovanyRocnyObrat)}</p>
-                  )}
-                </div>
-                
-                <div>
-                  <Label htmlFor="priemernaVyskaTransakcie">{t('average.transaction')}</Label>
-                  <Input
-                    id="priemernaVyskaTransakcie"
-                    name="priemernaVyskaTransakcie"
-                    type="number"
-                    value={business.priemernaVyskaTransakcie || ''}
-                    onChange={handleNumberChange}
-                    placeholder="0.00"
-                    className="mt-1"
-                  />
-                  {business.priemernaVyskaTransakcie > 0 && (
-                    <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">{formatCurrency(business.priemernaVyskaTransakcie)}</p>
-                  )}
-                </div>
-                
-                <div>
-                  <Label htmlFor="ocakavanyObratKariet">{t('expected.card.turnover')}</Label>
-                  <Input
-                    id="ocakavanyObratKariet"
-                    name="ocakavanyObratKariet"
-                    type="number"
-                    value={business.ocakavanyObratKariet || ''}
-                    onChange={handleNumberChange}
-                    placeholder="0.00"
-                    className="mt-1"
-                  />
-                  {business.ocakavanyObratKariet > 0 && (
-                    <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">{formatCurrency(business.ocakavanyObratKariet)}</p>
-                  )}
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </StepContainer>
   );
