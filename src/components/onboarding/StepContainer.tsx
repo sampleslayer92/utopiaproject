@@ -3,6 +3,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { BackButton } from './BackButton';
 import { NextButton } from './NextButton';
+import { SaveContinueLater } from './SaveContinueLater';
 
 interface StepContainerProps {
   children: React.ReactNode;
@@ -35,7 +36,7 @@ export const StepContainer: React.FC<StepContainerProps> = ({
       </div>
 
       <div className="mt-12 pt-4 border-t flex items-center justify-between">
-        <BackButton />
+        <SaveContinueLater />
         
         <div className="flex items-center gap-4">
           {actionBar}

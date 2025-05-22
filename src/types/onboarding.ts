@@ -1,4 +1,3 @@
-
 export interface CompanyInfo {
   ico: string;
   nazovSpolocnosti: string;
@@ -147,6 +146,7 @@ export type OnboardingContextType = {
   nextStep: () => void;
   prevStep: () => void;
   isStepComplete: (step: OnboardingStep) => boolean;
+  saveProgress: () => void;
 };
 
 export const defaultOnboardingData: OnboardingData = {

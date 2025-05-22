@@ -1,5 +1,6 @@
-
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'sonner';
 import { 
   OnboardingContextType, 
   OnboardingData, 
@@ -18,11 +19,50 @@ import {
 const OnboardingContext = createContext<OnboardingContextType | undefined>(undefined);
 
 export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const navigate = useNavigate();
+  const { step } = useParams<{ step: string }>();
   const [currentStep, setCurrentStep] = useState<OnboardingStep>('company');
   const [data, setData] = useState<OnboardingData>(defaultOnboardingData);
 
+  // Load data from localStorage when component mounts
+  useEffect(() => {
+    const savedData = localStorage.getItem('utopiaOnboardingData');
+    if (savedData) {
+      try {
+        setData(JSON.parse(savedData));
+      } catch (error) {
+        console.error('Error parsing saved data:', error);
+      }
+    }
+  }, []);
+
+  // Update current step based on URL parameter
+  useEffect(() => {
+    if (step && isValidStep(step)) {
+      setCurrentStep(step as OnboardingStep);
+    }
+  }, [step]);
+
+  const isValidStep = (step: string): boolean => {
+    return ['company', 'business', 'products', 'persons', 'beneficialOwners', 'billing', 'sign'].includes(step);
+  };
+
+  // Save data to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('utopiaOnboardingData', JSON.stringify(data));
+  }, [data]);
+
   const setStep = (step: OnboardingStep) => {
     setCurrentStep(step);
+    navigate(`/onboarding/${step}`);
+  };
+
+  const saveProgress = () => {
+    // In a real app, you would also save to backend
+    localStorage.setItem('utopiaOnboardingData', JSON.stringify(data));
+    toast.success("Progres uložený!", {
+      description: "Môžete sa vrátiť neskôr a pokračovať."
+    });
   };
 
   const updateCompanyInfo = (info: Partial<CompanyInfo>) => {
@@ -136,27 +176,28 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const nextStep = () => {
     switch (currentStep) {
       case 'company':
-        setCurrentStep('business');
+        setStep('business');
         break;
       case 'business':
-        setCurrentStep('products');
+        setStep('products');
         break;
       case 'products':
-        setCurrentStep('persons');
+        setStep('persons');
         break;
       case 'persons':
-        setCurrentStep(
+        setStep(
           data.opravnenaOsoba.politickyExponovana ? 'beneficialOwners' : 'billing'
         );
         break;
       case 'beneficialOwners':
-        setCurrentStep('billing');
+        setStep('billing');
         break;
       case 'billing':
-        setCurrentStep('sign');
+        setStep('sign');
         break;
       case 'sign':
-        // Final step - do nothing or handle completion
+        toast.success("Onboarding úspešne dokončený!");
+        navigate('/dashboard');
         break;
     }
   };
@@ -164,27 +205,27 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const prevStep = () => {
     switch (currentStep) {
       case 'company':
-        // Already at first step, do nothing
+        navigate('/dashboard');
         break;
       case 'business':
-        setCurrentStep('company');
+        setStep('company');
         break;
       case 'products':
-        setCurrentStep('business');
+        setStep('business');
         break;
       case 'persons':
-        setCurrentStep('products');
+        setStep('products');
         break;
       case 'beneficialOwners':
-        setCurrentStep('persons');
+        setStep('persons');
         break;
       case 'billing':
-        setCurrentStep(
+        setStep(
           data.opravnenaOsoba.politickyExponovana ? 'beneficialOwners' : 'persons'
         );
         break;
       case 'sign':
-        setCurrentStep('billing');
+        setStep('billing');
         break;
     }
   };
@@ -259,7 +300,8 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     updatePodpisSuhlasy,
     nextStep,
     prevStep,
-    isStepComplete
+    isStepComplete,
+    saveProgress
   };
 
   return (

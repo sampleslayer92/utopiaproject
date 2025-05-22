@@ -6,7 +6,7 @@ import { CheckCircle } from 'lucide-react';
 import { OnboardingStep } from '@/types/onboarding';
 
 const steps: { id: OnboardingStep; label: string }[] = [
-  { id: 'company', label: 'Výber firmy' },
+  { id: 'company', label: 'Adresa firmy' },
   { id: 'business', label: 'Údaje o prevádzke' },
   { id: 'products', label: 'Výber produktov a služieb' },
   { id: 'persons', label: 'Osoby' },
@@ -41,15 +41,15 @@ export const OnboardingSidebar: React.FC = () => {
   };
 
   return (
-    <div className="bg-gradient-to-b from-utopia-900 to-utopia-700 text-white rounded-l-xl py-8 px-6 flex flex-col h-full min-h-screen w-80">
+    <div className="bg-white shadow-lg rounded-r-xl py-8 px-6 flex flex-col h-full min-h-screen w-80">
       <div className="mb-10">
-        <h1 className="text-2xl font-bold mb-2">Utopia</h1>
-        <p className="text-white/70 text-sm">Onboarding do platformy</p>
+        <h1 className="text-2xl font-bold text-utopia-700 mb-2">Utopia</h1>
+        <p className="text-gray-500 text-sm">Onboarding do platformy</p>
       </div>
       
       <div className="flex flex-col space-y-1 relative">
         {/* Vertical line connecting steps */}
-        <div className="absolute top-0 bottom-0 left-4 w-0.5 bg-white/20 z-0"></div>
+        <div className="absolute top-0 bottom-0 left-4 w-0.5 bg-gray-200 z-0"></div>
         
         {steps.map((step, index) => {
           const status = getStepStatus(step.id);
@@ -60,8 +60,8 @@ export const OnboardingSidebar: React.FC = () => {
               onClick={() => handleStepClick(step.id)}
               className={cn(
                 "relative z-10 flex items-center py-3 px-4 rounded-lg transition-all duration-200 cursor-pointer",
-                status === 'active' ? "bg-white/10" : "",
-                status === 'disabled' ? "opacity-50 cursor-not-allowed" : "hover:bg-white/10"
+                status === 'active' ? "bg-utopia-50 border border-utopia-100" : "",
+                status === 'disabled' ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-50"
               )}
             >
               <div className="mr-4 flex items-center justify-center">
@@ -72,7 +72,7 @@ export const OnboardingSidebar: React.FC = () => {
                 ) : (
                   <div className={cn(
                     "w-8 h-8 rounded-full flex items-center justify-center border-2",
-                    status === 'active' ? "border-white bg-utopia-500" : "border-white/40 bg-transparent"
+                    status === 'active' ? "border-utopia-500 bg-utopia-50 text-utopia-700" : "border-gray-300 bg-white"
                   )}>
                     {index + 1}
                   </div>
@@ -82,7 +82,7 @@ export const OnboardingSidebar: React.FC = () => {
               <div>
                 <p className={cn(
                   "font-medium",
-                  status === 'active' ? "text-white" : "text-white/80"
+                  status === 'active' ? "text-utopia-700" : "text-gray-700"
                 )}>
                   {step.label}
                 </p>
@@ -93,10 +93,10 @@ export const OnboardingSidebar: React.FC = () => {
       </div>
       
       <div className="mt-auto">
-        <div className="bg-white/10 rounded-lg p-4">
-          <p className="text-sm text-white/90">Potrebujete pomôcť?</p>
-          <p className="text-sm text-white/70 mt-1">
-            Kontaktujte nás na <span className="text-white">+421 XXX XXX XXX</span>
+        <div className="bg-gray-50 rounded-lg p-4">
+          <p className="text-sm font-medium text-gray-700">Potrebujete pomôcť?</p>
+          <p className="text-sm text-gray-500 mt-1">
+            Kontaktujte nás na <span className="text-utopia-600 font-medium">+421 XXX XXX XXX</span>
           </p>
         </div>
       </div>
