@@ -267,27 +267,30 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         return Boolean(nazovPrevadzky && adresaPrevadzky && mesto && psc && telefon && email);
       }
       case 'products': {
-        const hasZariadenie = data.zariadenia.some(z => z.selected);
-        const hasLicencia = data.licencie.some(l => l.selected);
-        const hasPlatobnaMetoda = data.platobneMetody.some(p => p.selected);
+        const hasZariadenie = Array.isArray(data.zariadenia) && data.zariadenia.some(z => z.selected);
+        const hasLicencia = Array.isArray(data.licencie) && data.licencie.some(l => l.selected);
+        const hasPlatobnaMetoda = Array.isArray(data.platobneMetody) && data.platobneMetody.some(p => p.selected);
         return hasZariadenie || hasLicencia || hasPlatobnaMetoda;
       }
       case 'persons': {
         const { meno: obchodne, email: obchodnyEmail, telefon: obchodnyTelefon } = data.obchodnaOsoba;
         const { meno: technicke, email: technickyEmail, telefon: technickyTelefon } = data.technickaOsoba;
         
-        // Check if we have at least one authorized person with all required fields
-        const hasValidOpravnenaOsoba = data.opravneneOsoby.length > 0 && data.opravneneOsoby.some(osoba => {
-          const { 
-            meno, funkcia, datumNarodenia, rodneCislo, obcianstvo, 
-            adresaTrvalehoBydliska, cisloDokladu, platnostDokladu
-          } = osoba;
-          
-          return Boolean(
-            meno && funkcia && datumNarodenia && rodneCislo && 
-            obcianstvo && adresaTrvalehoBydliska && cisloDokladu && platnostDokladu
-          );
-        });
+        // Add null check before accessing length and using some
+        const hasValidOpravnenaOsoba = Array.isArray(data.opravneneOsoby) && 
+          data.opravneneOsoby.length > 0 && 
+          data.opravneneOsoby.some(osoba => {
+            if (!osoba) return false;
+            const { 
+              meno, funkcia, datumNarodenia, rodneCislo, obcianstvo, 
+              adresaTrvalehoBydliska, cisloDokladu, platnostDokladu
+            } = osoba;
+            
+            return Boolean(
+              meno && funkcia && datumNarodenia && rodneCislo && 
+              obcianstvo && adresaTrvalehoBydliska && cisloDokladu && platnostDokladu
+            );
+          });
         
         return Boolean(
           obchodne && obchodnyEmail && obchodnyTelefon &&
@@ -296,10 +299,14 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         );
       }
       case 'beneficialOwners': {
-        return data.skutocniMajitelia.length > 0 && data.skutocniMajitelia.every(
-          ({ menoAPriezvisko, datumNarodenia, trvalyPobyt, obcianstvo, vztahKObchodnikovi }) => 
-            Boolean(menoAPriezvisko && datumNarodenia && trvalyPobyt && obcianstvo && vztahKObchodnikovi)
-        );
+        // Add null check before accessing length and using every
+        return Array.isArray(data.skutocniMajitelia) && 
+          data.skutocniMajitelia.length > 0 && 
+          data.skutocniMajitelia.every(majitel => {
+            if (!majitel) return false;
+            const { menoAPriezvisko, datumNarodenia, trvalyPobyt, obcianstvo, vztahKObchodnikovi } = majitel;
+            return Boolean(menoAPriezvisko && datumNarodenia && trvalyPobyt && obcianstvo && vztahKObchodnikovi);
+          });
       }
       case 'billing': {
         const { fakturacnyEmail, fakturacnaAdresa, iban, sposobUhrady } = data.fakturacneUdaje;

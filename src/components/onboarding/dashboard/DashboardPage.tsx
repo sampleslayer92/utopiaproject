@@ -57,19 +57,29 @@ export const DashboardPage: React.FC = () => {
   const [activeMenuItem, setActiveMenuItem] = useState('dashboard');
   const [showNotifications, setShowNotifications] = useState(false);
   
-  // Get registration data from localStorage
+  // Get registration data from localStorage with safe default
   const registrationData = localStorage.getItem('utopiaRegistration') 
     ? JSON.parse(localStorage.getItem('utopiaRegistration')!) 
     : { fullName: 'Používateľ', selectedProducts: [] };
   
-  // Mapping of tasks to steps in the wizard
+  // Safely check if isStepComplete function exists before using it
+  const checkStepComplete = (step: string) => {
+    try {
+      return isStepComplete ? isStepComplete(step as any) : false;
+    } catch (error) {
+      console.error(`Error checking completion of step ${step}:`, error);
+      return false;
+    }
+  };
+  
+  // Mapping of tasks to steps in the wizard with safe step completion check
   const tasks = [
-    { id: 'company', title: t('company.info'), completed: isStepComplete('company'), timeEstimate: 2, step: 'company' },
-    { id: 'business', title: t('business.locations'), completed: isStepComplete('business'), timeEstimate: 3, step: 'business' },
-    { id: 'products', title: t('products.select'), completed: isStepComplete('products'), timeEstimate: 4, step: 'products' },
-    { id: 'persons', title: t('personal.info'), completed: isStepComplete('persons'), timeEstimate: 3, step: 'persons' },
-    { id: 'beneficialOwners', title: t('beneficial.owners'), completed: isStepComplete('beneficialOwners'), timeEstimate: 2, step: 'beneficialOwners' },
-    { id: 'billing', title: t('billing'), completed: isStepComplete('billing'), timeEstimate: 2, step: 'billing' },
+    { id: 'company', title: t('company.info'), completed: checkStepComplete('company'), timeEstimate: 2, step: 'company' },
+    { id: 'business', title: t('business.locations'), completed: checkStepComplete('business'), timeEstimate: 3, step: 'business' },
+    { id: 'products', title: t('products.select'), completed: checkStepComplete('products'), timeEstimate: 4, step: 'products' },
+    { id: 'persons', title: t('personal.info'), completed: checkStepComplete('persons'), timeEstimate: 3, step: 'persons' },
+    { id: 'beneficialOwners', title: t('beneficial.owners'), completed: checkStepComplete('beneficialOwners'), timeEstimate: 2, step: 'beneficialOwners' },
+    { id: 'billing', title: t('billing'), completed: checkStepComplete('billing'), timeEstimate: 2, step: 'billing' },
   ];
   
   const handleTaskClick = (step: string) => {
@@ -84,7 +94,7 @@ export const DashboardPage: React.FC = () => {
   const completedTasks = tasks.filter(t => t.completed).length;
   const progressPercentage = Math.round((completedTasks / totalTasks) * 100);
 
-  const firstName = data.company.nazovSpolocnosti 
+  const firstName = (data?.company?.nazovSpolocnosti || '').length > 0
     ? data.company.nazovSpolocnosti 
     : (registrationData.fullName || '').split(' ')[0] || t('user');
 

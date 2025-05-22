@@ -14,8 +14,27 @@ import { OnboardingWizard } from "./components/onboarding/OnboardingWizard";
 import { ThemeProvider } from "next-themes";
 import { TransactionsPage } from "./components/dashboard/TransactionsPage";
 import { DevicesPage } from "./components/dashboard/DevicesPage";
+import { ErrorBoundary } from "react-error-boundary";
 
 const queryClient = new QueryClient();
+
+// Simple fallback component for error boundary
+const ErrorFallback = () => (
+  <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-slate-900 text-center p-5">
+    <div>
+      <h2 className="text-2xl font-bold mb-3 text-red-600">Oops! Something went wrong</h2>
+      <p className="mb-4 text-gray-700 dark:text-gray-300">
+        We encountered an error. Please try refreshing the page.
+      </p>
+      <button 
+        onClick={() => window.location.href = '/'} 
+        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+      >
+        Go to Home Page
+      </button>
+    </div>
+  </div>
+);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -24,17 +43,19 @@ const App = () => (
         <BrowserRouter>
           <OnboardingProvider>
             <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <Routes>
-                <Route path="/" element={<RegistrationPage />} />
-                <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/onboarding" element={<Navigate to="/dashboard" />} />
-                <Route path="/onboarding/:step" element={<OnboardingWizard />} />
-                <Route path="/transactions" element={<TransactionsPage />} />
-                <Route path="/devices" element={<DevicesPage />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+              <ErrorBoundary FallbackComponent={ErrorFallback}>
+                <Toaster />
+                <Sonner />
+                <Routes>
+                  <Route path="/" element={<RegistrationPage />} />
+                  <Route path="/dashboard" element={<DashboardPage />} />
+                  <Route path="/onboarding" element={<Navigate to="/dashboard" />} />
+                  <Route path="/onboarding/:step" element={<OnboardingWizard />} />
+                  <Route path="/transactions" element={<TransactionsPage />} />
+                  <Route path="/devices" element={<DevicesPage />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </ErrorBoundary>
             </TooltipProvider>
           </OnboardingProvider>
         </BrowserRouter>
