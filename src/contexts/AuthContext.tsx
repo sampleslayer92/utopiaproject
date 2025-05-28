@@ -56,17 +56,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setAuthState(prev => ({ ...prev, isLoading: true }));
       
-      // Simulate API call - in real app, this would be a backend call
+      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Mock user data based on email for demo purposes
+      // Enhanced mock user data with hierarchical structure
       const mockUser: User = {
-        id: '1',
+        id: getMockUserId(credentials.email),
         email: credentials.email,
         fullName: getMockUserName(credentials.email),
         role: getMockUserRole(credentials.email),
+        businessPartnerId: getMockBusinessPartnerId(credentials.email),
+        clientId: getMockClientId(credentials.email),
+        organizationId: credentials.email.includes('admin') ? 'org-1' : undefined,
         createdAt: new Date().toISOString(),
-        lastLogin: new Date().toISOString()
+        lastLogin: new Date().toISOString(),
+        isActive: true
       };
 
       // Store user session
@@ -121,7 +125,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         role: data.role,
         businessPartnerId: data.businessPartnerId,
         clientId: data.clientId,
-        createdAt: new Date().toISOString()
+        organizationId: data.organizationId,
+        createdAt: new Date().toISOString(),
+        isActive: true
       };
 
       localStorage.setItem('utopia_user', JSON.stringify(newUser));
@@ -173,12 +179,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 };
 
-// Helper functions for mock data
+// Helper functions for mock data with hierarchical structure
+const getMockUserId = (email: string): string => {
+  if (email.includes('admin')) return 'admin-1';
+  if (email.includes('partner1')) return 'bp-1';
+  if (email.includes('partner2')) return 'bp-2';
+  if (email.includes('client1')) return 'client-1';
+  if (email.includes('client2')) return 'client-2';
+  if (email.includes('location1')) return 'location-1';
+  if (email.includes('location2')) return 'location-2';
+  return 'user-' + Date.now();
+};
+
 const getMockUserName = (email: string): string => {
   if (email.includes('admin')) return 'Admin Používateľ';
-  if (email.includes('partner')) return 'Obchodný Partner';
-  if (email.includes('location')) return 'Prevádzka Používateľ';
-  return 'Klient Používateľ';
+  if (email.includes('partner1')) return 'Martin Novák - Partner';
+  if (email.includes('partner2')) return 'Jana Svoboda - Partner';
+  if (email.includes('client1')) return 'TechCorp s.r.o.';
+  if (email.includes('client2')) return 'RetailMax a.s.';
+  if (email.includes('location1')) return 'Prevádzka Centrum';
+  if (email.includes('location2')) return 'Prevádzka Východ';
+  return 'Demo Používateľ';
 };
 
 const getMockUserRole = (email: string) => {
@@ -186,4 +207,16 @@ const getMockUserRole = (email: string) => {
   if (email.includes('partner')) return 'business_partner' as const;
   if (email.includes('location')) return 'location' as const;
   return 'client' as const;
+};
+
+const getMockBusinessPartnerId = (email: string): string | undefined => {
+  if (email.includes('client1') || email.includes('location1')) return 'bp-1';
+  if (email.includes('client2') || email.includes('location2')) return 'bp-2';
+  return undefined;
+};
+
+const getMockClientId = (email: string): string | undefined => {
+  if (email.includes('location1')) return 'client-1';
+  if (email.includes('location2')) return 'client-2';
+  return undefined;
 };

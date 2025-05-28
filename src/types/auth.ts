@@ -6,10 +6,13 @@ export interface User {
   email: string;
   fullName: string;
   role: UserRole;
-  businessPartnerId?: string; // For clients and locations
-  clientId?: string; // For locations
+  businessPartnerId?: string; // For clients and locations - ID of their business partner
+  clientId?: string; // For locations - ID of their parent client
+  parentId?: string; // Generic parent ID for hierarchical structure
+  organizationId?: string; // For admin users
   createdAt: string;
   lastLogin?: string;
+  isActive: boolean;
 }
 
 export interface AuthState {
@@ -31,6 +34,7 @@ export interface RegisterData {
   role: UserRole;
   businessPartnerId?: string;
   clientId?: string;
+  organizationId?: string;
 }
 
 export interface AuthContextType {

@@ -50,8 +50,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onBack, onForgotPassword }
     
     if (!formData.password) {
       newErrors.password = 'Heslo je povinné';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Heslo musí mať aspoň 6 znakov';
     }
     
     setErrors(newErrors);
@@ -103,7 +101,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onBack, onForgotPassword }
         >
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-              Prihlásenie
+              Prihlásenie do Utopia
             </h1>
             <p className="text-slate-600 dark:text-blue-300">
               Zadajte svoje prihlasovacie údaje
@@ -201,16 +199,32 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onBack, onForgotPassword }
               </Button>
             </form>
             
-            <div className="mt-6 text-center">
-              <p className="text-sm text-slate-600 dark:text-slate-400">
+            <div className="mt-8 text-center">
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
                 Demo prihlasovacie údaje:
               </p>
-              <div className="mt-2 text-xs text-slate-500 dark:text-slate-500 space-y-1">
-                <div>Admin: admin@utopia.sk</div>
-                <div>Partner: partner@utopia.sk</div>
-                <div>Klient: client@utopia.sk</div>
-                <div>Prevádzka: location@utopia.sk</div>
-                <div>Heslo: password</div>
+              <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-4 text-xs text-slate-600 dark:text-slate-400 space-y-2">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="font-semibold text-slate-800 dark:text-slate-200">Admin:</p>
+                    <p>admin@utopia.sk</p>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-slate-800 dark:text-slate-200">Partner 1:</p>
+                    <p>partner1@utopia.sk</p>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-slate-800 dark:text-slate-200">Klient 1:</p>
+                    <p>client1@utopia.sk</p>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-slate-800 dark:text-slate-200">Prevádzka 1:</p>
+                    <p>location1@utopia.sk</p>
+                  </div>
+                </div>
+                <p className="text-center border-t border-slate-300 dark:border-slate-600 pt-2 mt-2">
+                  <span className="font-semibold">Heslo pre všetky účty:</span> password
+                </p>
               </div>
             </div>
           </div>

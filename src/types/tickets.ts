@@ -5,39 +5,34 @@ export interface Ticket {
   description: string;
   status: 'open' | 'in_progress' | 'resolved' | 'closed';
   priority: 'low' | 'medium' | 'high' | 'urgent';
-  category: 'technical' | 'billing' | 'general' | 'feature_request';
-  createdBy: string;
-  assignedTo?: string;
-  businessPartnerId?: string;
+  category: 'device' | 'location' | 'contract' | 'technical' | 'billing';
+  createdBy: string; // User ID
+  assignedTo?: string; // Business Partner ID
   clientId?: string;
   locationId?: string;
+  deviceId?: string;
+  attachments?: string[];
   createdAt: string;
   updatedAt: string;
-  attachments?: TicketAttachment[];
-  comments?: TicketComment[];
-}
-
-export interface TicketAttachment {
-  id: string;
-  fileName: string;
-  fileSize: number;
-  fileType: string;
-  url: string;
-  uploadedAt: string;
+  resolvedAt?: string;
+  comments: TicketComment[];
 }
 
 export interface TicketComment {
   id: string;
+  ticketId: string;
+  userId: string;
   content: string;
-  authorId: string;
-  authorName: string;
+  isInternal: boolean; // Internal notes vs client-visible comments
   createdAt: string;
 }
 
 export interface CreateTicketData {
   title: string;
   description: string;
-  priority: Ticket['priority'];
-  category: Ticket['category'];
-  assignedTo?: string;
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  category: 'device' | 'location' | 'contract' | 'technical' | 'billing';
+  deviceId?: string;
+  locationId?: string;
+  attachments?: File[];
 }
