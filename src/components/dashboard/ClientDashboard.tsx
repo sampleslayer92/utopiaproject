@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -217,12 +216,7 @@ export const ClientDashboard: React.FC = () => {
             <CardTitle>Rýchle akcie</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <CreateTicketDialog onTicketCreated={handleTicketCreated}>
-              <Button className="w-full justify-start" variant="outline">
-                <Plus className="h-4 w-4 mr-2" />
-                Nahlásiť problém
-              </Button>
-            </CreateTicketDialog>
+            <CreateTicketDialog onTicketCreated={handleTicketCreated} />
             
             <Button className="w-full justify-start" variant="outline">
               <BarChart3 className="h-4 w-4 mr-2" />
