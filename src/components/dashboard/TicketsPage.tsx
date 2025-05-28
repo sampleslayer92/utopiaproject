@@ -7,9 +7,9 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { Search, Plus, Edit, Eye, AlertCircle, CheckCircle, Clock, MessageSquare } from 'lucide-react';
+import { Search, Edit, Eye, AlertCircle, CheckCircle, Clock, MessageSquare } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { CreateTicketDialog } from './CreateTicketDialog';
 
 interface Ticket {
   id: string;
@@ -117,28 +117,34 @@ export const TicketsPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
+  const [tickets, setTickets] = useState(mockTickets);
+
+  const handleTicketCreated = () => {
+    // Refresh tickets list when new ticket is created
+    console.log('Ticket created, refreshing list...');
+  };
 
   // Filter tickets based on user role
   const getFilteredTickets = () => {
-    let tickets = mockTickets;
+    let filteredTickets = tickets;
     
     if (user?.role === 'business_partner') {
-      tickets = tickets.filter(ticket => ticket.businessPartnerId === user.businessPartnerId);
+      filteredTickets = filteredTickets.filter(ticket => ticket.businessPartnerId === user.businessPartnerId);
     } else if (user?.role === 'client') {
-      tickets = tickets.filter(ticket => ticket.clientId === user.clientId);
+      filteredTickets = filteredTickets.filter(ticket => ticket.clientId === user.clientId);
     } else if (user?.role === 'location') {
-      tickets = tickets.filter(ticket => ticket.locationId === user.clientId); // For location users, clientId represents locationId
+      filteredTickets = filteredTickets.filter(ticket => ticket.locationId === user.clientId);
     }
     
     // Apply filters
     if (statusFilter !== 'all') {
-      tickets = tickets.filter(ticket => ticket.status === statusFilter);
+      filteredTickets = filteredTickets.filter(ticket => ticket.status === statusFilter);
     }
     if (priorityFilter !== 'all') {
-      tickets = tickets.filter(ticket => ticket.priority === priorityFilter);
+      filteredTickets = filteredTickets.filter(ticket => ticket.priority === priorityFilter);
     }
     
-    return tickets.filter(ticket =>
+    return filteredTickets.filter(ticket =>
       ticket.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       ticket.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       ticket.id.toLowerCase().includes(searchTerm.toLowerCase())
@@ -247,10 +253,7 @@ export const TicketsPage: React.FC = () => {
             Správa a sledovanie tiketov technickej podpory
           </p>
         </div>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          Nový tiket
-        </Button>
+        <CreateTicketDialog onTicketCreated={handleTicketCreated} />
       </div>
 
       {/* Summary Cards */}

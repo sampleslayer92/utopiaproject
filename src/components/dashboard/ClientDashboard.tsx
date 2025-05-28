@@ -1,195 +1,297 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { 
-  TrendingUp, 
-  TrendingDown, 
-  DollarSign, 
   Smartphone, 
+  TrendingUp, 
+  AlertTriangle, 
+  CheckCircle, 
+  CreditCard, 
   Users, 
-  AlertCircle,
-  CheckCircle,
-  Clock
+  MapPin, 
+  BarChart3,
+  Plus,
+  Zap
 } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { useAuth } from '@/contexts/AuthContext';
+import { CreateTicketDialog } from './CreateTicketDialog';
+
+const weeklyData = [
+  { day: 'Pon', transactions: 450, revenue: 2340 },
+  { day: 'Uto', transactions: 520, revenue: 2680 },
+  { day: 'Str', transactions: 380, revenue: 1950 },
+  { day: 'Štv', transactions: 620, revenue: 3200 },
+  { day: 'Pia', transactions: 750, revenue: 3890 },
+  { day: 'Sob', transactions: 890, revenue: 4560 },
+  { day: 'Ned', transactions: 680, revenue: 3510 }
+];
+
+const devicePerformanceData = [
+  { name: 'Terminal 1', transactions: 1250, uptime: 99.2, revenue: 6450 },
+  { name: 'Terminal 2', transactions: 980, uptime: 97.8, revenue: 5120 },
+  { name: 'Terminal 3', transactions: 1180, uptime: 98.5, revenue: 6180 },
+  { name: 'Terminal 4', transactions: 750, uptime: 95.2, revenue: 3890 }
+];
 
 export const ClientDashboard: React.FC = () => {
-  // Mock data for transactions chart
-  const transactionData = [
-    { month: 'Jan', amount: 4200 },
-    { month: 'Feb', amount: 3800 },
-    { month: 'Mar', amount: 5100 },
-    { month: 'Apr', amount: 4600 },
-    { month: 'Máj', amount: 5800 },
-    { month: 'Jún', amount: 6200 },
-  ];
+  const { user } = useAuth();
+  const [selectedPeriod, setSelectedPeriod] = useState('week');
 
-  // Mock devices data
-  const devices = [
-    { id: '001', name: 'Platobný terminál 1', location: 'Hlavná prevádzka', status: 'online', lastSeen: '2 min' },
-    { id: '002', name: 'Platobný terminál 2', location: 'Hlavná prevádzka', status: 'online', lastSeen: '1 min' },
-    { id: '003', name: 'Platobný terminál 3', location: 'Pobočka Centrum', status: 'offline', lastSeen: '2 hod' },
-    { id: '004', name: 'Platobný terminál 4', location: 'Pobočka Východ', status: 'maintenance', lastSeen: '1 deň' },
-  ];
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'online':
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'offline':
-        return <AlertCircle className="h-4 w-4 text-red-500" />;
-      case 'maintenance':
-        return <Clock className="h-4 w-4 text-yellow-500" />;
-      default:
-        return <AlertCircle className="h-4 w-4 text-gray-500" />;
-    }
-  };
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'online':
-        return <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">Online</Badge>;
-      case 'offline':
-        return <Badge className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">Offline</Badge>;
-      case 'maintenance':
-        return <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">Údržba</Badge>;
-      default:
-        return <Badge variant="secondary">Neznámy</Badge>;
-    }
+  const handleTicketCreated = () => {
+    console.log('Quick ticket created');
   };
 
   return (
     <div className="space-y-6">
-      {/* KPI Cards */}
+      {/* Header with Quick Actions */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Dashboard - {user?.fullName}
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            Prehľad výkonnosti vašich zariadení
+          </p>
+        </div>
+        <div className="flex gap-3">
+          <CreateTicketDialog onTicketCreated={handleTicketCreated} />
+          <Button variant="outline">
+            <BarChart3 className="h-4 w-4 mr-2" />
+            Detailný report
+          </Button>
+        </div>
+      </div>
+
+      {/* Quick Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+        <Card className="border-l-4 border-l-green-500">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-blue-100 text-sm font-medium">Celkové tržby</p>
-                <p className="text-2xl font-bold">€34,250</p>
-                <p className="text-blue-100 text-xs flex items-center mt-1">
-                  <TrendingUp className="h-3 w-3 mr-1" />
-                  +12.5% oproti minulému mesiacu
-                </p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Denné tržby</p>
+                <p className="text-2xl font-bold text-green-600">€3,890</p>
+                <p className="text-xs text-green-600 mt-1">+12.5% vs včera</p>
               </div>
-              <DollarSign className="h-8 w-8 text-blue-200" />
+              <TrendingUp className="h-8 w-8 text-green-500" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
+        <Card className="border-l-4 border-l-blue-500">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-green-100 text-sm font-medium">Priemerná transakcia</p>
-                <p className="text-2xl font-bold">€28.50</p>
-                <p className="text-green-100 text-xs flex items-center mt-1">
-                  <TrendingUp className="h-3 w-3 mr-1" />
-                  +5.2% oproti minulému mesiacu
-                </p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Transakcie dnes</p>
+                <p className="text-2xl font-bold text-blue-600">1,247</p>
+                <p className="text-xs text-blue-600 mt-1">+8.3% vs včera</p>
               </div>
-              <TrendingUp className="h-8 w-8 text-green-200" />
+              <CreditCard className="h-8 w-8 text-blue-500" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
+        <Card className="border-l-4 border-l-purple-500">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-purple-100 text-sm font-medium">Aktívne zariadenia</p>
-                <p className="text-2xl font-bold">3/4</p>
-                <p className="text-purple-100 text-xs flex items-center mt-1">
-                  <TrendingDown className="h-3 w-3 mr-1" />
-                  1 zariadenie v údržbe
-                </p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Aktívne zariadenia</p>
+                <p className="text-2xl font-bold text-purple-600">4/4</p>
+                <p className="text-xs text-green-600 mt-1">Všetky online</p>
               </div>
-              <Smartphone className="h-8 w-8 text-purple-200" />
+              <Smartphone className="h-8 w-8 text-purple-500" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
+        <Card className="border-l-4 border-l-orange-500">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-orange-100 text-sm font-medium">Prevádzky</p>
-                <p className="text-2xl font-bold">3</p>
-                <p className="text-orange-100 text-xs flex items-center mt-1">
-                  <Users className="h-3 w-3 mr-1" />
-                  Všetky aktívne
-                </p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Priemerná dostupnosť</p>
+                <p className="text-2xl font-bold text-orange-600">98.2%</p>
+                <p className="text-xs text-green-600 mt-1">Výborná</p>
               </div>
-              <Users className="h-8 w-8 text-orange-200" />
+              <Zap className="h-8 w-8 text-orange-500" />
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Charts and Lists Row */}
+      {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Monthly Transactions Chart */}
         <Card>
           <CardHeader>
-            <CardTitle>Mesačné transakcie</CardTitle>
+            <CardTitle>Týždenný trend</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={transactionData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Line 
-                    type="monotone" 
-                    dataKey="amount" 
-                    stroke="#3b82f6" 
-                    strokeWidth={2}
-                    dot={{ fill: '#3b82f6' }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={weeklyData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="day" />
+                <YAxis yAxisId="left" />
+                <YAxis yAxisId="right" orientation="right" />
+                <Tooltip />
+                <Line 
+                  yAxisId="left" 
+                  type="monotone" 
+                  dataKey="transactions" 
+                  stroke="#3b82f6" 
+                  strokeWidth={3}
+                  name="Transakcie"
+                />
+                <Line 
+                  yAxisId="right" 
+                  type="monotone" 
+                  dataKey="revenue" 
+                  stroke="#10b981" 
+                  strokeWidth={3}
+                  name="Tržby (€)"
+                />
+              </LineChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        {/* Device Status List */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span>Stav zariadení</span>
-              <Badge variant="outline">4 zariadenia</Badge>
-            </CardTitle>
+            <CardTitle>Výkonnosť zariadení</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={devicePerformanceData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="transactions" fill="#8b5cf6" name="Transakcie" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Device Status and Alerts */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Status zariadení</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {devices.map((device) => (
-                <div key={device.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    {getStatusIcon(device.status)}
+              {devicePerformanceData.map((device, index) => (
+                <div key={device.name} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                      <Smartphone className="h-5 w-5 text-green-600" />
+                    </div>
                     <div>
-                      <p className="font-medium text-gray-900 dark:text-gray-100">
-                        {device.name}
-                      </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {device.location}
-                      </p>
+                      <h4 className="font-medium">{device.name}</h4>
+                      <p className="text-sm text-gray-500">TID: T{1000 + index}</p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    {getStatusBadge(device.status)}
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Posledný kontakt: {device.lastSeen}
-                    </p>
+                  <div className="flex items-center space-x-6">
+                    <div className="text-right">
+                      <p className="text-sm font-medium">{device.transactions} transakcií</p>
+                      <p className="text-xs text-gray-500">€{device.revenue.toLocaleString()}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-medium">{device.uptime}% uptime</p>
+                      <Progress value={device.uptime} className="w-20 h-2" />
+                    </div>
+                    <Badge variant={device.uptime > 98 ? 'default' : device.uptime > 95 ? 'secondary' : 'destructive'}>
+                      {device.uptime > 98 ? 'Výborné' : device.uptime > 95 ? 'Dobré' : 'Problémy'}
+                    </Badge>
                   </div>
                 </div>
               ))}
             </div>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Rýchle akcie</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <CreateTicketDialog onTicketCreated={handleTicketCreated}>
+              <Button className="w-full justify-start" variant="outline">
+                <Plus className="h-4 w-4 mr-2" />
+                Nahlásiť problém
+              </Button>
+            </CreateTicketDialog>
+            
+            <Button className="w-full justify-start" variant="outline">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Mesačný report
+            </Button>
+            
+            <Button className="w-full justify-start" variant="outline">
+              <Users className="h-4 w-4 mr-2" />
+              Správa používateľov
+            </Button>
+            
+            <Button className="w-full justify-start" variant="outline">
+              <MapPin className="h-4 w-4 mr-2" />
+              Nastavenia prevádzky
+            </Button>
+
+            <div className="pt-4 border-t">
+              <h4 className="font-medium mb-3">Posledné upozornenia</h4>
+              <div className="space-y-3">
+                <div className="flex items-start space-x-2">
+                  <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
+                  <div className="text-sm">
+                    <p className="font-medium">Údržba dokončená</p>
+                    <p className="text-gray-500">Terminal 2 - pred 2h</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <AlertTriangle className="h-4 w-4 text-yellow-500 mt-0.5" />
+                  <div className="text-sm">
+                    <p className="font-medium">Nízka úroveň papiera</p>
+                    <p className="text-gray-500">Terminal 1 - pred 4h</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* Performance Summary */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Mesačný súhrn</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="text-center">
+              <p className="text-3xl font-bold text-green-600">€89,240</p>
+              <p className="text-sm text-gray-500">Celkové tržby</p>
+              <p className="text-xs text-green-600">+15.2% vs minulý mesiac</p>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl font-bold text-blue-600">28,947</p>
+              <p className="text-sm text-gray-500">Celkové transakcie</p>
+              <p className="text-xs text-blue-600">+8.7% vs minulý mesiac</p>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl font-bold text-purple-600">€30.84</p>
+              <p className="text-sm text-gray-500">Priemerná transakcia</p>
+              <p className="text-xs text-purple-600">+2.1% vs minulý mesiac</p>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl font-bold text-orange-600">97.8%</p>
+              <p className="text-sm text-gray-500">Priemerná dostupnosť</p>
+              <p className="text-xs text-green-600">Stabilná</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
