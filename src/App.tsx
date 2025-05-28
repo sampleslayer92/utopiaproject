@@ -10,6 +10,7 @@ import { RegistrationPage } from "./components/onboarding/registration/Registrat
 import { DashboardPage } from "./components/onboarding/dashboard/DashboardPage";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { OnboardingProvider } from "./contexts/OnboardingContext";
+import { AuthProvider } from "./contexts/AuthContext";
 import { OnboardingWizard } from "./components/onboarding/OnboardingWizard";
 import { ThemeProvider } from "next-themes";
 import { TransactionsPage } from "./components/dashboard/TransactionsPage";
@@ -40,25 +41,27 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <LanguageProvider>
-        <BrowserRouter>
-          <OnboardingProvider>
-            <TooltipProvider>
-              <ErrorBoundary FallbackComponent={ErrorFallback}>
-                <Toaster />
-                <Sonner />
-                <Routes>
-                  <Route path="/" element={<RegistrationPage />} />
-                  <Route path="/dashboard" element={<DashboardPage />} />
-                  <Route path="/onboarding" element={<Navigate to="/dashboard" />} />
-                  <Route path="/onboarding/:step" element={<OnboardingWizard />} />
-                  <Route path="/transactions" element={<TransactionsPage />} />
-                  <Route path="/devices" element={<DevicesPage />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </ErrorBoundary>
-            </TooltipProvider>
-          </OnboardingProvider>
-        </BrowserRouter>
+        <AuthProvider>
+          <BrowserRouter>
+            <OnboardingProvider>
+              <TooltipProvider>
+                <ErrorBoundary FallbackComponent={ErrorFallback}>
+                  <Toaster />
+                  <Sonner />
+                  <Routes>
+                    <Route path="/" element={<RegistrationPage />} />
+                    <Route path="/dashboard" element={<DashboardPage />} />
+                    <Route path="/onboarding" element={<Navigate to="/dashboard" />} />
+                    <Route path="/onboarding/:step" element={<OnboardingWizard />} />
+                    <Route path="/transactions" element={<TransactionsPage />} />
+                    <Route path="/devices" element={<DevicesPage />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </ErrorBoundary>
+              </TooltipProvider>
+            </OnboardingProvider>
+          </BrowserRouter>
+        </AuthProvider>
       </LanguageProvider>
     </ThemeProvider>
   </QueryClientProvider>

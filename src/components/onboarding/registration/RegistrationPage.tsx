@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,6 +11,8 @@ import { BusinessTypeScreen } from './BusinessTypeScreen';
 import { ProductSelectionScreen } from './ProductSelectionScreen';
 import { CountrySelectionScreen } from './CountrySelectionScreen';
 import { PhoneVerificationScreen } from './PhoneVerificationScreen';
+import { WelcomeChoiceScreen } from '@/components/auth/WelcomeChoiceScreen';
+import { LoginPage } from '@/components/auth/LoginPage';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
