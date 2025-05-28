@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,9 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Search, Plus, Edit, Eye, MapPin, Users, Smartphone, DollarSign } from 'lucide-react';
+import { Search, Edit, Eye, MapPin, Users, Smartphone, DollarSign } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { BusinessPartner } from '@/types/dashboard';
+import { AddBusinessPartnerDialog } from './AddBusinessPartnerDialog';
 
 const mockBusinessPartners: BusinessPartner[] = [
   {
@@ -93,6 +93,11 @@ export const BusinessPartnersPage: React.FC = () => {
     }
   };
 
+  const handlePartnerAdded = () => {
+    console.log('Business partner added successfully');
+    // Refresh data if needed
+  };
+
   // Only admins can see this page
   if (user?.role !== 'admin') {
     return (
@@ -115,10 +120,7 @@ export const BusinessPartnersPage: React.FC = () => {
             Správa obchodných partnerov a ich výkonnosti
           </p>
         </div>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          Pridať partnera
-        </Button>
+        <AddBusinessPartnerDialog onPartnerAdded={handlePartnerAdded} />
       </div>
 
       {/* Summary Cards */}

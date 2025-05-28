@@ -1,0 +1,186 @@
+
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Plus } from 'lucide-react';
+import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
+
+interface AddClientDialogProps {
+  onClientAdded?: () => void;
+}
+
+export const AddClientDialog: React.FC<AddClientDialogProps> = ({ onClientAdded }) => {
+  const { user } = useAuth();
+  const [open, setOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    businessType: '',
+    businessPartnerId: user?.role === 'business_partner' ? user.businessPartnerId : '',
+    contactPerson: '',
+    phone: '',
+    address: ''
+  });
+
+  // Mock business partners for admin users
+  const mockBusinessPartners = [
+    { id: 'bp-1', name: 'Martin Novák' },
+    { id: 'bp-2', name: 'Jana Svoboda' },
+    { id: 'bp-3', name: 'TechSolutions Ltd.' }
+  ];
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.name || !formData.email || !formData.businessType) {
+      toast.error('Vyplňte všetky povinné polia');
+      return;
+    }
+
+    if (user?.role === 'admin' && !formData.businessPartnerId) {
+      toast.error('Vyberte obchodného partnera');
+      return;
+    }
+
+    // Create client logic here
+    console.log('Creating client:', formData);
+    toast.success('Klient bol úspešne pridaný');
+    
+    setFormData({
+      name: '',
+      email: '',
+      businessType: '',
+      businessPartnerId: user?.role === 'business_partner' ? user.businessPartnerId : '',
+      contactPerson: '',
+      phone: '',
+      address: ''
+    });
+    
+    setOpen(false);
+    onClientAdded?.();
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button>
+          <Plus className="h-4 w-4 mr-2" />
+          Pridať klienta
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Pridať nového klienta</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Label htmlFor="name">Názov spoločnosti *</Label>
+            <Input
+              id="name"
+              value={formData.name}
+              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+              placeholder="Zadajte názov spoločnosti..."
+              required
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="email">Email *</Label>
+            <Input
+              id="email"
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+              placeholder="client@example.com"
+              required
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="businessType">Typ podnikania *</Label>
+            <Select 
+              value={formData.businessType} 
+              onValueChange={(value) => setFormData(prev => ({ ...prev, businessType: value }))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Vyberte typ podnikania" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="retail">Maloobchod</SelectItem>
+                <SelectItem value="restaurant">Reštaurácia</SelectItem>
+                <SelectItem value="service">Služby</SelectItem>
+                <SelectItem value="e-commerce">E-commerce</SelectItem>
+                <SelectItem value="healthcare">Zdravotníctvo</SelectItem>
+                <SelectItem value="other">Iné</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          {user?.role === 'admin' && (
+            <div>
+              <Label htmlFor="businessPartnerId">Obchodný partner *</Label>
+              <Select 
+                value={formData.businessPartnerId} 
+                onValueChange={(value) => setFormData(prev => ({ ...prev, businessPartnerId: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Vyberte obchodného partnera" />
+                </SelectTrigger>
+                <SelectContent>
+                  {mockBusinessPartners.map((partner) => (
+                    <SelectItem key={partner.id} value={partner.id}>
+                      {partner.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+          
+          <div>
+            <Label htmlFor="contactPerson">Kontaktná osoba</Label>
+            <Input
+              id="contactPerson"
+              value={formData.contactPerson}
+              onChange={(e) => setFormData(prev => ({ ...prev, contactPerson: e.target.value }))}
+              placeholder="Meno kontaktnej osoby"
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="phone">Telefón</Label>
+            <Input
+              id="phone"
+              value={formData.phone}
+              onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+              placeholder="+421 9XX XXX XXX"
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="address">Adresa</Label>
+            <Input
+              id="address"
+              value={formData.address}
+              onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
+              placeholder="Ulica, mesto"
+            />
+          </div>
+          
+          <div className="flex justify-end space-x-2 pt-4">
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              Zrušiť
+            </Button>
+            <Button type="submit">
+              Pridať klienta
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+};

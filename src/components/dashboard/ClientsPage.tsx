@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,9 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Search, Plus, Edit, Eye, Building2, Smartphone, DollarSign, MapPin } from 'lucide-react';
+import { Search, Edit, Eye, Building2, Smartphone, DollarSign, MapPin } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Client } from '@/types/dashboard';
+import { AddClientDialog } from './AddClientDialog';
 
 const mockClients: Client[] = [
   {
@@ -103,6 +103,11 @@ export const ClientsPage: React.FC = () => {
     }
   };
 
+  const handleClientAdded = () => {
+    console.log('Client added successfully');
+    // Refresh data if needed
+  };
+
   // Check if user has access to this page
   if (!user || !['admin', 'business_partner'].includes(user.role)) {
     return (
@@ -125,10 +130,7 @@ export const ClientsPage: React.FC = () => {
             {user.role === 'admin' ? 'Správa všetkých klientov' : 'Správa vašich klientov'}
           </p>
         </div>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          Pridať klienta
-        </Button>
+        <AddClientDialog onClientAdded={handleClientAdded} />
       </div>
 
       {/* Summary Cards */}
