@@ -1,12 +1,12 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MapPin, Devices, FileText, Ticket } from 'lucide-react';
+import { MapPin, Smartphone, FileText, Ticket } from 'lucide-react';
 import { DashboardCard } from '@/types/dashboard';
 
 const dashboardData: DashboardCard[] = [
   { title: 'My Locations', value: 8, change: '+1', trend: 'up', icon: MapPin },
-  { title: 'Total Devices', value: 45, change: '+3', trend: 'up', icon: Devices },
+  { title: 'Total Devices', value: 45, change: '+3', trend: 'up', icon: Smartphone },
   { title: 'Active Contracts', value: 3, change: '0', trend: 'neutral', icon: FileText },
   { title: 'Open Tickets', value: 2, change: '-1', trend: 'down', icon: Ticket },
 ];

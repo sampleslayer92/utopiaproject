@@ -1,11 +1,11 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Devices, Activity, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Smartphone, Activity, AlertTriangle, CheckCircle } from 'lucide-react';
 import { DashboardCard } from '@/types/dashboard';
 
 const dashboardData: DashboardCard[] = [
-  { title: 'Location Devices', value: 6, change: '+1', trend: 'up', icon: Devices },
+  { title: 'Location Devices', value: 6, change: '+1', trend: 'up', icon: Smartphone },
   { title: 'Online Devices', value: 5, change: '0', trend: 'neutral', icon: CheckCircle },
   { title: 'Offline Devices', value: 1, change: '+1', trend: 'up', icon: AlertTriangle },
   { title: 'Avg. Uptime', value: '98.5%', change: '+0.3%', trend: 'up', icon: Activity },
