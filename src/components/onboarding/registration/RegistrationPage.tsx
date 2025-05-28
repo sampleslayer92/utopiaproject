@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,6 +17,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { useNavigate } from 'react-router-dom';
 
 interface UserData {
   country: string;
@@ -32,8 +32,9 @@ interface UserData {
 export const RegistrationPage: React.FC = () => {
   const { t } = useLanguage();
   const { register } = useAuth();
+  const navigate = useNavigate();
   const [currentView, setCurrentView] = useState<'choice' | 'login' | 'register' | 'forgot-password'>('choice');
-  const [step, setStep] = useState(0); // 0: Welcome, 1: Country Selection, 2: Account Info, 3: Phone Verification, 4: Business Type, 5: Product Selection
+  const [step, setStep] = useState(0);
   const [userData, setUserData] = useState<UserData>({
     country: 'SK',
     fullName: '',
@@ -43,7 +44,7 @@ export const RegistrationPage: React.FC = () => {
     selectedProducts: [],
     verificationCode: ''
   });
-  
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUserData({
       ...userData,
@@ -97,7 +98,6 @@ export const RegistrationPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Determine role based on business type
       let role: 'admin' | 'business_partner' | 'client' | 'location' = 'client';
       if (userData.businessType === 'business_partner') {
         role = 'business_partner';
@@ -107,13 +107,21 @@ export const RegistrationPage: React.FC = () => {
 
       await register({
         email: userData.email,
-        password: 'defaultPassword123', // In real app, collect this from user
+        password: 'defaultPassword123',
         fullName: userData.fullName,
         role
       });
       
-      // The register function now handles navigation automatically
-      toast.success(t("registration.complete"));
+      // Store onboarding progress - new user hasn't completed onboarding
+      localStorage.setItem('onboarding_progress', JSON.stringify({
+        completed: false,
+        currentStep: 'company',
+        completedSteps: [],
+        userData: userData
+      }));
+      
+      toast.success("Registrácia úspešná! Pokračujte s onboardingom.");
+      navigate('/onboarding/company');
     } catch (error) {
       console.error('Registration error:', error);
     }
@@ -127,7 +135,6 @@ export const RegistrationPage: React.FC = () => {
     setStep(step - 1);
   };
 
-  // Handle different views
   if (currentView === 'choice') {
     return (
       <WelcomeChoiceScreen 
@@ -157,7 +164,6 @@ export const RegistrationPage: React.FC = () => {
     );
   }
 
-  // Registration flow
   if (step === 0) {
     return <WelcomeScreen onNext={nextStep} />;
   }

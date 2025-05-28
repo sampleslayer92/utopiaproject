@@ -21,7 +21,6 @@ import { DashboardLayout } from "./components/dashboard/layouts/DashboardLayout"
 
 const queryClient = new QueryClient();
 
-// Simple fallback component for error boundary
 const ErrorFallback = () => (
   <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-slate-900 text-center p-5">
     <div>
@@ -65,21 +64,10 @@ const App = () => (
                       <Route path="devices" element={<DevicesPage />} />
                     </Route>
                     
-                    {/* Legacy routes */}
-                    <Route path="/onboarding" element={<Navigate to="/dashboard" />} />
+                    {/* Onboarding routes */}
                     <Route path="/onboarding/:step" element={
                       <ProtectedRoute>
                         <OnboardingWizard />
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/transactions" element={
-                      <ProtectedRoute>
-                        <TransactionsPage />
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/devices" element={
-                      <ProtectedRoute>
-                        <DevicesPage />
                       </ProtectedRoute>
                     } />
                     

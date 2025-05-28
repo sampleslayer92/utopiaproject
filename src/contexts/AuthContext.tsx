@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, AuthState, LoginCredentials, RegisterData, AuthContextType } from '@/types/auth';
@@ -26,7 +25,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isLoading: true
   });
 
-  // Check for existing session on mount
   useEffect(() => {
     const checkExistingSession = () => {
       try {
@@ -56,10 +54,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setAuthState(prev => ({ ...prev, isLoading: true }));
       
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Enhanced mock user data with hierarchical structure
       const mockUser: User = {
         id: getMockUserId(credentials.email),
         email: credentials.email,
@@ -73,7 +69,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         isActive: true
       };
 
-      // Store user session
       localStorage.setItem('utopia_user', JSON.stringify(mockUser));
       if (credentials.rememberMe) {
         localStorage.setItem('utopia_remember_me', 'true');
@@ -89,7 +84,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       toast.success('Úspešne ste sa prihlásili');
       
-      // Redirect to dashboard after successful login
+      // Check if user has completed onboarding
+      const onboardingProgress = localStorage.getItem('onboarding_progress');
+      if (onboardingProgress) {
+        const progress = JSON.parse(onboardingProgress);
+        if (!progress.completed) {
+          navigate(`/onboarding/${progress.currentStep || 'company'}`);
+          return;
+        }
+      }
+      
       navigate('/dashboard');
     } catch (error) {
       console.error('Login error:', error);
@@ -115,7 +119,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setAuthState(prev => ({ ...prev, isLoading: true }));
       
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       const newUser: User = {
@@ -140,8 +143,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       toast.success('Účet bol úspešne vytvorený');
       
-      // Redirect to dashboard after successful registration
-      navigate('/dashboard');
+      // Don't navigate here - let the registration component handle it
     } catch (error) {
       console.error('Registration error:', error);
       setAuthState(prev => ({ ...prev, isLoading: false }));
@@ -152,7 +154,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const forgotPassword = async (email: string): Promise<void> => {
     try {
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       toast.success(`Odkaz na reset hesla bol odoslaný na ${email}`);
     } catch (error) {

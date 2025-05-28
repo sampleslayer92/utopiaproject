@@ -1,295 +1,341 @@
 
 import React, { useState } from 'react';
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Badge } from '@/components/ui/badge';
-import { Transakcia } from '@/types/onboarding';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { 
+  CreditCard, 
+  Search,
+  Filter,
+  Download,
+  Calendar,
+  TrendingUp,
+  TrendingDown,
+  DollarSign
+} from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
-// Mock data for transactions
-const mockTransakcie: Transakcia[] = [
-  {
-    id: 'tr-001',
-    datum: '2025-05-21T14:32:11',
-    suma: 43.50,
-    mena: 'EUR',
-    typ: 'Platba',
-    stav: 'Schválená',
-    zakaznik: 'Zákazník 1',
-    karta: 'VISA ****1234'
-  },
-  {
-    id: 'tr-002',
-    datum: '2025-05-21T13:15:43',
-    suma: 18.90,
-    mena: 'EUR',
-    typ: 'Platba',
-    stav: 'Schválená',
-    zakaznik: 'Zákazník 2',
-    karta: 'Mastercard ****5678'
-  },
-  {
-    id: 'tr-003',
-    datum: '2025-05-21T11:05:22',
-    suma: 32.75,
-    mena: 'EUR',
-    typ: 'Platba',
-    stav: 'Schválená',
-    zakaznik: 'Zákazník 3',
-    karta: 'VISA ****9012'
-  },
-  {
-    id: 'tr-004',
-    datum: '2025-05-21T10:47:31',
-    suma: 15.20,
-    mena: 'EUR',
-    typ: 'Vrátenie',
-    stav: 'Schválená',
-    zakaznik: 'Zákazník 4',
-    karta: 'VISA ****3456'
-  },
-  {
-    id: 'tr-005',
-    datum: '2025-05-20T16:23:55',
-    suma: 50.00,
-    mena: 'EUR',
-    typ: 'Predautorizácia',
-    stav: 'Čaká sa',
-    zakaznik: 'Zákazník 5',
-    karta: 'Mastercard ****7890'
-  },
-  {
-    id: 'tr-006',
-    datum: '2025-05-20T15:12:08',
-    suma: 22.40,
-    mena: 'EUR',
-    typ: 'Platba',
-    stav: 'Zamietnutá',
-    zakaznik: 'Zákazník 6',
-    karta: 'Mastercard ****1357'
-  },
-  {
-    id: 'tr-007',
-    datum: '2025-05-20T14:05:17',
-    suma: 37.80,
-    mena: 'EUR',
-    typ: 'Platba',
-    stav: 'Schválená',
-    zakaznik: 'Zákazník 7',
-    karta: 'VISA ****2468'
-  },
-  {
-    id: 'tr-008',
-    datum: '2025-05-20T11:34:29',
-    suma: 19.95,
-    mena: 'EUR',
-    typ: 'Platba',
-    stav: 'Schválená',
-    zakaznik: 'Zákazník 8',
-    karta: 'Mastercard ****3579'
-  }
-];
+interface Transaction {
+  id: string;
+  amount: number;
+  currency: string;
+  type: 'card' | 'cash' | 'contactless' | 'mobile';
+  status: 'completed' | 'pending' | 'failed' | 'refunded';
+  deviceId: string;
+  deviceName: string;
+  location: string;
+  timestamp: string;
+  customerRef?: string;
+  receiptNumber: string;
+  fee: number;
+}
 
 export const TransactionsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
-  
-  // Filter transactions based on search term and filters
-  const filteredTransactions = mockTransakcie.filter(transaction => {
-    const matchesSearch = 
-      transaction.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      transaction.zakaznik.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      transaction.karta.toLowerCase().includes(searchTerm.toLowerCase());
-      
-    const matchesStatus = statusFilter === 'all' || transaction.stav === statusFilter;
-    const matchesType = typeFilter === 'all' || transaction.typ === typeFilter;
-    
+
+  // Mock transactions data
+  const transactions: Transaction[] = [
+    {
+      id: 'TXN-001',
+      amount: 45.50,
+      currency: 'EUR',
+      type: 'contactless',
+      status: 'completed',
+      deviceId: 'DEV-001',
+      deviceName: 'Platobný terminál 1',
+      location: 'Hlavná prevádzka',
+      timestamp: '2024-12-28T14:30:00Z',
+      receiptNumber: 'RCP-202412280001',
+      fee: 0.65
+    },
+    {
+      id: 'TXN-002',
+      amount: 128.90,
+      currency: 'EUR',
+      type: 'card',
+      status: 'completed',
+      deviceId: 'DEV-002',
+      deviceName: 'Platobný terminál 2',
+      location: 'Hlavná prevádzka',
+      timestamp: '2024-12-28T14:25:00Z',
+      receiptNumber: 'RCP-202412280002',
+      fee: 1.85
+    },
+    {
+      id: 'TXN-003',
+      amount: 23.75,
+      currency: 'EUR',
+      type: 'mobile',
+      status: 'completed',
+      deviceId: 'DEV-001',
+      deviceName: 'Platobný terminál 1',
+      location: 'Hlavná prevádzka',
+      timestamp: '2024-12-28T14:20:00Z',
+      receiptNumber: 'RCP-202412280003',
+      fee: 0.34
+    },
+    {
+      id: 'TXN-004',
+      amount: 89.00,
+      currency: 'EUR',
+      type: 'card',
+      status: 'failed',
+      deviceId: 'DEV-003',
+      deviceName: 'Platobný terminál 3',
+      location: 'Pobočka Centrum',
+      timestamp: '2024-12-28T13:45:00Z',
+      receiptNumber: 'RCP-202412280004',
+      fee: 0.00
+    },
+    {
+      id: 'TXN-005',
+      amount: 67.25,
+      currency: 'EUR',
+      type: 'contactless',
+      status: 'refunded',
+      deviceId: 'DEV-002',
+      deviceName: 'Platobný terminál 2',
+      location: 'Hlavná prevádzka',
+      timestamp: '2024-12-28T13:30:00Z',
+      receiptNumber: 'RCP-202412280005',
+      fee: -0.96
+    },
+    {
+      id: 'TXN-006',
+      amount: 156.80,
+      currency: 'EUR',
+      type: 'card',
+      status: 'pending',
+      deviceId: 'DEV-004',
+      deviceName: 'Platobný terminál 4',
+      location: 'Pobočka Východ',
+      timestamp: '2024-12-28T13:15:00Z',
+      receiptNumber: 'RCP-202412280006',
+      fee: 2.25
+    }
+  ];
+
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case 'card':
+      case 'contactless':
+      case 'mobile':
+        return <CreditCard className="h-4 w-4" />;
+      default:
+        return <DollarSign className="h-4 w-4" />;
+    }
+  };
+
+  const getTypeBadge = (type: string) => {
+    switch (type) {
+      case 'card':
+        return <Badge variant="outline">Karta</Badge>;
+      case 'contactless':
+        return <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">Bezkontaktne</Badge>;
+      case 'mobile':
+        return <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">Mobil</Badge>;
+      case 'cash':
+        return <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">Hotovosť</Badge>;
+      default:
+        return <Badge variant="secondary">{type}</Badge>;
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">Dokončené</Badge>;
+      case 'pending':
+        return <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">Čaká</Badge>;
+      case 'failed':
+        return <Badge className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">Zlyhané</Badge>;
+      case 'refunded':
+        return <Badge className="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300">Vrátené</Badge>;
+      default:
+        return <Badge variant="secondary">{status}</Badge>;
+    }
+  };
+
+  const filteredTransactions = transactions.filter(transaction => {
+    const matchesSearch = transaction.receiptNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         transaction.deviceName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         transaction.location.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || transaction.status === statusFilter;
+    const matchesType = typeFilter === 'all' || transaction.type === typeFilter;
     return matchesSearch && matchesStatus && matchesType;
   });
-  
-  // Calculate summary values
-  const totalAmount = filteredTransactions
-    .filter(t => t.stav === 'Schválená')
-    .reduce((sum, transaction) => sum + (transaction.typ === 'Vrátenie' ? -transaction.suma : transaction.suma), 0);
-    
-  const approvedCount = filteredTransactions.filter(t => t.stav === 'Schválená').length;
-  const pendingCount = filteredTransactions.filter(t => t.stav === 'Čaká sa').length;
-  const rejectedCount = filteredTransactions.filter(t => t.stav === 'Zamietnutá').length;
-  
-  // Format date for display
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('sk-SK') + ' ' + date.toLocaleTimeString('sk-SK');
-  };
-  
-  // Get status badge color
-  const getStatusBadgeClass = (status: string) => {
-    switch (status) {
-      case 'Schválená': return 'bg-green-100 text-green-800 hover:bg-green-200';
-      case 'Zamietnutá': return 'bg-red-100 text-red-800 hover:bg-red-200';
-      case 'Čaká sa': return 'bg-amber-100 text-amber-800 hover:bg-amber-200';
-      case 'Zrušená': return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
-      default: return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
-    }
-  };
 
-  // Get transaction type badge color
-  const getTypeBadgeClass = (type: string) => {
-    switch (type) {
-      case 'Platba': return 'bg-blue-100 text-blue-800 hover:bg-blue-200';
-      case 'Vrátenie': return 'bg-purple-100 text-purple-800 hover:bg-purple-200';
-      case 'Predautorizácia': return 'bg-indigo-100 text-indigo-800 hover:bg-indigo-200';
-      case 'Zrušenie': return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
-      default: return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
-    }
-  };
+  const totalAmount = filteredTransactions
+    .filter(t => t.status === 'completed')
+    .reduce((sum, t) => sum + t.amount, 0);
+
+  const totalFees = filteredTransactions
+    .filter(t => t.status === 'completed')
+    .reduce((sum, t) => sum + t.fee, 0);
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold mb-8">Transakcie</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold">{filteredTransactions.length}</div>
-            <p className="text-muted-foreground">Počet transakcií</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold text-green-600">{totalAmount.toFixed(2)} €</div>
-            <p className="text-muted-foreground">Celkový objem</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-2">
-              <div className="text-2xl font-bold">{approvedCount}</div>
-              <Badge className="bg-green-100 text-green-800">Schválené</Badge>
-            </div>
-            <div className="flex items-center gap-2 mt-1">
-              <div className="text-lg font-medium">{pendingCount}</div>
-              <Badge className="bg-amber-100 text-amber-800">Čaká sa</Badge>
+    <div className="space-y-6">
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-green-100 text-sm font-medium">Celkový obrat</p>
+                <p className="text-2xl font-bold">€{totalAmount.toFixed(2)}</p>
+                <p className="text-green-100 text-xs flex items-center mt-1">
+                  <TrendingUp className="h-3 w-3 mr-1" />
+                  +12.5% oproti včera
+                </p>
+              </div>
+              <DollarSign className="h-8 w-8 text-green-200" />
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-2">
-              <div className="text-2xl font-bold">{rejectedCount}</div>
-              <Badge className="bg-red-100 text-red-800">Zamietnuté</Badge>
+
+        <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-blue-100 text-sm font-medium">Počet transakcií</p>
+                <p className="text-2xl font-bold">{filteredTransactions.length}</p>
+                <p className="text-blue-100 text-xs flex items-center mt-1">
+                  <TrendingUp className="h-3 w-3 mr-1" />
+                  +8.3% oproti včera
+                </p>
+              </div>
+              <CreditCard className="h-8 w-8 text-blue-200" />
             </div>
-            <p className="text-muted-foreground">Neúspešné platby</p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-purple-100 text-sm font-medium">Poplatky</p>
+                <p className="text-2xl font-bold">€{totalFees.toFixed(2)}</p>
+                <p className="text-purple-100 text-xs flex items-center mt-1">
+                  <TrendingDown className="h-3 w-3 mr-1" />
+                  -2.1% oproti včera
+                </p>
+              </div>
+              <TrendingDown className="h-8 w-8 text-purple-200" />
+            </div>
           </CardContent>
         </Card>
       </div>
-      
-      <Card className="mb-8">
+
+      {/* Filters */}
+      <Card>
         <CardHeader>
-          <CardTitle>Zoznam transakcií</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="flex-1">
-              <Input
-                placeholder="Vyhľadať transakciu..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full"
-              />
-            </div>
-            <div className="flex flex-row gap-2">
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Filter podľa stavu" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Všetky stavy</SelectItem>
-                  <SelectItem value="Schválená">Schválené</SelectItem>
-                  <SelectItem value="Zamietnutá">Zamietnuté</SelectItem>
-                  <SelectItem value="Čaká sa">Čaká sa</SelectItem>
-                  <SelectItem value="Zrušená">Zrušené</SelectItem>
-                </SelectContent>
-              </Select>
+          <div className="flex flex-col sm:flex-row gap-4 justify-between">
+            <CardTitle>Transakcie</CardTitle>
+            <div className="flex gap-2">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  placeholder="Hľadať transakcie..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 w-64"
+                />
+              </div>
               
-              <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Filter podľa typu" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Všetky typy</SelectItem>
-                  <SelectItem value="Platba">Platby</SelectItem>
-                  <SelectItem value="Vrátenie">Vrátenia</SelectItem>
-                  <SelectItem value="Predautorizácia">Predautorizácie</SelectItem>
-                  <SelectItem value="Zrušenie">Zrušenia</SelectItem>
-                </SelectContent>
-              </Select>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="gap-2">
+                    <Filter className="h-4 w-4" />
+                    Status
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onClick={() => setStatusFilter('all')}>Všetky</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setStatusFilter('completed')}>Dokončené</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setStatusFilter('pending')}>Čakajúce</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setStatusFilter('failed')}>Zlyhané</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setStatusFilter('refunded')}>Vrátené</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="gap-2">
+                    <Filter className="h-4 w-4" />
+                    Typ
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onClick={() => setTypeFilter('all')}>Všetky</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setTypeFilter('card')}>Karta</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setTypeFilter('contactless')}>Bezkontaktne</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setTypeFilter('mobile')}>Mobil</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setTypeFilter('cash')}>Hotovosť</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <Button variant="outline" className="gap-2">
+                <Download className="h-4 w-4" />
+                Export
+              </Button>
             </div>
           </div>
-          
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ID transakcie</TableHead>
-                  <TableHead>Dátum a čas</TableHead>
-                  <TableHead>Zákazník</TableHead>
-                  <TableHead>Karta</TableHead>
-                  <TableHead>Typ</TableHead>
-                  <TableHead>Suma</TableHead>
-                  <TableHead>Stav</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredTransactions.length > 0 ? (
-                  filteredTransactions.map((transaction) => (
-                    <TableRow key={transaction.id}>
-                      <TableCell className="font-mono">{transaction.id}</TableCell>
-                      <TableCell>{formatDate(transaction.datum)}</TableCell>
-                      <TableCell>{transaction.zakaznik}</TableCell>
-                      <TableCell>{transaction.karta}</TableCell>
-                      <TableCell>
-                        <Badge className={getTypeBadgeClass(transaction.typ)}>
-                          {transaction.typ}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {transaction.suma.toFixed(2)} {transaction.mena}
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={getStatusBadgeClass(transaction.stav)}>
-                          {transaction.stav}
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={7} className="h-24 text-center">
-                      Nenašli sa žiadne transakcie.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+        </CardHeader>
+        
+        <CardContent>
+          <div className="space-y-4">
+            {filteredTransactions.map((transaction) => (
+              <div key={transaction.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                <div className="flex items-center gap-4">
+                  <div className="p-2 bg-white dark:bg-gray-600 rounded-lg">
+                    {getTypeIcon(transaction.type)}
+                  </div>
+                  
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="font-semibold text-gray-900 dark:text-gray-100">
+                        {transaction.receiptNumber}
+                      </p>
+                      {getTypeBadge(transaction.type)}
+                      {getStatusBadge(transaction.status)}
+                    </div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {transaction.deviceName} • {transaction.location}
+                    </p>
+                    <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      <Calendar className="h-3 w-3" />
+                      {new Date(transaction.timestamp).toLocaleString('sk-SK')}
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="text-right">
+                  <p className={`text-lg font-bold ${
+                    transaction.status === 'refunded' ? 'text-red-600' : 
+                    transaction.status === 'completed' ? 'text-green-600' : 
+                    'text-gray-600'
+                  }`}>
+                    {transaction.status === 'refunded' ? '-' : ''}€{transaction.amount.toFixed(2)}
+                  </p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Poplatok: €{transaction.fee.toFixed(2)}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
+
+          {filteredTransactions.length === 0 && (
+            <div className="text-center py-8">
+              <CreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-600 dark:text-gray-400">
+                Žiadne transakcie nezodpovedajú filtrom.
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

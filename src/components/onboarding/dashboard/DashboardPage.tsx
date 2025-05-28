@@ -5,6 +5,7 @@ import { AdminDashboard } from '@/components/dashboard/AdminDashboard';
 import { BusinessPartnerDashboard } from '@/components/dashboard/BusinessPartnerDashboard';
 import { ClientDashboard } from '@/components/dashboard/ClientDashboard';
 import { LocationDashboard } from '@/components/dashboard/LocationDashboard';
+import { OnboardingProgress } from './OnboardingProgress';
 
 export const DashboardPage: React.FC = () => {
   const { user } = useAuth();
@@ -16,6 +17,10 @@ export const DashboardPage: React.FC = () => {
       </div>
     );
   }
+
+  // Check if user has completed onboarding
+  const onboardingProgress = localStorage.getItem('onboarding_progress');
+  const showOnboardingProgress = onboardingProgress && !JSON.parse(onboardingProgress).completed;
 
   const renderDashboard = () => {
     switch (user.role) {
@@ -48,6 +53,8 @@ export const DashboardPage: React.FC = () => {
           Vítejte zpět, {user.fullName}
         </p>
       </div>
+      
+      {showOnboardingProgress && <OnboardingProgress />}
       
       {renderDashboard()}
     </div>
