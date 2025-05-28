@@ -87,7 +87,7 @@ export const DashboardLayout: React.FC = () => {
           
           <ul className="space-y-2 px-3">
             {filteredNavigation.map((item) => {
-              const Icon = item.icon;
+              const IconComponent = item.icon;
               const isActive = location.pathname === item.href;
               
               return (
@@ -104,7 +104,7 @@ export const DashboardLayout: React.FC = () => {
                       setSidebarOpen(false);
                     }}
                   >
-                    <Icon className="h-4 w-4 mr-3" />
+                    <IconComponent className="h-4 w-4 mr-3" />
                     {item.label}
                   </Button>
                 </li>

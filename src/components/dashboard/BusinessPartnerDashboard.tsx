@@ -16,14 +16,14 @@ export const BusinessPartnerDashboard: React.FC = () => {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {dashboardData.map((item, index) => {
-          const Icon = item.icon;
+          const IconComponent = item.icon;
           return (
             <Card key={index} className="bg-white dark:bg-gray-800">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
                   {item.title}
                 </CardTitle>
-                {Icon && <Icon className="h-4 w-4 text-muted-foreground" />}
+                {IconComponent && <IconComponent className="h-4 w-4 text-muted-foreground" />}
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-gray-900 dark:text-white">{item.value}</div>
