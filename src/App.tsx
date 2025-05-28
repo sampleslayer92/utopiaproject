@@ -15,6 +15,12 @@ import { OnboardingWizard } from "./components/onboarding/OnboardingWizard";
 import { ThemeProvider } from "next-themes";
 import { TransactionsPage } from "./components/dashboard/TransactionsPage";
 import { DevicesPage } from "./components/dashboard/DevicesPage";
+import { BusinessPartnersPage } from "./components/dashboard/BusinessPartnersPage";
+import { ClientsPage } from "./components/dashboard/ClientsPage";
+import { LocationsPage } from "./components/dashboard/LocationsPage";
+import { ContractsPage } from "./components/dashboard/ContractsPage";
+import { TicketsPage } from "./components/dashboard/TicketsPage";
+import { SettingsPage } from "./components/dashboard/SettingsPage";
 import { ErrorBoundary } from "react-error-boundary";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { DashboardLayout } from "./components/dashboard/layouts/DashboardLayout";
@@ -62,6 +68,12 @@ const App = () => (
                       <Route index element={<DashboardPage />} />
                       <Route path="transactions" element={<TransactionsPage />} />
                       <Route path="devices" element={<DevicesPage />} />
+                      <Route path="business-partners" element={<BusinessPartnersPage />} />
+                      <Route path="clients" element={<ClientsPage />} />
+                      <Route path="locations" element={<LocationsPage />} />
+                      <Route path="contracts" element={<ContractsPage />} />
+                      <Route path="tickets" element={<TicketsPage />} />
+                      <Route path="settings" element={<SettingsPage />} />
                     </Route>
                     
                     {/* Onboarding routes */}
