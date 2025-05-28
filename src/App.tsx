@@ -43,8 +43,8 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <LanguageProvider>
-        <AuthProvider>
-          <BrowserRouter>
+        <BrowserRouter>
+          <AuthProvider>
             <OnboardingProvider>
               <TooltipProvider>
                 <ErrorBoundary FallbackComponent={ErrorFallback}>
@@ -88,8 +88,8 @@ const App = () => (
                 </ErrorBoundary>
               </TooltipProvider>
             </OnboardingProvider>
-          </BrowserRouter>
-        </AuthProvider>
+          </AuthProvider>
+        </BrowserRouter>
       </LanguageProvider>
     </ThemeProvider>
   </QueryClientProvider>
