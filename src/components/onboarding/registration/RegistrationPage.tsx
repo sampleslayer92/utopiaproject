@@ -13,8 +13,10 @@ import { CountrySelectionScreen } from './CountrySelectionScreen';
 import { PhoneVerificationScreen } from './PhoneVerificationScreen';
 import { WelcomeChoiceScreen } from '@/components/auth/WelcomeChoiceScreen';
 import { LoginPage } from '@/components/auth/LoginPage';
+import { ForgotPasswordPage } from '@/components/auth/ForgotPasswordPage';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 
@@ -31,6 +33,8 @@ interface UserData {
 export const RegistrationPage: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { register } = useAuth();
+  const [currentView, setCurrentView] = useState<'choice' | 'login' | 'register' | 'forgot-password'>('choice');
   const [step, setStep] = useState(0); // 0: Welcome, 1: Country Selection, 2: Account Info, 3: Phone Verification, 4: Business Type, 5: Product Selection
   const [userData, setUserData] = useState<UserData>({
     country: 'SK',
@@ -84,8 +88,6 @@ export const RegistrationPage: React.FC = () => {
       verificationCode: code
     });
     
-    // In a real app, we would verify the code with an API
-    // For now, we'll just accept any 4-digit code
     if (code.length === 4) {
       toast.success(t("phone.verified"));
       nextStep();
@@ -94,13 +96,29 @@ export const RegistrationPage: React.FC = () => {
     }
   };
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Save data to localStorage or context
-    localStorage.setItem('utopiaRegistration', JSON.stringify(userData));
-    // Redirect to dashboard
-    navigate('/dashboard');
-    toast.success(t("registration.complete"));
+    try {
+      // Determine role based on business type
+      let role: 'admin' | 'business_partner' | 'client' | 'location' = 'client';
+      if (userData.businessType === 'business_partner') {
+        role = 'business_partner';
+      } else if (userData.businessType === 'location') {
+        role = 'location';
+      }
+
+      await register({
+        email: userData.email,
+        password: 'defaultPassword123', // In real app, collect this from user
+        fullName: userData.fullName,
+        role
+      });
+      
+      navigate('/dashboard');
+      toast.success(t("registration.complete"));
+    } catch (error) {
+      console.error('Registration error:', error);
+    }
   };
   
   const nextStep = () => {
@@ -110,7 +128,38 @@ export const RegistrationPage: React.FC = () => {
   const prevStep = () => {
     setStep(step - 1);
   };
-  
+
+  // Handle different views
+  if (currentView === 'choice') {
+    return (
+      <WelcomeChoiceScreen 
+        onNewClient={() => {
+          setCurrentView('register');
+          setStep(0);
+        }}
+        onExistingClient={() => setCurrentView('login')}
+      />
+    );
+  }
+
+  if (currentView === 'login') {
+    return (
+      <LoginPage 
+        onBack={() => setCurrentView('choice')}
+        onForgotPassword={() => setCurrentView('forgot-password')}
+      />
+    );
+  }
+
+  if (currentView === 'forgot-password') {
+    return (
+      <ForgotPasswordPage 
+        onBack={() => setCurrentView('login')}
+      />
+    );
+  }
+
+  // Registration flow
   if (step === 0) {
     return <WelcomeScreen onNext={nextStep} />;
   }
@@ -245,6 +294,5 @@ export const RegistrationPage: React.FC = () => {
     />;
   }
 
-  // This should never happen but providing a fallback
   return <WelcomeScreen onNext={nextStep} />;
 };

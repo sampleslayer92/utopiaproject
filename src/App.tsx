@@ -16,6 +16,8 @@ import { ThemeProvider } from "next-themes";
 import { TransactionsPage } from "./components/dashboard/TransactionsPage";
 import { DevicesPage } from "./components/dashboard/DevicesPage";
 import { ErrorBoundary } from "react-error-boundary";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import { DashboardLayout } from "./components/dashboard/layouts/DashboardLayout";
 
 const queryClient = new QueryClient();
 
@@ -50,11 +52,36 @@ const App = () => (
                   <Sonner />
                   <Routes>
                     <Route path="/" element={<RegistrationPage />} />
-                    <Route path="/dashboard" element={<DashboardPage />} />
+                    
+                    {/* Protected dashboard routes */}
+                    <Route path="/dashboard" element={
+                      <ProtectedRoute>
+                        <DashboardLayout />
+                      </ProtectedRoute>
+                    }>
+                      <Route index element={<DashboardPage />} />
+                      <Route path="transactions" element={<TransactionsPage />} />
+                      <Route path="devices" element={<DevicesPage />} />
+                    </Route>
+                    
+                    {/* Legacy routes */}
                     <Route path="/onboarding" element={<Navigate to="/dashboard" />} />
-                    <Route path="/onboarding/:step" element={<OnboardingWizard />} />
-                    <Route path="/transactions" element={<TransactionsPage />} />
-                    <Route path="/devices" element={<DevicesPage />} />
+                    <Route path="/onboarding/:step" element={
+                      <ProtectedRoute>
+                        <OnboardingWizard />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/transactions" element={
+                      <ProtectedRoute>
+                        <TransactionsPage />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/devices" element={
+                      <ProtectedRoute>
+                        <DevicesPage />
+                      </ProtectedRoute>
+                    } />
+                    
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </ErrorBoundary>
