@@ -1,16 +1,18 @@
 
+import { LucideIcon } from 'lucide-react';
+
 export interface DashboardCard {
   title: string;
   value: string | number;
   change?: string;
   trend?: 'up' | 'down' | 'neutral';
-  icon?: React.ComponentType;
+  icon?: LucideIcon;
 }
 
 export interface NavigationItem {
   label: string;
   href: string;
-  icon: React.ComponentType;
+  icon: LucideIcon;
   roles: string[];
 }
 
