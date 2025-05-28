@@ -51,7 +51,8 @@ const App = () => (
                   <Toaster />
                   <Sonner />
                   <Routes>
-                    <Route path="/" element={<RegistrationPage />} />
+                    <Route path="/" element={<Index />} />
+                    <Route path="/register" element={<RegistrationPage />} />
                     
                     {/* Protected dashboard routes */}
                     <Route path="/dashboard" element={

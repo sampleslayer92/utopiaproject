@@ -1,5 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { User, AuthState, LoginCredentials, RegisterData, AuthContextType } from '@/types/auth';
 import { toast } from 'sonner';
 
@@ -18,6 +19,7 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const navigate = useNavigate();
   const [authState, setAuthState] = useState<AuthState>({
     user: null,
     isAuthenticated: false,
@@ -82,6 +84,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
 
       toast.success('Úspešne ste sa prihlásili');
+      
+      // Redirect to dashboard after successful login
+      navigate('/dashboard');
     } catch (error) {
       console.error('Login error:', error);
       setAuthState(prev => ({ ...prev, isLoading: false }));
@@ -99,6 +104,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       isLoading: false
     });
     toast.success('Úspešne ste sa odhlásili');
+    navigate('/');
   };
 
   const register = async (data: RegisterData): Promise<void> => {
@@ -127,6 +133,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
 
       toast.success('Účet bol úspešne vytvorený');
+      
+      // Redirect to dashboard after successful registration
+      navigate('/dashboard');
     } catch (error) {
       console.error('Registration error:', error);
       setAuthState(prev => ({ ...prev, isLoading: false }));

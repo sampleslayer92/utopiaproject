@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { LanguageSwitcher } from '@/components/ui/language-switcher';
-import { useNavigate } from 'react-router-dom';
 import { WelcomeScreen } from './WelcomeScreen';
 import { BusinessTypeScreen } from './BusinessTypeScreen';
 import { ProductSelectionScreen } from './ProductSelectionScreen';
@@ -31,7 +30,6 @@ interface UserData {
 }
 
 export const RegistrationPage: React.FC = () => {
-  const navigate = useNavigate();
   const { t } = useLanguage();
   const { register } = useAuth();
   const [currentView, setCurrentView] = useState<'choice' | 'login' | 'register' | 'forgot-password'>('choice');
@@ -114,7 +112,7 @@ export const RegistrationPage: React.FC = () => {
         role
       });
       
-      navigate('/dashboard');
+      // The register function now handles navigation automatically
       toast.success(t("registration.complete"));
     } catch (error) {
       console.error('Registration error:', error);
