@@ -4,7 +4,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { LanguageSwitcher } from '@/components/ui/language-switcher';
-import { WelcomeScreen } from './WelcomeScreen';
 import { BusinessTypeScreen } from './BusinessTypeScreen';
 import { ProductSelectionScreen } from './ProductSelectionScreen';
 import { CountrySelectionScreen } from './CountrySelectionScreen';
@@ -34,6 +33,7 @@ export const RegistrationPage: React.FC = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
   const [currentView, setCurrentView] = useState<'choice' | 'login' | 'register' | 'forgot-password'>('choice');
+  // Start directly at country selection instead of welcome screen
   const [step, setStep] = useState(0);
   const [userData, setUserData] = useState<UserData>({
     country: 'SK',
@@ -140,6 +140,7 @@ export const RegistrationPage: React.FC = () => {
       <WelcomeChoiceScreen 
         onNewClient={() => {
           setCurrentView('register');
+          // Skip welcome screen - start directly at country selection
           setStep(0);
         }}
         onExistingClient={() => setCurrentView('login')}
@@ -164,20 +165,17 @@ export const RegistrationPage: React.FC = () => {
     );
   }
 
+  // Start directly with country selection (step 0)
   if (step === 0) {
-    return <WelcomeScreen onNext={nextStep} />;
-  }
-  
-  if (step === 1) {
     return <CountrySelectionScreen 
       selectedCountry={userData.country} 
       onSelect={handleCountrySelect}
       onNext={nextStep}
-      onBack={prevStep}
+      onBack={() => setCurrentView('choice')}
     />;
   }
 
-  if (step === 2) {
+  if (step === 1) {
     return (
       <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 to-blue-100 dark:from-slate-900 dark:to-blue-900">
         <header className="flex justify-between items-center p-4">
@@ -271,7 +269,7 @@ export const RegistrationPage: React.FC = () => {
     );
   }
 
-  if (step === 3) {
+  if (step === 2) {
     return <PhoneVerificationScreen 
       phone={userData.phone}
       onChangePhone={(phone) => setUserData({...userData, phone})}
@@ -280,7 +278,7 @@ export const RegistrationPage: React.FC = () => {
     />;
   }
   
-  if (step === 4) {
+  if (step === 3) {
     return <BusinessTypeScreen 
       onSelect={handleBusinessTypeSelect} 
       selectedType={userData.businessType}
@@ -289,7 +287,7 @@ export const RegistrationPage: React.FC = () => {
     />;
   }
   
-  if (step === 5) {
+  if (step === 4) {
     return <ProductSelectionScreen 
       onSelect={handleProductSelect} 
       selectedProducts={userData.selectedProducts}
@@ -298,5 +296,10 @@ export const RegistrationPage: React.FC = () => {
     />;
   }
 
-  return <WelcomeScreen onNext={nextStep} />;
+  return <CountrySelectionScreen 
+    selectedCountry={userData.country} 
+    onSelect={handleCountrySelect}
+    onNext={nextStep}
+    onBack={() => setCurrentView('choice')}
+  />;
 };

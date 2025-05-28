@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -17,6 +18,8 @@ import {
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { LanguageSwitcher } from '@/components/ui/language-switcher';
+import { NotificationCenter } from '@/components/notifications/NotificationCenter';
+import { GlobalChatbot } from '@/components/chat/GlobalChatbot';
 import { NavigationItem } from '@/types/dashboard';
 
 const navigationItems: NavigationItem[] = [
@@ -128,7 +131,7 @@ export const DashboardLayout: React.FC = () => {
       
       {/* Main content */}
       <div className="flex-1 lg:ml-0">
-        {/* Header */}
+        {/* Header with notifications */}
         <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
           <div className="px-6 py-4 flex items-center justify-between">
             <div className="flex items-center">
@@ -146,6 +149,7 @@ export const DashboardLayout: React.FC = () => {
             </div>
             
             <div className="flex items-center gap-2">
+              <NotificationCenter />
               <ThemeToggle />
               <LanguageSwitcher />
             </div>
@@ -165,6 +169,9 @@ export const DashboardLayout: React.FC = () => {
           onClick={() => setSidebarOpen(false)}
         />
       )}
+      
+      {/* Global Chatbot */}
+      <GlobalChatbot />
     </div>
   );
 };
