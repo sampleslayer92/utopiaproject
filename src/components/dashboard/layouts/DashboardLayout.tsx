@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -20,13 +21,13 @@ import { NavigationItem } from '@/types/dashboard';
 
 const navigationItems: NavigationItem[] = [
   { label: 'Dashboard', href: '/dashboard', icon: Home, roles: ['admin', 'business_partner', 'client', 'location'] },
-  { label: 'Business Partners', href: '/business-partners', icon: Building2, roles: ['admin'] },
-  { label: 'Clients', href: '/clients', icon: Users, roles: ['admin', 'business_partner'] },
-  { label: 'Locations', href: '/locations', icon: Building2, roles: ['admin', 'business_partner', 'client'] },
-  { label: 'Devices', href: '/devices', icon: Smartphone, roles: ['admin', 'business_partner', 'client', 'location'] },
-  { label: 'Contracts', href: '/contracts', icon: FileText, roles: ['admin', 'business_partner', 'client'] },
-  { label: 'Tickets', href: '/tickets', icon: Ticket, roles: ['admin', 'business_partner', 'client', 'location'] },
-  { label: 'Settings', href: '/settings', icon: Settings, roles: ['admin', 'business_partner', 'client', 'location'] },
+  { label: 'Business Partners', href: '/dashboard/business-partners', icon: Building2, roles: ['admin'] },
+  { label: 'Clients', href: '/dashboard/clients', icon: Users, roles: ['admin', 'business_partner'] },
+  { label: 'Locations', href: '/dashboard/locations', icon: Building2, roles: ['admin', 'business_partner', 'client'] },
+  { label: 'Devices', href: '/dashboard/devices', icon: Smartphone, roles: ['admin', 'business_partner', 'client', 'location'] },
+  { label: 'Contracts', href: '/dashboard/contracts', icon: FileText, roles: ['admin', 'business_partner', 'client'] },
+  { label: 'Tickets', href: '/dashboard/tickets', icon: Ticket, roles: ['admin', 'business_partner', 'client', 'location'] },
+  { label: 'Settings', href: '/dashboard/settings', icon: Settings, roles: ['admin', 'business_partner', 'client', 'location'] },
 ];
 
 export const DashboardLayout: React.FC = () => {
