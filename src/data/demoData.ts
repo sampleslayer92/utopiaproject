@@ -103,6 +103,11 @@ export interface DemoLocation {
   phone?: string;
   contactPerson?: string;
   openingHours?: string;
+  status: 'active' | 'inactive' | 'setup';
+  manager: string;
+  dailyTransactions: number;
+  email: string;
+  openDate: string;
 }
 
 export interface DemoDevice {
@@ -134,6 +139,9 @@ export interface DemoTicket {
   locationId?: string;
   assignedTo?: string;
   estimatedResolution?: string;
+  type: string;
+  responseTime?: string;
+  lastUpdate?: string;
 }
 
 export interface DemoContract {
@@ -147,6 +155,12 @@ export interface DemoContract {
   type: 'hardware' | 'software' | 'service' | 'maintenance';
   description: string;
   renewalDate?: string;
+  contractNumber: string;
+  clientName: string;
+  locationId?: string;
+  monthlyFee: number;
+  autoRenewal: boolean;
+  notes?: string;
 }
 
 export interface DemoTransaction {
@@ -177,7 +191,12 @@ export const demoLocations: DemoLocation[] = [
     businessPartnerId: 'bp-1',
     phone: '+421 2 5555 1234',
     contactPerson: 'Peter Novotný',
-    openingHours: '8:00 - 20:00'
+    openingHours: '8:00 - 20:00',
+    status: 'active',
+    manager: 'Peter Novotný',
+    dailyTransactions: 150,
+    email: 'hlavna@techcorp.sk',
+    openDate: '2024-01-15'
   },
   {
     id: 'loc-2', 
@@ -191,7 +210,12 @@ export const demoLocations: DemoLocation[] = [
     businessPartnerId: 'bp-1',
     phone: '+421 2 4857 1111',
     contactPerson: 'Mária Kováčová',
-    openingHours: '24/7'
+    openingHours: '24/7',
+    status: 'active',
+    manager: 'Mária Kováčová',
+    dailyTransactions: 95,
+    email: 'letisko@techcorp.sk',
+    openDate: '2024-02-01'
   },
   {
     id: 'loc-3',
@@ -205,7 +229,12 @@ export const demoLocations: DemoLocation[] = [
     businessPartnerId: 'bp-1',
     phone: '+421 2 6820 0000',
     contactPerson: 'Ján Svoboda',
-    openingHours: '9:00 - 22:00'
+    openingHours: '9:00 - 22:00',
+    status: 'active',
+    manager: 'Ján Svoboda',
+    dailyTransactions: 220,
+    email: 'eurovea@retailmax.sk',
+    openDate: '2024-03-10'
   },
   {
     id: 'loc-4',
@@ -219,7 +248,12 @@ export const demoLocations: DemoLocation[] = [
     businessPartnerId: 'bp-1',
     phone: '+421 2 5555 9999',
     contactPerson: 'Online tím',
-    openingHours: '24/7'
+    openingHours: '24/7',
+    status: 'active',
+    manager: 'Online tím',
+    dailyTransactions: 85,
+    email: 'online@cafechain.sk',
+    openDate: '2024-04-01'
   },
   {
     id: 'loc-5',
@@ -233,7 +267,12 @@ export const demoLocations: DemoLocation[] = [
     businessPartnerId: 'bp-1',
     phone: '+421 2 5555 7777',
     contactPerson: 'Anna Mráková',
-    openingHours: '7:00 - 23:00'
+    openingHours: '7:00 - 23:00',
+    status: 'active',
+    manager: 'Anna Mráková',
+    dailyTransactions: 65,
+    email: 'central@cafechain.sk',
+    openDate: '2024-05-15'
   }
 ];
 
@@ -326,7 +365,10 @@ export const demoTickets: DemoTicket[] = [
     clientId: 'client-1',
     deviceId: 'dev-3',
     locationId: 'loc-1',
-    estimatedResolution: '2024-11-28T18:00:00Z'
+    estimatedResolution: '2024-11-28T18:00:00Z',
+    type: 'Technický problém',
+    responseTime: '4h',
+    lastUpdate: '2024-11-28T10:30:00Z'
   },
   {
     id: 'T-002',
@@ -338,7 +380,10 @@ export const demoTickets: DemoTicket[] = [
     updatedAt: '2024-11-28T09:00:00Z',
     clientId: 'client-2',
     locationId: 'loc-3',
-    assignedTo: 'Technický tím'
+    assignedTo: 'Technický tím',
+    type: 'Performance',
+    responseTime: '2h',
+    lastUpdate: '2024-11-28T09:00:00Z'
   },
   {
     id: 'T-003',
@@ -349,7 +394,10 @@ export const demoTickets: DemoTicket[] = [
     createdAt: '2024-11-25T10:00:00Z',
     updatedAt: '2024-11-27T16:00:00Z',
     clientId: 'client-3',
-    locationId: 'loc-5'
+    locationId: 'loc-5',
+    type: 'Údržba',
+    responseTime: '1h',
+    lastUpdate: '2024-11-27T16:00:00Z'
   }
 ];
 
@@ -365,7 +413,13 @@ export const demoContracts: DemoContract[] = [
     value: 25000,
     type: 'service',
     description: 'Kompletné platobné riešenie pre retail pobočky.',
-    renewalDate: '2025-10-01'
+    renewalDate: '2025-10-01',
+    contractNumber: 'SML-2024-001',
+    clientName: 'TechCorp s.r.o.',
+    locationId: 'loc-1',
+    monthlyFee: 450,
+    autoRenewal: true,
+    notes: 'Preferovaný klient, priority support'
   },
   {
     id: 'C-002',
@@ -377,7 +431,12 @@ export const demoContracts: DemoContract[] = [
     value: 45000,
     type: 'hardware',
     description: 'Dodávka a inštalácia 15 platobných terminálov.',
-    renewalDate: '2025-12-01'
+    renewalDate: '2025-12-01',
+    contractNumber: 'HW-2024-002',
+    clientName: 'RetailMax a.s.',
+    locationId: 'loc-3',
+    monthlyFee: 1200,
+    autoRenewal: false
   },
   {
     id: 'C-003',
@@ -388,7 +447,13 @@ export const demoContracts: DemoContract[] = [
     endDate: '2026-12-31',
     value: 12000,
     type: 'maintenance',
-    description: 'Preventívna údržba a technická podpora 24/7.'
+    description: 'Preventívna údržba a technická podpora 24/7.',
+    contractNumber: 'MNT-2024-003',
+    clientName: 'CafeChain Ltd.',
+    locationId: 'loc-5',
+    monthlyFee: 500,
+    autoRenewal: true,
+    notes: 'Zahŕňa emergency response'
   }
 ];
 
