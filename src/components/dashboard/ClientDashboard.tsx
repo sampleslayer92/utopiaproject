@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,7 +13,9 @@ import {
   MapPin, 
   BarChart3,
   Plus,
-  Zap
+  Zap,
+  Building2,
+  Headphones
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { useAuth } from '@/contexts/AuthContext';
@@ -59,26 +60,55 @@ export const ClientDashboard: React.FC = () => {
 
   return (
     <div className="p-6 space-y-6 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 min-h-full">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            {isOverviewMode ? 'Všeobecný prehľad' : selectedLocation?.name}
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            {isOverviewMode 
-              ? `Prehľad všetkých ${allLocations.length} prevádzok`
-              : `Prehľad prevádzky ${selectedLocation?.name}`
-            }
-          </p>
+      {/* Enhanced Header */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-emerald-500 via-green-600 to-teal-700 rounded-3xl p-8 text-white shadow-2xl">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="relative z-10">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-2xl">
+                  <Building2 className="h-8 w-8 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-4xl font-bold">
+                    {isOverviewMode ? 'Všeobecný prehľad' : selectedLocation?.name}
+                  </h1>
+                  <p className="text-green-100 text-lg mt-1">
+                    Vitajte späť! Vaše podnikanie rastie.
+                  </p>
+                </div>
+              </div>
+              <p className="text-green-100 max-w-2xl">
+                {isOverviewMode 
+                  ? `Komplexný prehľad všetkých ${allLocations.length} prevádzok a ich výkonnosti`
+                  : `Detailný prehľad prevádzky ${selectedLocation?.name} a jej výkonnosti`
+                }
+              </p>
+            </div>
+            
+            <div className="flex flex-wrap gap-3">
+              <Button 
+                size="lg" 
+                className="bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105"
+              >
+                <Plus className="h-5 w-5 mr-2" />
+                Nová prevádzka
+              </Button>
+              <CreateTicketDialog onTicketCreated={handleTicketCreated} />
+              <Button 
+                size="lg"
+                variant="outline"
+                className="bg-transparent hover:bg-white/10 border-white/30 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105"
+              >
+                <BarChart3 className="h-5 w-5 mr-2" />
+                Detailný report
+              </Button>
+            </div>
+          </div>
         </div>
-        <div className="flex gap-3">
-          <CreateTicketDialog onTicketCreated={handleTicketCreated} />
-          <Button variant="outline" className="hover:bg-blue-50 dark:hover:bg-blue-900/20">
-            <BarChart3 className="h-4 w-4 mr-2" />
-            Detailný report
-          </Button>
-        </div>
+        <div className="absolute -top-24 -right-24 w-48 h-48 bg-white/10 rounded-full"></div>
+        <div className="absolute -bottom-12 -left-12 w-32 h-32 bg-white/10 rounded-full"></div>
       </div>
 
       {/* Overview Cards for All Locations */}

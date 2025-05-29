@@ -5,8 +5,6 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from './AppSidebar';
 import { NotificationCenter } from '@/components/notifications/NotificationCenter';
 import { GlobalChatbot } from '@/components/chat/GlobalChatbot';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
-import { LanguageSwitcher } from '@/components/ui/language-switcher';
 import { LocationSelector } from '../LocationSelector';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -27,8 +25,6 @@ export const DashboardLayout: React.FC = () => {
             </div>
             
             <div className="flex items-center gap-3">
-              <ThemeToggle />
-              <LanguageSwitcher />
               <NotificationCenter />
               
               <div className="flex items-center gap-2 ml-4 pl-4 border-l border-gray-200 dark:border-gray-700">
