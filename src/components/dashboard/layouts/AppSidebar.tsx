@@ -86,7 +86,7 @@ export const AppSidebar: React.FC = () => {
       ];
     }
 
-    if (user?.role === 'partner') {
+    if (user?.role === 'business_partner') {
       return [
         ...baseItems,
         {
@@ -165,12 +165,12 @@ export const AppSidebar: React.FC = () => {
           <UserCheck className="h-6 w-6 text-primary" />
           <div>
             <h2 className="text-lg font-semibold">PaymentHub</h2>
-            <p className="text-sm text-muted-foreground capitalize">{user?.role}</p>
+            <p className="text-sm text-muted-foreground capitalize">{user?.role?.replace('_', ' ')}</p>
           </div>
         </div>
         {user && (
           <div className="mt-2 text-sm">
-            <p className="font-medium">{user.companyName || user.name}</p>
+            <p className="font-medium">{user.fullName}</p>
             <p className="text-muted-foreground">{user.email}</p>
           </div>
         )}
