@@ -1,343 +1,290 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { demoTransactions, demoLocations, demoClients, demoDevices, type DemoTransaction } from '@/data/demoData';
 import { 
-  CreditCard, 
-  Search,
-  Filter,
-  Download,
+  Search, 
+  Filter, 
+  Download, 
   Calendar,
-  TrendingUp,
-  TrendingDown,
-  DollarSign
+  CreditCard,
+  Smartphone,
+  Clock,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  RefreshCw
 } from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-
-interface Transaction {
-  id: string;
-  amount: number;
-  currency: string;
-  type: 'card' | 'cash' | 'contactless' | 'mobile';
-  status: 'completed' | 'pending' | 'failed' | 'refunded';
-  deviceId: string;
-  deviceName: string;
-  location: string;
-  timestamp: string;
-  customerRef?: string;
-  receiptNumber: string;
-  fee: number;
-}
+import { format } from 'date-fns';
+import { sk, enUS } from 'date-fns/locale';
 
 export const TransactionsPage: React.FC = () => {
+  const { user } = useAuth();
+  const { t, language } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [methodFilter, setMethodFilter] = useState<string>('all');
 
-  // Mock transactions data
-  const transactions: Transaction[] = [
-    {
-      id: 'TXN-001',
-      amount: 45.50,
-      currency: 'EUR',
-      type: 'contactless',
-      status: 'completed',
-      deviceId: 'DEV-001',
-      deviceName: 'Platobný terminál 1',
-      location: 'Hlavná prevádzka',
-      timestamp: '2024-12-28T14:30:00Z',
-      receiptNumber: 'RCP-202412280001',
-      fee: 0.65
-    },
-    {
-      id: 'TXN-002',
-      amount: 128.90,
-      currency: 'EUR',
-      type: 'card',
-      status: 'completed',
-      deviceId: 'DEV-002',
-      deviceName: 'Platobný terminál 2',
-      location: 'Hlavná prevádzka',
-      timestamp: '2024-12-28T14:25:00Z',
-      receiptNumber: 'RCP-202412280002',
-      fee: 1.85
-    },
-    {
-      id: 'TXN-003',
-      amount: 23.75,
-      currency: 'EUR',
-      type: 'mobile',
-      status: 'completed',
-      deviceId: 'DEV-001',
-      deviceName: 'Platobný terminál 1',
-      location: 'Hlavná prevádzka',
-      timestamp: '2024-12-28T14:20:00Z',
-      receiptNumber: 'RCP-202412280003',
-      fee: 0.34
-    },
-    {
-      id: 'TXN-004',
-      amount: 89.00,
-      currency: 'EUR',
-      type: 'card',
-      status: 'failed',
-      deviceId: 'DEV-003',
-      deviceName: 'Platobný terminál 3',
-      location: 'Pobočka Centrum',
-      timestamp: '2024-12-28T13:45:00Z',
-      receiptNumber: 'RCP-202412280004',
-      fee: 0.00
-    },
-    {
-      id: 'TXN-005',
-      amount: 67.25,
-      currency: 'EUR',
-      type: 'contactless',
-      status: 'refunded',
-      deviceId: 'DEV-002',
-      deviceName: 'Platobný terminál 2',
-      location: 'Hlavná prevádzka',
-      timestamp: '2024-12-28T13:30:00Z',
-      receiptNumber: 'RCP-202412280005',
-      fee: -0.96
-    },
-    {
-      id: 'TXN-006',
-      amount: 156.80,
-      currency: 'EUR',
-      type: 'card',
-      status: 'pending',
-      deviceId: 'DEV-004',
-      deviceName: 'Platobný terminál 4',
-      location: 'Pobočka Východ',
-      timestamp: '2024-12-28T13:15:00Z',
-      receiptNumber: 'RCP-202412280006',
-      fee: 2.25
-    }
-  ];
+  // Filter transactions based on user role
+  const getFilteredTransactions = (): DemoTransaction[] => {
+    let transactions = demoTransactions;
 
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case 'card':
-      case 'contactless':
-      case 'mobile':
-        return <CreditCard className="h-4 w-4" />;
-      default:
-        return <DollarSign className="h-4 w-4" />;
+    if (user?.role === 'business_partner') {
+      const partnerClients = demoClients.filter(client => client.businessPartnerId === user.id);
+      const clientIds = partnerClients.map(client => client.id);
+      transactions = transactions.filter(tx => clientIds.includes(tx.clientId));
+    } else if (user?.role === 'client') {
+      transactions = transactions.filter(tx => tx.clientId === user.id);
+    } else if (user?.role === 'location') {
+      transactions = transactions.filter(tx => tx.locationId === user.parentId);
     }
+
+    // Apply filters
+    if (searchTerm) {
+      transactions = transactions.filter(tx => 
+        tx.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        tx.deviceId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        tx.amount.toString().includes(searchTerm)
+      );
+    }
+
+    if (statusFilter !== 'all') {
+      transactions = transactions.filter(tx => tx.status === statusFilter);
+    }
+
+    if (methodFilter !== 'all') {
+      transactions = transactions.filter(tx => tx.paymentMethod === methodFilter);
+    }
+
+    return transactions.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
   };
 
-  const getTypeBadge = (type: string) => {
-    switch (type) {
-      case 'card':
-        return <Badge variant="outline">Karta</Badge>;
-      case 'contactless':
-        return <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">Bezkontaktne</Badge>;
-      case 'mobile':
-        return <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">Mobil</Badge>;
-      case 'cash':
-        return <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">Hotovosť</Badge>;
-      default:
-        return <Badge variant="secondary">{type}</Badge>;
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'completed': return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case 'pending': return <Clock className="h-4 w-4 text-yellow-500" />;
+      case 'failed': return <XCircle className="h-4 w-4 text-red-500" />;
+      case 'refunded': return <RefreshCw className="h-4 w-4 text-blue-500" />;
+      default: return <AlertCircle className="h-4 w-4 text-gray-500" />;
     }
   };
 
   const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">Dokončené</Badge>;
-      case 'pending':
-        return <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">Čaká</Badge>;
-      case 'failed':
-        return <Badge className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">Zlyhané</Badge>;
-      case 'refunded':
-        return <Badge className="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300">Vrátené</Badge>;
-      default:
-        return <Badge variant="secondary">{status}</Badge>;
+    const variant = status === 'completed' ? 'default' : 
+                   status === 'pending' ? 'secondary' : 
+                   status === 'failed' ? 'destructive' : 'outline';
+    return (
+      <Badge variant={variant} className="flex items-center gap-1">
+        {getStatusIcon(status)}
+        {t(`transaction.status.${status}`)}
+      </Badge>
+    );
+  };
+
+  const getPaymentMethodIcon = (method: string) => {
+    switch (method) {
+      case 'card': return <CreditCard className="h-4 w-4" />;
+      case 'contactless': return <Smartphone className="h-4 w-4" />;
+      case 'mobile': return <Smartphone className="h-4 w-4" />;
+      default: return <CreditCard className="h-4 w-4" />;
     }
   };
 
-  const filteredTransactions = transactions.filter(transaction => {
-    const matchesSearch = transaction.receiptNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         transaction.deviceName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         transaction.location.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || transaction.status === statusFilter;
-    const matchesType = typeFilter === 'all' || transaction.type === typeFilter;
-    return matchesSearch && matchesStatus && matchesType;
-  });
+  const getLocationName = (locationId: string) => {
+    const location = demoLocations.find(loc => loc.id === locationId);
+    return location?.name || 'Neznáma lokácia';
+  };
+
+  const getDeviceName = (deviceId: string) => {
+    const device = demoDevices.find(dev => dev.id === deviceId);
+    return device?.name || 'Neznáme zariadenie';
+  };
+
+  const filteredTransactions = getFilteredTransactions();
 
   const totalAmount = filteredTransactions
-    .filter(t => t.status === 'completed')
-    .reduce((sum, t) => sum + t.amount, 0);
+    .filter(tx => tx.status === 'completed')
+    .reduce((sum, tx) => sum + tx.amount, 0);
 
   const totalFees = filteredTransactions
-    .filter(t => t.status === 'completed')
-    .reduce((sum, t) => sum + t.fee, 0);
+    .filter(tx => tx.status === 'completed')
+    .reduce((sum, tx) => sum + tx.fee, 0);
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            {t('transactions')}
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            {t('transactions.manage.description')}
+          </p>
+        </div>
+        <Button className="flex items-center gap-2">
+          <Download className="h-4 w-4" />
+          {t('export')}
+        </Button>
+      </div>
+
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-green-100 text-sm font-medium">Celkový obrat</p>
-                <p className="text-2xl font-bold">€{totalAmount.toFixed(2)}</p>
-                <p className="text-green-100 text-xs flex items-center mt-1">
-                  <TrendingUp className="h-3 w-3 mr-1" />
-                  +12.5% oproti včera
-                </p>
-              </div>
-              <DollarSign className="h-8 w-8 text-green-200" />
-            </div>
-          </CardContent>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardDescription>{t('total.transactions')}</CardDescription>
+            <CardTitle className="text-2xl">
+              {filteredTransactions.length}
+            </CardTitle>
+          </CardHeader>
         </Card>
-
-        <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-blue-100 text-sm font-medium">Počet transakcií</p>
-                <p className="text-2xl font-bold">{filteredTransactions.length}</p>
-                <p className="text-blue-100 text-xs flex items-center mt-1">
-                  <TrendingUp className="h-3 w-3 mr-1" />
-                  +8.3% oproti včera
-                </p>
-              </div>
-              <CreditCard className="h-8 w-8 text-blue-200" />
-            </div>
-          </CardContent>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardDescription>{t('total.amount')}</CardDescription>
+            <CardTitle className="text-2xl text-green-600">
+              €{totalAmount.toFixed(2)}
+            </CardTitle>
+          </CardHeader>
         </Card>
-
-        <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-purple-100 text-sm font-medium">Poplatky</p>
-                <p className="text-2xl font-bold">€{totalFees.toFixed(2)}</p>
-                <p className="text-purple-100 text-xs flex items-center mt-1">
-                  <TrendingDown className="h-3 w-3 mr-1" />
-                  -2.1% oproti včera
-                </p>
-              </div>
-              <TrendingDown className="h-8 w-8 text-purple-200" />
-            </div>
-          </CardContent>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardDescription>{t('total.fees')}</CardDescription>
+            <CardTitle className="text-2xl text-blue-600">
+              €{totalFees.toFixed(2)}
+            </CardTitle>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardDescription>{t('success.rate')}</CardDescription>
+            <CardTitle className="text-2xl text-emerald-600">
+              {filteredTransactions.length > 0 
+                ? ((filteredTransactions.filter(tx => tx.status === 'completed').length / filteredTransactions.length) * 100).toFixed(1)
+                : 0}%
+            </CardTitle>
+          </CardHeader>
         </Card>
       </div>
 
       {/* Filters */}
       <Card>
         <CardHeader>
-          <div className="flex flex-col sm:flex-row gap-4 justify-between">
-            <CardTitle>Transakcie</CardTitle>
-            <div className="flex gap-2">
+          <CardTitle className="flex items-center gap-2">
+            <Filter className="h-5 w-5" />
+            {t('filters')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input
-                  placeholder="Hľadať transakcie..."
+                  placeholder={t('search.transactions')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 w-64"
+                  className="pl-10"
                 />
               </div>
-              
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="gap-2">
-                    <Filter className="h-4 w-4" />
-                    Status
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem onClick={() => setStatusFilter('all')}>Všetky</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setStatusFilter('completed')}>Dokončené</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setStatusFilter('pending')}>Čakajúce</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setStatusFilter('failed')}>Zlyhané</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setStatusFilter('refunded')}>Vrátené</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="gap-2">
-                    <Filter className="h-4 w-4" />
-                    Typ
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem onClick={() => setTypeFilter('all')}>Všetky</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setTypeFilter('card')}>Karta</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setTypeFilter('contactless')}>Bezkontaktne</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setTypeFilter('mobile')}>Mobil</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setTypeFilter('cash')}>Hotovosť</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <Button variant="outline" className="gap-2">
-                <Download className="h-4 w-4" />
-                Export
-              </Button>
             </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full sm:w-48">
+                <SelectValue placeholder={t('filter.by.status')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('all.statuses')}</SelectItem>
+                <SelectItem value="completed">{t('transaction.status.completed')}</SelectItem>
+                <SelectItem value="pending">{t('transaction.status.pending')}</SelectItem>
+                <SelectItem value="failed">{t('transaction.status.failed')}</SelectItem>
+                <SelectItem value="refunded">{t('transaction.status.refunded')}</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={methodFilter} onValueChange={setMethodFilter}>
+              <SelectTrigger className="w-full sm:w-48">
+                <SelectValue placeholder={t('filter.by.method')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('all.methods')}</SelectItem>
+                <SelectItem value="card">{t('payment.method.card')}</SelectItem>
+                <SelectItem value="contactless">{t('payment.method.contactless')}</SelectItem>
+                <SelectItem value="mobile">{t('payment.method.mobile')}</SelectItem>
+                <SelectItem value="cash">{t('payment.method.cash')}</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-        </CardHeader>
-        
-        <CardContent>
-          <div className="space-y-4">
-            {filteredTransactions.map((transaction) => (
-              <div key={transaction.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                <div className="flex items-center gap-4">
-                  <div className="p-2 bg-white dark:bg-gray-600 rounded-lg">
-                    {getTypeIcon(transaction.type)}
-                  </div>
-                  
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className="font-semibold text-gray-900 dark:text-gray-100">
-                        {transaction.receiptNumber}
-                      </p>
-                      {getTypeBadge(transaction.type)}
-                      {getStatusBadge(transaction.status)}
-                    </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {transaction.deviceName} • {transaction.location}
-                    </p>
-                    <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      <Calendar className="h-3 w-3" />
-                      {new Date(transaction.timestamp).toLocaleString('sk-SK')}
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="text-right">
-                  <p className={`text-lg font-bold ${
-                    transaction.status === 'refunded' ? 'text-red-600' : 
-                    transaction.status === 'completed' ? 'text-green-600' : 
-                    'text-gray-600'
-                  }`}>
-                    {transaction.status === 'refunded' ? '-' : ''}€{transaction.amount.toFixed(2)}
-                  </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Poplatok: €{transaction.fee.toFixed(2)}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {filteredTransactions.length === 0 && (
-            <div className="text-center py-8">
-              <CreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 dark:text-gray-400">
-                Žiadne transakcie nezodpovedajú filtrom.
-              </p>
-            </div>
-          )}
         </CardContent>
       </Card>
+
+      {/* Transactions List */}
+      <div className="space-y-4">
+        {filteredTransactions.length === 0 ? (
+          <Card>
+            <CardContent className="py-8 text-center">
+              <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-500 dark:text-gray-400">
+                {t('no.transactions.found')}
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          filteredTransactions.map((transaction) => (
+            <Card key={transaction.id} className="hover:shadow-md transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2">
+                        {getPaymentMethodIcon(transaction.paymentMethod)}
+                        <span className="font-semibold text-lg">
+                          €{transaction.amount.toFixed(2)}
+                        </span>
+                        <span className="text-gray-500">
+                          {transaction.currency}
+                        </span>
+                      </div>
+                      {getStatusBadge(transaction.status)}
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 text-sm text-gray-600 dark:text-gray-400">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        {format(new Date(transaction.timestamp), 'dd.MM.yyyy HH:mm', {
+                          locale: language === 'sk' ? sk : enUS
+                        })}
+                      </div>
+                      <div>
+                        <strong>{t('reference')}:</strong> {transaction.reference}
+                      </div>
+                      <div>
+                        <strong>{t('device')}:</strong> {getDeviceName(transaction.deviceId)}
+                      </div>
+                      <div>
+                        <strong>{t('location')}:</strong> {getLocationName(transaction.locationId)}
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="text-gray-600 dark:text-gray-400">
+                        <strong>{t('payment.method')}:</strong> {t(`payment.method.${transaction.paymentMethod}`)}
+                      </div>
+                      {transaction.status === 'completed' && (
+                        <div className="text-gray-600 dark:text-gray-400">
+                          <strong>{t('fee')}:</strong> €{transaction.fee.toFixed(2)}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        )}
+      </div>
     </div>
   );
 };
