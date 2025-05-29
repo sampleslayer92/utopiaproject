@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { UserPlus, LogIn, ArrowRight } from 'lucide-react';
+import { UserPlus, LayoutDashboard, ArrowRight } from 'lucide-react';
 import { LanguageSwitcher } from '@/components/ui/language-switcher';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { motion } from 'framer-motion';
@@ -78,13 +77,13 @@ export const WelcomeChoiceScreen: React.FC<WelcomeChoiceScreenProps> = ({
                 <CardContent className="p-8 text-center h-full flex flex-col justify-between">
                   <div>
                     <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <LogIn className="w-8 h-8 text-white" />
+                      <LayoutDashboard className="w-8 h-8 text-white" />
                     </div>
                     <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
                       Existujúci klient
                     </h2>
                     <p className="text-slate-600 dark:text-blue-300 mb-6">
-                      Už máte účet? Prihláste sa pomocou svojho emailu a hesla
+                      Už máte účet? Prihláste sa a pristúpte k svojmu dashboardu
                     </p>
                   </div>
                   <Button 
@@ -92,7 +91,7 @@ export const WelcomeChoiceScreen: React.FC<WelcomeChoiceScreenProps> = ({
                     variant="outline"
                     className="w-full py-6 text-lg border-2 border-slate-300 dark:border-white/30 hover:bg-slate-100 dark:hover:bg-white/10 rounded-xl hover:scale-[1.02] transition-all duration-300"
                   >
-                    Prihlásiť sa
+                    Prístupiť k dashboardu
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </CardContent>

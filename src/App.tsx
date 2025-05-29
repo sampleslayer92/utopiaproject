@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -24,6 +23,7 @@ import { SettingsPage } from "./components/dashboard/SettingsPage";
 import { ErrorBoundary } from "react-error-boundary";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { DashboardLayout } from "./components/dashboard/layouts/DashboardLayout";
+import { LocationProvider } from "./contexts/LocationContext";
 
 const queryClient = new QueryClient();
 
@@ -50,44 +50,46 @@ const App = () => (
       <LanguageProvider>
         <BrowserRouter>
           <AuthProvider>
-            <OnboardingProvider>
-              <TooltipProvider>
-                <ErrorBoundary FallbackComponent={ErrorFallback}>
-                  <Toaster />
-                  <Sonner />
-                  <Routes>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/register" element={<RegistrationPage />} />
-                    
-                    {/* Protected dashboard routes */}
-                    <Route path="/dashboard" element={
-                      <ProtectedRoute>
-                        <DashboardLayout />
-                      </ProtectedRoute>
-                    }>
-                      <Route index element={<DashboardPage />} />
-                      <Route path="transactions" element={<TransactionsPage />} />
-                      <Route path="devices" element={<DevicesPage />} />
-                      <Route path="business-partners" element={<BusinessPartnersPage />} />
-                      <Route path="clients" element={<ClientsPage />} />
-                      <Route path="locations" element={<LocationsPage />} />
-                      <Route path="contracts" element={<ContractsPage />} />
-                      <Route path="tickets" element={<TicketsPage />} />
-                      <Route path="settings" element={<SettingsPage />} />
-                    </Route>
-                    
-                    {/* Onboarding routes */}
-                    <Route path="/onboarding/:step" element={
-                      <ProtectedRoute>
-                        <OnboardingWizard />
-                      </ProtectedRoute>
-                    } />
-                    
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </ErrorBoundary>
-              </TooltipProvider>
-            </OnboardingProvider>
+            <LocationProvider>
+              <OnboardingProvider>
+                <TooltipProvider>
+                  <ErrorBoundary FallbackComponent={ErrorFallback}>
+                    <Toaster />
+                    <Sonner />
+                    <Routes>
+                      <Route path="/" element={<Index />} />
+                      <Route path="/register" element={<RegistrationPage />} />
+                      
+                      {/* Protected dashboard routes */}
+                      <Route path="/dashboard" element={
+                        <ProtectedRoute>
+                          <DashboardLayout />
+                        </ProtectedRoute>
+                      }>
+                        <Route index element={<DashboardPage />} />
+                        <Route path="transactions" element={<TransactionsPage />} />
+                        <Route path="devices" element={<DevicesPage />} />
+                        <Route path="business-partners" element={<BusinessPartnersPage />} />
+                        <Route path="clients" element={<ClientsPage />} />
+                        <Route path="locations" element={<LocationsPage />} />
+                        <Route path="contracts" element={<ContractsPage />} />
+                        <Route path="tickets" element={<TicketsPage />} />
+                        <Route path="settings" element={<SettingsPage />} />
+                      </Route>
+                      
+                      {/* Onboarding routes */}
+                      <Route path="/onboarding/:step" element={
+                        <ProtectedRoute>
+                          <OnboardingWizard />
+                        </ProtectedRoute>
+                      } />
+                      
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </ErrorBoundary>
+                </TooltipProvider>
+              </OnboardingProvider>
+            </LocationProvider>
           </AuthProvider>
         </BrowserRouter>
       </LanguageProvider>
