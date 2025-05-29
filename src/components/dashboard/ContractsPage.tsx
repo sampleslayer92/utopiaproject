@@ -4,114 +4,36 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Search, Plus, Edit, Eye, FileText, DollarSign, Calendar, AlertTriangle } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Search, FileText, Calendar, DollarSign, TrendingUp, AlertTriangle, CheckCircle, Eye } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Contract } from '@/types/dashboard';
-
-const mockContracts: Contract[] = [
-  {
-    id: 'contract-1',
-    clientId: 'client-1',
-    businessPartnerId: 'bp-1',
-    type: 'subscription',
-    title: 'Platobné terminály - TechCorp',
-    value: 25000,
-    monthlyValue: 2100,
-    status: 'active',
-    startDate: '2024-01-15',
-    endDate: '2024-12-31',
-    renewalDate: '2024-11-15',
-    autoRenewal: true,
-    terms: 'Mesačná licencia pre platobné terminály s podporou 24/7',
-    devices: ['dev-1', 'dev-2', 'dev-3']
-  },
-  {
-    id: 'contract-2',
-    clientId: 'client-2',
-    businessPartnerId: 'bp-1',
-    type: 'lease',
-    title: 'Prenájom zariadení - RetailMax',
-    value: 58000,
-    monthlyValue: 4800,
-    status: 'active',
-    startDate: '2024-02-01',
-    endDate: '2025-01-31',
-    renewalDate: '2024-12-01',
-    autoRenewal: false,
-    terms: 'Prenájom POS terminálov s údržbou a podporou',
-    devices: ['dev-4', 'dev-5', 'dev-6', 'dev-7']
-  },
-  {
-    id: 'contract-3',
-    clientId: 'client-3',
-    businessPartnerId: 'bp-2',
-    type: 'purchase',
-    title: 'Nákup licencií - CafeChain',
-    value: 42000,
-    status: 'active',
-    startDate: '2024-03-10',
-    endDate: '2025-03-09',
-    autoRenewal: true,
-    terms: 'Jednorazový nákup licencií s ročnou podporou',
-    devices: ['dev-8', 'dev-9']
-  },
-  {
-    id: 'contract-4',
-    clientId: 'client-1',
-    businessPartnerId: 'bp-1',
-    type: 'maintenance',
-    title: 'Údržbová zmluva - TechCorp',
-    value: 8400,
-    monthlyValue: 700,
-    status: 'pending',
-    startDate: '2025-01-01',
-    endDate: '2025-12-31',
-    autoRenewal: false,
-    terms: 'Rozšírená údržba a technická podpora pre všetky zariadenia'
-  },
-  {
-    id: 'contract-5',
-    clientId: 'client-4',
-    businessPartnerId: 'bp-1',
-    type: 'subscription',
-    title: 'Licencie - ShopEasy',
-    value: 15000,
-    monthlyValue: 1250,
-    status: 'expired',
-    startDate: '2024-01-01',
-    endDate: '2024-11-30',
-    autoRenewal: false,
-    terms: 'Mesačné licencie pre základné funkcie POS systému'
-  }
-];
+import { demoContracts, demoLocations } from '@/data/demoData';
 
 export const ContractsPage: React.FC = () => {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedContract, setSelectedContract] = useState<Contract | null>(null);
+  const [statusFilter, setStatusFilter] = useState('all');
 
-  // Filter contracts based on user role
-  const getFilteredContracts = () => {
-    let contracts = mockContracts;
+  // Filter contracts based on search and filters
+  const filteredContracts = demoContracts.filter(contract => {
+    const matchesSearch = contract.contractNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         contract.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         contract.clientName.toLowerCase().includes(searchTerm.toLowerCase());
     
-    if (user?.role === 'business_partner') {
-      contracts = contracts.filter(contract => contract.businessPartnerId === user.businessPartnerId);
-    } else if (user?.role === 'client') {
-      contracts = contracts.filter(contract => contract.clientId === user.clientId);
-    } else if (user?.role === 'location') {
-      // Location users can't see contracts
-      return [];
-    }
+    const matchesStatus = statusFilter === 'all' || contract.status === statusFilter;
     
-    return contracts.filter(contract =>
-      contract.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contract.type.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  };
+    return matchesSearch && matchesStatus;
+  });
 
-  const filteredContracts = getFilteredContracts();
+  const activeContracts = demoContracts.filter(c => c.status === 'active').length;
+  const pendingContracts = demoContracts.filter(c => c.status === 'pending').length;
+  const expiringSoon = demoContracts.filter(c => {
+    const endDate = new Date(c.endDate);
+    const now = new Date();
+    const daysDiff = Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 3600 * 24));
+    return daysDiff <= 30 && daysDiff > 0;
+  }).length;
+  const totalValue = demoContracts.reduce((sum, c) => sum + c.value, 0);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -121,60 +43,19 @@ export const ContractsPage: React.FC = () => {
         return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
       case 'expired':
         return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
-      case 'cancelled':
+      case 'terminated':
         return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
       default:
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'Aktívna';
-      case 'pending':
-        return 'Čakajúca';
-      case 'expired':
-        return 'Vypršala';
-      case 'cancelled':
-        return 'Zrušená';
-      default:
-        return 'Neznámy';
-    }
-  };
-
-  const getTypeText = (type: string) => {
-    switch (type) {
-      case 'subscription':
-        return 'Predplatné';
-      case 'lease':
-        return 'Prenájom';
-      case 'purchase':
-        return 'Nákup';
-      case 'maintenance':
-        return 'Údržba';
-      default:
-        return 'Iný';
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
     }
   };
 
   const isExpiringSoon = (endDate: string) => {
     const end = new Date(endDate);
-    const today = new Date();
-    const daysUntilExpiry = Math.ceil((end.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-    return daysUntilExpiry <= 30 && daysUntilExpiry > 0;
+    const now = new Date();
+    const daysDiff = Math.ceil((end.getTime() - now.getTime()) / (1000 * 3600 * 24));
+    return daysDiff <= 30 && daysDiff > 0;
   };
-
-  // Check if user has access to this page
-  if (!user || user.role === 'location') {
-    return (
-      <div className="text-center py-8">
-        <p className="text-gray-600 dark:text-gray-400">
-          Nemáte oprávnenie na zobrazenie tejto stránky.
-        </p>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
@@ -184,215 +65,191 @@ export const ContractsPage: React.FC = () => {
             Zmluvy
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            {user.role === 'admin' ? 'Správa všetkých zmlúv' : 
-             user.role === 'business_partner' ? 'Správa zmlúv vašich klientov' : 'Vaše zmluvy'}
+            Správa zmlúv a kontraktov
           </p>
         </div>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          Nová zmluva
-        </Button>
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800">
           <CardContent className="p-6">
-            <div className="flex items-center">
-              <FileText className="h-8 w-8 text-blue-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Celkom zmlúv</p>
-                <p className="text-2xl font-bold">{filteredContracts.length}</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-green-600 dark:text-green-400">Aktívne zmluvy</p>
+                <p className="text-2xl font-bold text-green-700 dark:text-green-300">{activeContracts}</p>
+                <p className="text-xs text-green-600 dark:text-green-400">Platné kontrakty</p>
               </div>
+              <CheckCircle className="h-8 w-8 text-green-500" />
             </div>
           </CardContent>
         </Card>
-        <Card>
+
+        <Card className="bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-yellow-200 dark:border-yellow-800">
           <CardContent className="p-6">
-            <div className="flex items-center">
-              <DollarSign className="h-8 w-8 text-green-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Aktívne zmluvy</p>
-                <p className="text-2xl font-bold">{filteredContracts.filter(c => c.status === 'active').length}</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-yellow-600 dark:text-yellow-400">Čakajúce</p>
+                <p className="text-2xl font-bold text-yellow-700 dark:text-yellow-300">{pendingContracts}</p>
+                <p className="text-xs text-yellow-600 dark:text-yellow-400">Na podpis</p>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center">
               <Calendar className="h-8 w-8 text-yellow-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Čakajúce</p>
-                <p className="text-2xl font-bold">{filteredContracts.filter(c => c.status === 'pending').length}</p>
-              </div>
             </div>
           </CardContent>
         </Card>
-        <Card>
+
+        <Card className="bg-gradient-to-br from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20 border-red-200 dark:border-red-800">
           <CardContent className="p-6">
-            <div className="flex items-center">
-              <AlertTriangle className="h-8 w-8 text-red-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Čoskoro vypršia</p>
-                <p className="text-2xl font-bold">{filteredContracts.filter(c => isExpiringSoon(c.endDate)).length}</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-red-600 dark:text-red-400">Končia čoskoro</p>
+                <p className="text-2xl font-bold text-red-700 dark:text-red-300">{expiringSoon}</p>
+                <p className="text-xs text-red-600 dark:text-red-400">Do 30 dní</p>
               </div>
+              <AlertTriangle className="h-8 w-8 text-red-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-800">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-blue-600 dark:text-blue-400">Celková hodnota</p>
+                <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">€{totalValue.toLocaleString()}</p>
+                <p className="text-xs text-blue-600 dark:text-blue-400">Všetky zmluvy</p>
+              </div>
+              <DollarSign className="h-8 w-8 text-blue-500" />
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Search and Table */}
-      <Card>
+      {/* Filters */}
+      <Card className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm">
         <CardHeader>
-          <div className="flex items-center space-x-4">
+          <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
                 placeholder="Hľadať zmluvy..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-10 bg-white/80 dark:bg-gray-900/80"
               />
             </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Všetky statusy</SelectItem>
+                <SelectItem value="active">Aktívne</SelectItem>
+                <SelectItem value="pending">Čakajúce</SelectItem>
+                <SelectItem value="expired">Expirované</SelectItem>
+                <SelectItem value="terminated">Ukončené</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Zmluva</TableHead>
-                <TableHead>Typ</TableHead>
-                <TableHead>Hodnota</TableHead>
-                <TableHead>Mesačne</TableHead>
-                <TableHead>Platná do</TableHead>
-                <TableHead>Auto-predĺženie</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Akcie</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredContracts.map((contract) => (
-                <TableRow key={contract.id}>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{contract.title}</div>
-                      <div className="text-sm text-gray-500">ID: {contract.id}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell>{getTypeText(contract.type)}</TableCell>
-                  <TableCell>€{contract.value.toLocaleString()}</TableCell>
-                  <TableCell>
-                    {contract.monthlyValue ? `€${contract.monthlyValue.toLocaleString()}` : '-'}
-                  </TableCell>
-                  <TableCell>
-                    <div>
-                      {new Date(contract.endDate).toLocaleDateString('sk-SK')}
-                      {isExpiringSoon(contract.endDate) && (
-                        <div className="flex items-center text-orange-600 text-xs mt-1">
+      </Card>
+
+      {/* Contracts Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {filteredContracts.map((contract) => {
+          const location = demoLocations.find(loc => loc.id === contract.locationId);
+          const expiring = isExpiringSoon(contract.endDate);
+          
+          return (
+            <Card key={contract.id} className={`bg-white dark:bg-gray-800 hover:shadow-lg transition-all duration-300 border-l-4 ${expiring ? 'border-l-red-500' : 'border-l-blue-500'}`}>
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <CardTitle className="text-lg font-semibold mb-2">{contract.contractNumber}</CardTitle>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Badge className={getStatusColor(contract.status)}>
+                        {contract.status === 'active' ? 'Aktívne' :
+                         contract.status === 'pending' ? 'Čakajúce' :
+                         contract.status === 'expired' ? 'Expirované' : 'Ukončené'}
+                      </Badge>
+                      {expiring && (
+                        <Badge className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
                           <AlertTriangle className="h-3 w-3 mr-1" />
-                          Čoskoro vyprší
-                        </div>
+                          Končí čoskoro
+                        </Badge>
                       )}
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={contract.autoRenewal ? 'default' : 'secondary'}>
-                      {contract.autoRenewal ? 'Áno' : 'Nie'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={getStatusColor(contract.status)}>
-                      {getStatusText(contract.status)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-2">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setSelectedContract(contract)}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-3xl">
-                          <DialogHeader>
-                            <DialogTitle>Detail zmluvy</DialogTitle>
-                          </DialogHeader>
-                          {selectedContract && (
-                            <div className="space-y-6">
-                              <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                  <p className="text-sm font-medium text-gray-500">Názov</p>
-                                  <p>{selectedContract.title}</p>
-                                </div>
-                                <div>
-                                  <p className="text-sm font-medium text-gray-500">Typ</p>
-                                  <p>{getTypeText(selectedContract.type)}</p>
-                                </div>
-                                <div>
-                                  <p className="text-sm font-medium text-gray-500">Celková hodnota</p>
-                                  <p>€{selectedContract.value.toLocaleString()}</p>
-                                </div>
-                                <div>
-                                  <p className="text-sm font-medium text-gray-500">Mesačná hodnota</p>
-                                  <p>{selectedContract.monthlyValue ? `€${selectedContract.monthlyValue.toLocaleString()}` : 'N/A'}</p>
-                                </div>
-                                <div>
-                                  <p className="text-sm font-medium text-gray-500">Platná od</p>
-                                  <p>{new Date(selectedContract.startDate).toLocaleDateString('sk-SK')}</p>
-                                </div>
-                                <div>
-                                  <p className="text-sm font-medium text-gray-500">Platná do</p>
-                                  <p>{new Date(selectedContract.endDate).toLocaleDateString('sk-SK')}</p>
-                                </div>
-                                <div>
-                                  <p className="text-sm font-medium text-gray-500">Auto-predĺženie</p>
-                                  <p>{selectedContract.autoRenewal ? 'Áno' : 'Nie'}</p>
-                                </div>
-                                <div>
-                                  <p className="text-sm font-medium text-gray-500">Status</p>
-                                  <Badge className={getStatusColor(selectedContract.status)}>
-                                    {getStatusText(selectedContract.status)}
-                                  </Badge>
-                                </div>
-                              </div>
-                              <div>
-                                <p className="text-sm font-medium text-gray-500 mb-2">Podmienky zmluvy</p>
-                                <p className="text-sm bg-gray-50 dark:bg-gray-800 p-3 rounded">
-                                  {selectedContract.terms}
-                                </p>
-                              </div>
-                              {selectedContract.devices && selectedContract.devices.length > 0 && (
-                                <div>
-                                  <p className="text-sm font-medium text-gray-500 mb-2">Pokryté zariadenia</p>
-                                  <div className="flex flex-wrap gap-2">
-                                    {selectedContract.devices.map((deviceId) => (
-                                      <Badge key={deviceId} variant="outline">
-                                        {deviceId}
-                                      </Badge>
-                                    ))}
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </DialogContent>
-                      </Dialog>
-                      <Button variant="outline" size="sm">
-                        <Edit className="h-4 w-4" />
-                      </Button>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                      <p><strong>Klient:</strong> {contract.clientName}</p>
+                      <p><strong>Typ:</strong> {contract.type}</p>
+                      <p><strong>Prevádzka:</strong> {location?.name}</p>
                     </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <p className="text-lg font-bold text-blue-600">€{contract.value.toLocaleString()}</p>
+                    <p className="text-xs text-gray-500">Hodnota zmluvy</p>
+                  </div>
+                  <div className="text-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <p className="text-lg font-bold text-green-600">€{contract.monthlyFee}</p>
+                    <p className="text-xs text-gray-500">Mesačný poplatok</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Začiatok zmluvy</span>
+                    <span className="font-semibold">{new Date(contract.startDate).toLocaleDateString('sk-SK')}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>Koniec zmluvy</span>
+                    <span className={`font-semibold ${expiring ? 'text-red-600' : ''}`}>
+                      {new Date(contract.endDate).toLocaleDateString('sk-SK')}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>Automatické predĺženie</span>
+                    <span className="font-semibold">{contract.autoRenewal ? 'Áno' : 'Nie'}</span>
+                  </div>
+                </div>
+
+                {contract.notes && (
+                  <div className="text-sm text-gray-600 dark:text-gray-400 border-t pt-2">
+                    <p><strong>Poznámky:</strong> {contract.notes}</p>
+                  </div>
+                )}
+
+                <div className="flex gap-2 pt-2">
+                  <Button variant="outline" size="sm" className="flex-1">
+                    <Eye className="h-3 w-3 mr-1" />
+                    Zobraziť
+                  </Button>
+                  <Button size="sm" className="flex-1">
+                    Upraviť
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
+      {filteredContracts.length === 0 && (
+        <Card className="p-8 text-center">
+          <FileText className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            Žiadne zmluvy
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
+            {searchTerm || statusFilter !== 'all' 
+              ? 'Neboli nájdené žiadne zmluvy pre zadané kritériá.' 
+              : 'Zatiaľ nemáte žiadne zmluvy.'}
+          </p>
+        </Card>
+      )}
     </div>
   );
 };

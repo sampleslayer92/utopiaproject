@@ -33,7 +33,6 @@ export const RegistrationPage: React.FC = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
   const [currentView, setCurrentView] = useState<'choice' | 'login' | 'register' | 'forgot-password'>('choice');
-  // Start directly at country selection instead of welcome screen
   const [step, setStep] = useState(0);
   const [userData, setUserData] = useState<UserData>({
     country: 'SK',
@@ -112,7 +111,6 @@ export const RegistrationPage: React.FC = () => {
         role
       });
       
-      // Store onboarding progress - new user hasn't completed onboarding
       localStorage.setItem('onboarding_progress', JSON.stringify({
         completed: false,
         currentStep: 'company',
@@ -140,7 +138,6 @@ export const RegistrationPage: React.FC = () => {
       <WelcomeChoiceScreen 
         onNewClient={() => {
           setCurrentView('register');
-          // Skip welcome screen - start directly at country selection
           setStep(0);
         }}
         onExistingClient={() => setCurrentView('login')}
@@ -165,7 +162,6 @@ export const RegistrationPage: React.FC = () => {
     );
   }
 
-  // Start directly with country selection (step 0)
   if (step === 0) {
     return <CountrySelectionScreen 
       selectedCountry={userData.country} 
