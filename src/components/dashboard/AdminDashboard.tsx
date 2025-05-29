@@ -50,28 +50,47 @@ const recentActivity = [
 
 export const AdminDashboard: React.FC = () => {
   return (
-    <div className="space-y-8">
+    <div className="p-6 space-y-8 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 min-h-full">
+      {/* Welcome Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          Administrátorský panel
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-2">
+          Prehľad celého systému a kľúčových metrík
+        </p>
+      </div>
+
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {dashboardData.map((item, index) => {
           const IconComponent = item.icon;
+          const gradients = [
+            'from-blue-500 to-blue-600',
+            'from-green-500 to-green-600', 
+            'from-purple-500 to-purple-600',
+            'from-orange-500 to-orange-600'
+          ];
           return (
-            <Card key={index} className="bg-white dark:bg-gray-800 hover:shadow-lg transition-shadow">
+            <Card key={index} className="relative overflow-hidden bg-white dark:bg-gray-800 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-0 shadow-md">
+              <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${gradients[index]}`}></div>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
                   {item.title}
                 </CardTitle>
-                {IconComponent && <IconComponent className="h-5 w-5 text-blue-600 dark:text-blue-400" />}
+                <div className={`p-2 rounded-lg bg-gradient-to-r ${gradients[index]}`}>
+                  {IconComponent && <IconComponent className="h-5 w-5 text-white" />}
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-gray-900 dark:text-white">{item.value}</div>
+                <div className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{item.value}</div>
                 {item.change && (
-                  <p className={`text-xs flex items-center gap-1 ${
-                    item.trend === 'up' ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    <TrendingUp className="h-3 w-3" />
-                    {item.change} oproti minulému měsíci
-                  </p>
+                  <div className="flex items-center gap-1">
+                    <TrendingUp className="h-3 w-3 text-green-600" />
+                    <span className="text-xs text-green-600 font-medium">
+                      {item.change} oproti minulému měsíci
+                    </span>
+                  </div>
                 )}
               </CardContent>
             </Card>
@@ -81,30 +100,39 @@ export const AdminDashboard: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top Business Partners */}
-        <Card className="bg-white dark:bg-gray-800">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg font-semibold">Nejlepší obchodní partneri</CardTitle>
-            <Button variant="outline" size="sm">
-              Zobrazit všechny
-            </Button>
+        <Card className="bg-white dark:bg-gray-800 shadow-lg border-0">
+          <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                <Building2 className="h-5 w-5 text-blue-600" />
+                Nejlepší obchodní partneri
+              </CardTitle>
+              <Button variant="outline" size="sm" className="hover:bg-blue-50 dark:hover:bg-blue-900/20">
+                Zobrazit všechny
+              </Button>
+            </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-6">
             <div className="space-y-4">
               {topPartners.map((partner) => (
-                <div key={partner.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div key={partner.id} className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-600 rounded-xl hover:shadow-md transition-all duration-200">
                   <div className="flex items-center space-x-4">
-                    <div className={`w-3 h-3 rounded-full ${
-                      partner.tier === 'gold' ? 'bg-yellow-500' :
-                      partner.tier === 'silver' ? 'bg-gray-400' : 'bg-orange-500'
+                    <div className={`w-4 h-4 rounded-full shadow-sm ${
+                      partner.tier === 'gold' ? 'bg-gradient-to-r from-yellow-400 to-yellow-500' :
+                      partner.tier === 'silver' ? 'bg-gradient-to-r from-gray-300 to-gray-400' : 'bg-gradient-to-r from-orange-400 to-orange-500'
                     }`}></div>
                     <div>
                       <p className="font-medium text-gray-900 dark:text-white">{partner.name}</p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">{partner.region}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                        <span>{partner.region}</span>
+                        <span>•</span>
+                        <span className="capitalize">{partner.tier} tier</span>
+                      </p>
                     </div>
                   </div>
                   <div className="text-right">
                     <p className="font-semibold text-gray-900 dark:text-white">{partner.clientsCount} klientů</p>
-                    <p className="text-sm text-green-600">€{partner.monthlyRevenue.toLocaleString()}/měs</p>
+                    <p className="text-sm text-green-600 font-medium">€{partner.monthlyRevenue.toLocaleString()}/měs</p>
                   </div>
                 </div>
               ))}
@@ -113,22 +141,30 @@ export const AdminDashboard: React.FC = () => {
         </Card>
         
         {/* Recent Activity */}
-        <Card className="bg-white dark:bg-gray-800">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold">Nedávná aktivita</CardTitle>
+        <Card className="bg-white dark:bg-gray-800 shadow-lg border-0">
+          <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20">
+            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+              <Clock className="h-5 w-5 text-green-600" />
+              Nedávná aktivita
+            </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-6">
             <div className="space-y-4">
               {recentActivity.map((activity, index) => (
-                <div key={index} className="flex items-start space-x-3">
-                  <div className={`w-2 h-2 rounded-full mt-2 ${
-                    activity.status === 'success' ? 'bg-green-500' :
-                    activity.status === 'info' ? 'bg-blue-500' :
-                    activity.status === 'warning' ? 'bg-yellow-500' : 'bg-red-500'
-                  }`}></div>
-                  <div className="flex-1">
-                    <p className="text-sm text-gray-900 dark:text-white">{activity.message}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{activity.time}</p>
+                <div key={index} className="flex items-start space-x-4 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
+                  <div className="relative">
+                    <div className={`w-3 h-3 rounded-full mt-2 shadow-sm ${
+                      activity.status === 'success' ? 'bg-gradient-to-r from-green-400 to-green-500' :
+                      activity.status === 'info' ? 'bg-gradient-to-r from-blue-400 to-blue-500' :
+                      activity.status === 'warning' ? 'bg-gradient-to-r from-yellow-400 to-yellow-500' : 'bg-gradient-to-r from-red-400 to-red-500'
+                    }`}></div>
+                    {index < recentActivity.length - 1 && (
+                      <div className="absolute top-5 left-1/2 transform -translate-x-1/2 w-px h-8 bg-gray-200 dark:bg-gray-600"></div>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-gray-900 dark:text-white font-medium">{activity.message}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{activity.time}</p>
                   </div>
                 </div>
               ))}
@@ -138,38 +174,49 @@ export const AdminDashboard: React.FC = () => {
       </div>
 
       {/* System Health Overview */}
-      <Card className="bg-white dark:bg-gray-800">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold">Přehled systému</CardTitle>
+      <Card className="bg-white dark:bg-gray-800 shadow-lg border-0">
+        <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20">
+          <CardTitle className="text-lg font-semibold flex items-center gap-2">
+            <CheckCircle className="h-5 w-5 text-purple-600" />
+            Přehled systému
+          </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="flex items-center justify-center mb-2">
-                <CheckCircle className="h-8 w-8 text-green-500" />
+            <div className="text-center p-4 rounded-xl bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20">
+              <div className="flex items-center justify-center mb-3">
+                <div className="p-3 bg-gradient-to-r from-green-500 to-green-600 rounded-full">
+                  <CheckCircle className="h-6 w-6 text-white" />
+                </div>
               </div>
-              <p className="text-2xl font-bold text-green-600">99.8%</p>
+              <p className="text-2xl font-bold text-green-600 mb-1">99.8%</p>
               <p className="text-sm text-gray-600 dark:text-gray-400">Dostupnost zařízení</p>
             </div>
-            <div className="text-center">
-              <div className="flex items-center justify-center mb-2">
-                <Clock className="h-8 w-8 text-blue-500" />
+            <div className="text-center p-4 rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20">
+              <div className="flex items-center justify-center mb-3">
+                <div className="p-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full">
+                  <Clock className="h-6 w-6 text-white" />
+                </div>
               </div>
-              <p className="text-2xl font-bold text-blue-600">120ms</p>
+              <p className="text-2xl font-bold text-blue-600 mb-1">120ms</p>
               <p className="text-sm text-gray-600 dark:text-gray-400">Odezva API</p>
             </div>
-            <div className="text-center">
-              <div className="flex items-center justify-center mb-2">
-                <AlertTriangle className="h-8 w-8 text-yellow-500" />
+            <div className="text-center p-4 rounded-xl bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20">
+              <div className="flex items-center justify-center mb-3">
+                <div className="p-3 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full">
+                  <AlertTriangle className="h-6 w-6 text-white" />
+                </div>
               </div>
-              <p className="text-2xl font-bold text-yellow-600">3</p>
+              <p className="text-2xl font-bold text-yellow-600 mb-1">3</p>
               <p className="text-sm text-gray-600 dark:text-gray-400">Aktivní tikety</p>
             </div>
-            <div className="text-center">
-              <div className="flex items-center justify-center mb-2">
-                <DollarSign className="h-8 w-8 text-purple-500" />
+            <div className="text-center p-4 rounded-xl bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20">
+              <div className="flex items-center justify-center mb-3">
+                <div className="p-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full">
+                  <DollarSign className="h-6 w-6 text-white" />
+                </div>
               </div>
-              <p className="text-2xl font-bold text-purple-600">€156K</p>
+              <p className="text-2xl font-bold text-purple-600 mb-1">€156K</p>
               <p className="text-sm text-gray-600 dark:text-gray-400">Tržby tento měsíc</p>
             </div>
           </div>
