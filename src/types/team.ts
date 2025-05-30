@@ -22,6 +22,7 @@ export interface TeamMember {
   lastActivity?: string;
   permissions: string[];
   salary?: number;
+  commissionRate?: number; // percentage
   notes?: string;
 }
 
@@ -31,4 +32,24 @@ export interface TeamStats {
   totalRevenue: number;
   averagePerformance: number;
   topPerformer: TeamMember | null;
+}
+
+export interface Merchant {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  businessPartnerId: string;
+  assignedTeamMemberId?: string;
+  locationsCount: number;
+  devicesCount: number;
+  totalRevenue: number;
+  monthlyRevenue: number;
+  status: 'active' | 'inactive' | 'pending';
+  createdAt: string;
+  industry: string;
+  address?: string;
+  website?: string;
+  contactPerson?: string;
+  notes?: string;
 }

@@ -194,7 +194,7 @@ const getMockUserId = (email: string): string => {
 
 const getMockUserName = (email: string): string => {
   if (email.includes('admin')) return 'Admin Používateľ';
-  if (email.includes('partner1')) return 'Martin Novák - Partner';
+  if (email.includes('partner1') || email.includes('marian.lapos')) return 'Marián Lapoš';
   if (email.includes('partner2')) return 'Jana Svoboda - Partner';
   if (email.includes('client1')) return 'TechCorp s.r.o.';
   if (email.includes('client2')) return 'RetailMax a.s.';
@@ -234,12 +234,12 @@ const mockUsers = [
   },
   {
     id: 'bp-1',
-    email: 'marian.lapos@iso-org.sk',
+    email: 'marian.lapos@onepos.eu',
     fullName: 'Marián Lapoš',
     role: 'business_partner' as const,
     businessPartnerId: 'bp-1',
     locationId: null,
-    organizationName: 'Iso Organizacia'
+    organizationName: 'ISO Organizácia'
   },
   {
     id: 'client-1',

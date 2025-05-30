@@ -5,17 +5,19 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, Plus, Users, TrendingUp, Award, Target, Eye, Edit } from 'lucide-react';
+import { Search, Plus, Users, TrendingUp, Award, Target, Eye, Edit, Trash2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { TeamMember } from '@/types/team';
 import { useNavigate } from 'react-router-dom';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const mockTeamMembers: TeamMember[] = [
   {
     id: 'team-1',
     firstName: 'Peter',
-    lastName: 'Novák',
-    email: 'peter.novak@iso-org.sk',
+    lastName: 'Fekiač',
+    email: 'peter.fekiac@iso-org.sk',
     phone: '+421 900 123 456',
     position: 'Senior Account Manager',
     department: 'Sales',
@@ -25,19 +27,21 @@ const mockTeamMembers: TeamMember[] = [
     performance: {
       monthlyRevenue: 15000,
       totalRevenue: 180000,
-      merchantsManaged: 12,
+      merchantsManaged: 5,
       contractsSigned: 8,
       efficiency: 92
     },
-    assignedMerchants: ['client-1', 'client-2'],
+    assignedMerchants: ['merchant-1', 'merchant-2'],
     lastActivity: '2024-11-28T14:30:00Z',
-    permissions: ['view_merchants', 'edit_contracts', 'create_reports']
+    permissions: ['view_merchants', 'edit_contracts', 'create_reports'],
+    salary: 2800,
+    commissionRate: 8
   },
   {
     id: 'team-2',
-    firstName: 'Jana',
-    lastName: 'Kováčová',
-    email: 'jana.kovacova@iso-org.sk',
+    firstName: 'Ladislav',
+    lastName: 'Mathis',
+    email: 'ladislav.mathis@iso-org.sk',
     phone: '+421 900 234 567',
     position: 'Account Manager',
     department: 'Sales',
@@ -47,21 +51,23 @@ const mockTeamMembers: TeamMember[] = [
     performance: {
       monthlyRevenue: 12000,
       totalRevenue: 72000,
-      merchantsManaged: 8,
+      merchantsManaged: 4,
       contractsSigned: 5,
       efficiency: 88
     },
-    assignedMerchants: ['client-3'],
+    assignedMerchants: ['merchant-3'],
     lastActivity: '2024-11-28T16:45:00Z',
-    permissions: ['view_merchants', 'edit_contracts']
+    permissions: ['view_merchants', 'edit_contracts'],
+    salary: 2400,
+    commissionRate: 6
   },
   {
     id: 'team-3',
-    firstName: 'Martin',
-    lastName: 'Svoboda',
-    email: 'martin.svoboda@iso-org.sk',
+    firstName: 'Richie',
+    lastName: 'Plichta ❤️',
+    email: 'richie.plichta@iso-org.sk',
     phone: '+421 900 345 678',
-    position: 'Technical Support',
+    position: 'Technical Support Manager',
     department: 'Support',
     businessPartnerId: 'bp-1',
     status: 'active',
@@ -69,13 +75,15 @@ const mockTeamMembers: TeamMember[] = [
     performance: {
       monthlyRevenue: 8000,
       totalRevenue: 64000,
-      merchantsManaged: 15,
+      merchantsManaged: 3,
       contractsSigned: 2,
       efficiency: 95
     },
-    assignedMerchants: ['client-4'],
+    assignedMerchants: ['merchant-4'],
     lastActivity: '2024-11-28T12:20:00Z',
-    permissions: ['view_merchants', 'technical_support']
+    permissions: ['view_merchants', 'technical_support'],
+    salary: 2600,
+    commissionRate: 5
   }
 ];
 
@@ -83,6 +91,8 @@ export const TeamPage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
+  const [memberToDelete, setMemberToDelete] = useState<TeamMember | null>(null);
+  const [reassignTo, setReassignTo] = useState<string>('');
 
   const filteredMembers = mockTeamMembers.filter(member =>
     `${member.firstName} ${member.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -112,6 +122,21 @@ export const TeamPage: React.FC = () => {
   const handleMemberClick = (memberId: string) => {
     navigate(`/dashboard/team/${memberId}`);
   };
+
+  const handleDeleteMember = (member: TeamMember) => {
+    setMemberToDelete(member);
+  };
+
+  const confirmDeleteMember = () => {
+    if (memberToDelete && reassignTo) {
+      console.log(`Deleting member ${memberToDelete.id} and reassigning to ${reassignTo}`);
+      // TODO: Implement actual deletion and reassignment
+      setMemberToDelete(null);
+      setReassignTo('');
+    }
+  };
+
+  const otherMembers = mockTeamMembers.filter(m => m.id !== memberToDelete?.id);
 
   if (!user || user.role !== 'business_partner') {
     return (
@@ -213,6 +238,7 @@ export const TeamPage: React.FC = () => {
                 <TableHead>Oddelenie</TableHead>
                 <TableHead>Merchanti</TableHead>
                 <TableHead>Mesačné tržby</TableHead>
+                <TableHead>Provízia</TableHead>
                 <TableHead>Efektivita</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Akcie</TableHead>
@@ -235,6 +261,7 @@ export const TeamPage: React.FC = () => {
                   <TableCell>{member.department}</TableCell>
                   <TableCell>{member.performance.merchantsManaged}</TableCell>
                   <TableCell>€{member.performance.monthlyRevenue.toLocaleString()}</TableCell>
+                  <TableCell>{member.commissionRate}%</TableCell>
                   <TableCell>
                     <div className="flex items-center">
                       <div className="w-12 bg-gray-200 rounded-full h-2 mr-2">
@@ -264,6 +291,53 @@ export const TeamPage: React.FC = () => {
                       <Button variant="outline" size="sm">
                         <Edit className="h-4 w-4" />
                       </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleDeleteMember(member)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Odstrániť člena tímu</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Naozaj chcete odstrániť {member.firstName} {member.lastName} z tímu? 
+                              Musíte vybrať iného člena tímu, ktorému sa priradia jeho merchanti a zmluvy.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <div className="py-4">
+                            <Select value={reassignTo} onValueChange={setReassignTo}>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Vyber člena tímu..." />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {otherMembers.map((otherMember) => (
+                                  <SelectItem key={otherMember.id} value={otherMember.id}>
+                                    {otherMember.firstName} {otherMember.lastName}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel onClick={() => {setMemberToDelete(null); setReassignTo('');}}>
+                              Zrušiť
+                            </AlertDialogCancel>
+                            <AlertDialogAction 
+                              onClick={confirmDeleteMember}
+                              disabled={!reassignTo}
+                              className="bg-red-600 hover:bg-red-700"
+                            >
+                              Odstrániť a priradiť
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </TableCell>
                 </TableRow>

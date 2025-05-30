@@ -3,346 +3,267 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { 
-  TrendingUp, 
-  Users, 
-  DollarSign, 
-  FileText, 
-  Target,
-  Award,
-  Eye,
-  UsersRound,
-  BarChart3
-} from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
-import { TeamMember } from '@/types/team';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
+import { Users, TrendingUp, DollarSign, Target, Award, Building, FileText, Clock } from 'lucide-react';
+import { ActionPanel } from './ActionPanel';
 
-const mockTeamMembers: TeamMember[] = [
-  {
-    id: 'team-1',
-    firstName: 'Peter',
-    lastName: 'Novák',
-    email: 'peter.novak@iso-org.sk',
-    position: 'Senior Account Manager',
-    department: 'Sales',
-    businessPartnerId: 'bp-1',
-    status: 'active',
-    hireDate: '2023-01-15',
-    performance: {
-      monthlyRevenue: 15000,
-      totalRevenue: 180000,
-      merchantsManaged: 12,
-      contractsSigned: 8,
-      efficiency: 92
-    },
-    assignedMerchants: ['client-1', 'client-2'],
-    lastActivity: '2024-11-28T14:30:00Z',
-    permissions: ['view_merchants', 'edit_contracts', 'create_reports']
-  },
-  {
-    id: 'team-2',
-    firstName: 'Jana',
-    lastName: 'Kováčová',
-    email: 'jana.kovacova@iso-org.sk',
-    position: 'Account Manager',
-    department: 'Sales',
-    businessPartnerId: 'bp-1',
-    status: 'active',
-    hireDate: '2023-06-01',
-    performance: {
-      monthlyRevenue: 12000,
-      totalRevenue: 72000,
-      merchantsManaged: 8,
-      contractsSigned: 5,
-      efficiency: 88
-    },
-    assignedMerchants: ['client-3'],
-    lastActivity: '2024-11-28T16:45:00Z',
-    permissions: ['view_merchants', 'edit_contracts']
-  },
-  {
-    id: 'team-3',
-    firstName: 'Martin',
-    lastName: 'Svoboda',
-    email: 'martin.svoboda@iso-org.sk',
-    position: 'Technical Support',
-    department: 'Support',
-    businessPartnerId: 'bp-1',
-    status: 'active',
-    hireDate: '2023-03-20',
-    performance: {
-      monthlyRevenue: 8000,
-      totalRevenue: 64000,
-      merchantsManaged: 15,
-      contractsSigned: 2,
-      efficiency: 95
-    },
-    assignedMerchants: ['client-4'],
-    lastActivity: '2024-11-28T12:20:00Z',
-    permissions: ['view_merchants', 'technical_support']
-  }
+// Mock data for team members and their performance
+const teamMembers = [
+  { id: 'team-1', name: 'Peter Fekiač', monthlyRevenue: 15000, merchants: 5, efficiency: 92 },
+  { id: 'team-2', name: 'Ladislav Mathis', monthlyRevenue: 12000, merchants: 4, efficiency: 88 },
+  { id: 'team-3', name: 'Richie Plichta ❤️', monthlyRevenue: 8000, merchants: 3, efficiency: 95 },
 ];
 
 const monthlyData = [
-  { month: 'Jan', total: 35000, peter: 15000, jana: 12000, martin: 8000 },
-  { month: 'Feb', total: 38000, peter: 16000, jana: 13000, martin: 9000 },
-  { month: 'Mar', total: 42000, peter: 18000, jana: 14000, martin: 10000 },
-  { month: 'Apr', total: 45000, peter: 19000, jana: 15000, martin: 11000 },
-  { month: 'Máj', total: 41000, peter: 17000, jana: 13500, martin: 10500 },
-  { month: 'Jún', total: 47000, peter: 20000, jana: 16000, martin: 11000 },
+  { month: 'Jan', revenue: 28000, contracts: 12 },
+  { month: 'Feb', revenue: 32000, contracts: 15 },
+  { month: 'Mar', revenue: 35000, contracts: 18 },
+  { month: 'Apr', revenue: 31000, contracts: 14 },
+  { month: 'May', revenue: 38000, contracts: 20 },
+  { month: 'Jun', revenue: 35000, contracts: 16 },
 ];
 
+const revenueByTeamMember = teamMembers.map(member => ({
+  name: member.name.split(' ')[0],
+  revenue: member.monthlyRevenue,
+  merchants: member.merchants
+}));
+
+const COLORS = ['#3B82F6', '#8B5CF6', '#10B981', '#F59E0B'];
+
 export const BusinessPartnerDashboard: React.FC = () => {
-  const [selectedEmployee, setSelectedEmployee] = useState<string>('all');
+  const [selectedMember, setSelectedMember] = useState<string>('all');
 
-  const getFilteredData = () => {
-    if (selectedEmployee === 'all') {
-      return {
-        totalRevenue: mockTeamMembers.reduce((sum, member) => sum + member.performance.monthlyRevenue, 0),
-        totalMerchants: mockTeamMembers.reduce((sum, member) => sum + member.performance.merchantsManaged, 0),
-        totalContracts: mockTeamMembers.reduce((sum, member) => sum + member.performance.contractsSigned, 0),
-        averageEfficiency: mockTeamMembers.reduce((sum, member) => sum + member.performance.efficiency, 0) / mockTeamMembers.length,
-        chartData: monthlyData
-      };
-    }
+  const filteredData = selectedMember === 'all' 
+    ? teamMembers 
+    : teamMembers.filter(member => member.id === selectedMember);
 
-    const member = mockTeamMembers.find(m => m.id === selectedEmployee);
-    if (!member) return null;
-
-    return {
-      totalRevenue: member.performance.monthlyRevenue,
-      totalMerchants: member.performance.merchantsManaged,
-      totalContracts: member.performance.contractsSigned,
-      averageEfficiency: member.performance.efficiency,
-      chartData: monthlyData.map(item => ({
-        month: item.month,
-        value: item[member.firstName.toLowerCase() as keyof typeof item] || 0
-      }))
-    };
-  };
-
-  const filteredData = getFilteredData();
-  const topPerformer = mockTeamMembers.reduce((top, member) => 
-    member.performance.monthlyRevenue > top.performance.monthlyRevenue ? member : top
-  );
-
-  if (!filteredData) return null;
+  const totalRevenue = filteredData.reduce((sum, member) => sum + member.monthlyRevenue, 0);
+  const totalMerchants = filteredData.reduce((sum, member) => sum + member.merchants, 0);
+  const averageEfficiency = filteredData.reduce((sum, member) => sum + member.efficiency, 0) / filteredData.length;
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Dashboard - Iso Organizacia
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Vítajte späť, Marián Lapoš
-          </p>
-        </div>
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
-            <UsersRound className="h-4 w-4 text-gray-500" />
-            <Select value={selectedEmployee} onValueChange={setSelectedEmployee}>
-              <SelectTrigger className="w-48">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Všetci zamestnanci</SelectItem>
-                {mockTeamMembers.map((member) => (
-                  <SelectItem key={member.id} value={member.id}>
-                    {member.firstName} {member.lastName}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+      {/* Action Panel */}
+      <ActionPanel />
+
+      {/* Filter Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Target className="h-5 w-5" />
+            Filtrovanie údajov
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center space-x-4">
+            <div className="flex-1">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                Vybrať člena tímu:
+              </label>
+              <Select value={selectedMember} onValueChange={setSelectedMember}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Vybrať člena tímu..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Všetci členovia tímu</SelectItem>
+                  {teamMembers.map((member) => (
+                    <SelectItem key={member.id} value={member.id}>
+                      {member.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {selectedMember !== 'all' && (
+              <div className="text-right">
+                <Badge variant="outline" className="text-blue-600 border-blue-600">
+                  Zobrazujú sa údaje pre: {teamMembers.find(m => m.id === selectedMember)?.name}
+                </Badge>
+              </div>
+            )}
           </div>
-          <Button variant="outline">
-            <BarChart3 className="h-4 w-4 mr-2" />
-            Reporty
-          </Button>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
+        <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
           <CardContent className="p-6">
-            <div className="flex items-center">
-              <DollarSign className="h-8 w-8 text-green-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                  {selectedEmployee === 'all' ? 'Celkové tržby tímu' : 'Mesačné tržby'}
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-blue-100 text-sm font-medium">Celkový tím</p>
+                <p className="text-3xl font-bold">{filteredData.length}</p>
+                <p className="text-blue-100 text-sm">
+                  {selectedMember === 'all' ? 'členov' : 'vybraný člen'}
                 </p>
-                <p className="text-2xl font-bold">€{filteredData.totalRevenue.toLocaleString()}</p>
-                <p className="text-sm text-green-600">+12% vs minulý mesiac</p>
               </div>
+              <Users className="h-12 w-12 text-blue-200" />
             </div>
           </CardContent>
         </Card>
-        <Card>
+
+        <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
           <CardContent className="p-6">
-            <div className="flex items-center">
-              <Users className="h-8 w-8 text-blue-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                  {selectedEmployee === 'all' ? 'Celkom merchantov' : 'Spravovaní merchanti'}
-                </p>
-                <p className="text-2xl font-bold">{filteredData.totalMerchants}</p>
-                <p className="text-sm text-blue-600">
-                  {selectedEmployee === 'all' ? `${mockTeamMembers.length} zamestnancov` : 'Aktívne spravuje'}
-                </p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-green-100 text-sm font-medium">Mesačné tržby</p>
+                <p className="text-3xl font-bold">€{totalRevenue.toLocaleString()}</p>
+                <p className="text-green-100 text-sm">+12% vs. minulý mesiac</p>
               </div>
+              <DollarSign className="h-12 w-12 text-green-200" />
             </div>
           </CardContent>
         </Card>
-        <Card>
+
+        <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
           <CardContent className="p-6">
-            <div className="flex items-center">
-              <FileText className="h-8 w-8 text-purple-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                  {selectedEmployee === 'all' ? 'Celkom zmlúv' : 'Podpísané zmluvy'}
-                </p>
-                <p className="text-2xl font-bold">{filteredData.totalContracts}</p>
-                <p className="text-sm text-purple-600">Tento mesiac</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-purple-100 text-sm font-medium">Spravovaní merchanti</p>
+                <p className="text-3xl font-bold">{totalMerchants}</p>
+                <p className="text-purple-100 text-sm">Aktívne obsluhovaní</p>
               </div>
+              <Building className="h-12 w-12 text-purple-200" />
             </div>
           </CardContent>
         </Card>
-        <Card>
+
+        <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
           <CardContent className="p-6">
-            <div className="flex items-center">
-              <Target className="h-8 w-8 text-orange-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                  {selectedEmployee === 'all' ? 'Priemerná efektivita' : 'Efektivita'}
-                </p>
-                <p className="text-2xl font-bold">{filteredData.averageEfficiency.toFixed(1)}%</p>
-                <p className="text-sm text-orange-600">
-                  {selectedEmployee === 'all' ? 'Celého tímu' : 'Individuálna'}
-                </p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-orange-100 text-sm font-medium">Efektivita</p>
+                <p className="text-3xl font-bold">{averageEfficiency.toFixed(1)}%</p>
+                <p className="text-orange-100 text-sm">Priemerná výkonnosť</p>
               </div>
+              <Target className="h-12 w-12 text-orange-200" />
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Revenue Chart */}
-        <Card className="lg:col-span-2">
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5" />
-              {selectedEmployee === 'all' ? 'Tržby tímu' : `Tržby - ${mockTeamMembers.find(m => m.id === selectedEmployee)?.firstName} ${mockTeamMembers.find(m => m.id === selectedEmployee)?.lastName}`}
+              {selectedMember === 'all' ? 'Výkonnosť tímu' : 'Individuálna výkonnosť'}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              {selectedEmployee === 'all' ? (
-                <BarChart data={monthlyData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip formatter={(value) => [`€${value.toLocaleString()}`, 'Tržby']} />
-                  <Bar dataKey="total" fill="#3B82F6" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              ) : (
-                <LineChart data={filteredData.chartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip formatter={(value) => [`€${value.toLocaleString()}`, 'Tržby']} />
-                  <Line 
-                    type="monotone" 
-                    dataKey="value" 
-                    stroke="#8B5CF6" 
-                    strokeWidth={3}
-                    dot={{ fill: '#8B5CF6', strokeWidth: 2, r: 6 }}
-                  />
-                </LineChart>
-              )}
+              <BarChart data={selectedMember === 'all' ? revenueByTeamMember : [{
+                name: teamMembers.find(m => m.id === selectedMember)?.name.split(' ')[0] || '',
+                revenue: teamMembers.find(m => m.id === selectedMember)?.monthlyRevenue || 0,
+                merchants: teamMembers.find(m => m.id === selectedMember)?.merchants || 0
+              }]}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip formatter={(value, name) => [
+                  name === 'revenue' ? `€${value.toLocaleString()}` : value,
+                  name === 'revenue' ? 'Tržby' : 'Merchanti'
+                ]} />
+                <Bar dataKey="revenue" fill="#3B82F6" />
+              </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        {/* Team Performance */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Award className="h-5 w-5" />
-              {selectedEmployee === 'all' ? 'Top výkonnosť tímu' : 'Detail zamestnanca'}
+              Efektivita tímu
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {selectedEmployee === 'all' ? (
-              <div className="space-y-4">
-                <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20 p-4 rounded-lg">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold text-yellow-800 dark:text-yellow-300">🏆 Top performer</p>
-                      <p className="text-lg font-bold">{topPerformer.firstName} {topPerformer.lastName}</p>
-                      <p className="text-sm text-yellow-600">€{topPerformer.performance.monthlyRevenue.toLocaleString()}</p>
-                    </div>
-                    <Button size="sm" variant="outline">
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                  </div>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={filteredData.map(member => ({
+                    name: member.name.split(' ')[0],
+                    value: member.efficiency,
+                    revenue: member.monthlyRevenue
+                  }))}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, value }) => `${name}: ${value}%`}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {filteredData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value) => [`${value}%`, 'Efektivita']} />
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Recent Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Clock className="h-5 w-5" />
+              Nedávna aktivita
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center space-x-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">Peter Fekiač podpísal novú zmluvu</p>
+                  <p className="text-xs text-gray-500">pred 2 hodinami</p>
                 </div>
-                
-                {mockTeamMembers.map((member) => (
-                  <div key={member.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                    <div>
-                      <p className="font-medium">{member.firstName} {member.lastName}</p>
-                      <p className="text-sm text-gray-500">{member.position}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-semibold">€{member.performance.monthlyRevenue.toLocaleString()}</p>
-                      <p className="text-sm text-gray-500">{member.performance.efficiency}%</p>
-                    </div>
-                  </div>
-                ))}
               </div>
-            ) : (
-              <div className="space-y-4">
-                {(() => {
-                  const member = mockTeamMembers.find(m => m.id === selectedEmployee);
-                  if (!member) return null;
-                  
-                  return (
-                    <div className="space-y-4">
-                      <div className="text-center">
-                        <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-3">
-                          <span className="text-white font-bold text-xl">
-                            {member.firstName[0]}{member.lastName[0]}
-                          </span>
-                        </div>
-                        <h3 className="font-bold text-lg">{member.firstName} {member.lastName}</h3>
-                        <p className="text-gray-600 dark:text-gray-400">{member.position}</p>
-                        <Badge className="mt-2">
-                          {member.status === 'active' ? 'Aktívny' : 'Neaktívny'}
-                        </Badge>
-                      </div>
-                      
-                      <div className="space-y-3">
-                        <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
-                          <p className="text-sm font-medium text-green-700 dark:text-green-300">Celkové tržby</p>
-                          <p className="text-xl font-bold text-green-600">€{member.performance.totalRevenue.toLocaleString()}</p>
-                        </div>
-                        <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
-                          <p className="text-sm font-medium text-blue-700 dark:text-blue-300">Merchanti</p>
-                          <p className="text-xl font-bold text-blue-600">{member.performance.merchantsManaged}</p>
-                        </div>
-                        <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-lg">
-                          <p className="text-sm font-medium text-purple-700 dark:text-purple-300">Efektivita</p>
-                          <p className="text-xl font-bold text-purple-600">{member.performance.efficiency}%</p>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })()}
+              <div className="flex items-center space-x-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">Ladislav Mathis pridal nového merchanta</p>
+                  <p className="text-xs text-gray-500">pred 4 hodinami</p>
+                </div>
               </div>
-            )}
+              <div className="flex items-center space-x-3 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">Richie Plichta ❤️ aktualizoval merchant profil</p>
+                  <p className="text-xs text-gray-500">pred 6 hodinami</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Mesačný trend
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={200}>
+              <LineChart data={monthlyData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip formatter={(value, name) => [
+                  name === 'revenue' ? `€${value.toLocaleString()}` : value,
+                  name === 'revenue' ? 'Tržby' : 'Zmluvy'
+                ]} />
+                <Line type="monotone" dataKey="revenue" stroke="#3B82F6" strokeWidth={2} />
+                <Line type="monotone" dataKey="contracts" stroke="#8B5CF6" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
       </div>
