@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,19 +8,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Plus, Search, Filter, Calendar, FileText, User, MapPin, DollarSign, Clock, Eye, Edit } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/contexts/AuthContext';
-import { BusinessPartnerContractsPage } from './BusinessPartnerContractsPage';
 import { demoContracts, demoClients, type DemoContract } from '@/data/demoData';
 
 export const ContractsPage: React.FC = () => {
   const { user } = useAuth();
   const [selectedContract, setSelectedContract] = useState<DemoContract | null>(null);
-  
-  // If user is a business partner, show the specialized view
-  if (user?.role === 'business_partner') {
-    return <BusinessPartnerContractsPage />;
-  }
 
-  // Keep existing code for admin and other roles
   const [contracts] = useState<DemoContract[]>(demoContracts);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');

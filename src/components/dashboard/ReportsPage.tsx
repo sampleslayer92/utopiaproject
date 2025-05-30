@@ -1,74 +1,100 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { 
-  BarChart3, 
-  TrendingUp, 
-  Users, 
-  DollarSign, 
-  Download, 
-  Filter,
-  Calendar,
-  FileText
-} from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { Badge } from '@/components/ui/badge';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+import { Calendar, Download, TrendingUp, TrendingDown, DollarSign, Users, CreditCard, AlertCircle } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const monthlyData = [
-  { month: 'Jan', revenue: 45000, merchants: 15, contracts: 8 },
-  { month: 'Feb', revenue: 52000, merchants: 18, contracts: 12 },
-  { month: 'Mar', revenue: 48000, merchants: 16, contracts: 9 },
-  { month: 'Apr', revenue: 61000, merchants: 22, contracts: 15 },
-  { month: 'Máj', revenue: 55000, merchants: 20, contracts: 11 },
-  { month: 'Jún', revenue: 67000, merchants: 25, contracts: 18 },
+  { name: 'Jan', revenue: 45000, transactions: 1200, clients: 45 },
+  { name: 'Feb', revenue: 52000, transactions: 1350, clients: 48 },
+  { name: 'Mar', revenue: 48000, transactions: 1280, clients: 50 },
+  { name: 'Apr', revenue: 61000, transactions: 1450, clients: 53 },
+  { name: 'Máj', revenue: 58000, transactions: 1380, clients: 55 },
+  { name: 'Jún', revenue: 67000, transactions: 1520, clients: 58 },
 ];
 
-const teamPerformanceData = [
-  { name: 'Peter Novák', revenue: 15000, efficiency: 92 },
-  { name: 'Jana Kováčová', revenue: 12000, efficiency: 88 },
-  { name: 'Martin Svoboda', revenue: 8000, efficiency: 95 },
-];
-
-const departmentData = [
-  { name: 'Sales', value: 70, color: '#3B82F6' },
-  { name: 'Support', value: 20, color: '#10B981' },
-  { name: 'Management', value: 10, color: '#F59E0B' },
+const transactionTypeData = [
+  { name: 'Kartové platby', value: 68, color: '#8884d8' },
+  { name: 'Bezkontaktné', value: 25, color: '#82ca9d' },
+  { name: 'Mobilné platby', value: 7, color: '#ffc658' },
 ];
 
 export const ReportsPage: React.FC = () => {
   const { user } = useAuth();
   const [selectedPeriod, setSelectedPeriod] = useState('month');
-  const [selectedDepartment, setSelectedDepartment] = useState('all');
+  const [selectedReport, setSelectedReport] = useState('overview');
 
-  if (!user || user.role !== 'business_partner') {
+  // Only admins (ISO Organizácia) can view reports
+  if (!user || user.role !== 'admin') {
     return (
-      <div className="text-center py-8">
-        <p className="text-gray-600 dark:text-gray-400">
-          Nemáte oprávnenie na zobrazenie tejto stránky.
-        </p>
+      <div className="space-y-6">
+        <div className="text-center py-12">
+          <AlertCircle className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            Prístup zamietnutý
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+            Reporty sú dostupné len pre ISO Organizáciu. Ako klient nemáte oprávnenie na zobrazenie týchto dát.
+          </p>
+        </div>
       </div>
     );
   }
 
+  const currentRevenue = 67000;
+  const previousRevenue = 58000;
+  const revenueGrowth = ((currentRevenue - previousRevenue) / previousRevenue) * 100;
+
+  const currentTransactions = 1520;
+  const previousTransactions = 1380;
+  const transactionGrowth = ((currentTransactions - previousTransactions) / previousTransactions) * 100;
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Reporty a analytika
+            Reporty
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Komplexné prehľady výkonnosti vášho tímu a obchodu
+            Komplexné analýzy a štatistiky výkonnosti
           </p>
         </div>
-        <div className="flex items-center space-x-2">
-          <Button variant="outline" className="flex items-center">
-            <Filter className="h-4 w-4 mr-2" />
-            Filtre
+        
+        <div className="flex flex-wrap gap-3">
+          <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+            <SelectTrigger className="w-40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="week">Týždeň</SelectItem>
+              <SelectItem value="month">Mesiac</SelectItem>
+              <SelectItem value="quarter">Štvrťrok</SelectItem>
+              <SelectItem value="year">Rok</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          <Select value={selectedReport} onValueChange={setSelectedReport}>
+            <SelectTrigger className="w-48">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="overview">Prehľad</SelectItem>
+              <SelectItem value="financial">Finančné</SelectItem>
+              <SelectItem value="clients">Klienti</SelectItem>
+              <SelectItem value="transactions">Transakcie</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          <Button variant="outline">
+            <Calendar className="h-4 w-4 mr-2" />
+            Vlastný rozsah
           </Button>
+          
           <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600">
             <Download className="h-4 w-4 mr-2" />
             Export
@@ -76,223 +102,151 @@ export const ReportsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Summary Cards */}
+      {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card>
           <CardContent className="p-6">
-            <div className="flex items-center">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Mesačné tržby</p>
+                <p className="text-2xl font-bold">€{currentRevenue.toLocaleString()}</p>
+                <div className="flex items-center mt-1">
+                  {revenueGrowth > 0 ? (
+                    <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
+                  ) : (
+                    <TrendingDown className="h-4 w-4 text-red-500 mr-1" />
+                  )}
+                  <span className={`text-sm ${revenueGrowth > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                    {Math.abs(revenueGrowth).toFixed(1)}%
+                  </span>
+                </div>
+              </div>
               <DollarSign className="h-8 w-8 text-green-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Celkové tržby</p>
-                <p className="text-2xl font-bold">€328,000</p>
-                <p className="text-sm text-green-600">+12% vs min. mesiac</p>
-              </div>
             </div>
           </CardContent>
         </Card>
+
         <Card>
           <CardContent className="p-6">
-            <div className="flex items-center">
-              <Users className="h-8 w-8 text-blue-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Aktívni merchanti</p>
-                <p className="text-2xl font-bold">116</p>
-                <p className="text-sm text-blue-600">+8 nových</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Transakcie</p>
+                <p className="text-2xl font-bold">{currentTransactions.toLocaleString()}</p>
+                <div className="flex items-center mt-1">
+                  {transactionGrowth > 0 ? (
+                    <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
+                  ) : (
+                    <TrendingDown className="h-4 w-4 text-red-500 mr-1" />
+                  )}
+                  <span className={`text-sm ${transactionGrowth > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                    {Math.abs(transactionGrowth).toFixed(1)}%
+                  </span>
+                </div>
               </div>
+              <CreditCard className="h-8 w-8 text-blue-500" />
             </div>
           </CardContent>
         </Card>
+
         <Card>
           <CardContent className="p-6">
-            <div className="flex items-center">
-              <FileText className="h-8 w-8 text-purple-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Nové zmluvy</p>
-                <p className="text-2xl font-bold">73</p>
-                <p className="text-sm text-purple-600">+15% vs min. mesiac</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Aktívni klienti</p>
+                <p className="text-2xl font-bold">58</p>
+                <div className="flex items-center mt-1">
+                  <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
+                  <span className="text-sm text-green-500">5.5%</span>
+                </div>
               </div>
+              <Users className="h-8 w-8 text-purple-500" />
             </div>
           </CardContent>
         </Card>
+
         <Card>
           <CardContent className="p-6">
-            <div className="flex items-center">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Priemerná transakcia</p>
+                <p className="text-2xl font-bold">€{Math.round(currentRevenue / currentTransactions)}</p>
+                <div className="flex items-center mt-1">
+                  <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
+                  <span className="text-sm text-green-500">2.1%</span>
+                </div>
+              </div>
               <TrendingUp className="h-8 w-8 text-orange-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Priemerná efektivita</p>
-                <p className="text-2xl font-bold">91.7%</p>
-                <p className="text-sm text-orange-600">+2.3% vs min. mesiac</p>
-              </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Filters */}
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <Calendar className="h-4 w-4 text-gray-500" />
-              <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-                <SelectTrigger className="w-40">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="week">Tento týždeň</SelectItem>
-                  <SelectItem value="month">Tento mesiac</SelectItem>
-                  <SelectItem value="quarter">Tento štvrťrok</SelectItem>
-                  <SelectItem value="year">Tento rok</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Users className="h-4 w-4 text-gray-500" />
-              <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
-                <SelectTrigger className="w-40">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Všetky oddelenia</SelectItem>
-                  <SelectItem value="sales">Sales</SelectItem>
-                  <SelectItem value="support">Support</SelectItem>
-                  <SelectItem value="management">Management</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Mesačné tržby</CardTitle>
+            <CardDescription>Vývoj tržieb za posledných 6 mesiacov</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={monthlyData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip formatter={(value) => [`€${value?.toLocaleString()}`, 'Tržby']} />
+                <Bar dataKey="revenue" fill="#8884d8" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
 
-      {/* Charts and Analytics */}
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Prehľad</TabsTrigger>
-          <TabsTrigger value="team">Tím</TabsTrigger>
-          <TabsTrigger value="merchants">Merchanti</TabsTrigger>
-          <TabsTrigger value="financial">Finančné</TabsTrigger>
-        </TabsList>
+        <Card>
+          <CardHeader>
+            <CardTitle>Typy platieb</CardTitle>
+            <CardDescription>Rozloženie platieb podľa typu</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={transactionTypeData}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  dataKey="value"
+                  label={({ name, value }) => `${name}: ${value}%`}
+                >
+                  {transactionTypeData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
 
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5" />
-                  Mesačné tržby
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={monthlyData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip formatter={(value) => [`€${value.toLocaleString()}`, 'Tržby']} />
-                    <Bar dataKey="revenue" fill="#3B82F6" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Distribúcia tímu</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={departmentData}
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={100}
-                      dataKey="value"
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                    >
-                      {departmentData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="team" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Výkonnosť tímu</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={400}>
-                <BarChart data={teamPerformanceData} layout="horizontal">
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis type="number" />
-                  <YAxis dataKey="name" type="category" width={120} />
-                  <Tooltip formatter={(value) => [`€${value.toLocaleString()}`, 'Tržby']} />
-                  <Bar dataKey="revenue" fill="#10B981" radius={[0, 4, 4, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="merchants" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Rast počtu merchantov</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={monthlyData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Line 
-                    type="monotone" 
-                    dataKey="merchants" 
-                    stroke="#8B5CF6" 
-                    strokeWidth={3}
-                    dot={{ fill: '#8B5CF6', strokeWidth: 2, r: 6 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="financial" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Finančný prehľad</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 p-6 rounded-lg">
-                  <h3 className="font-semibold text-green-800 dark:text-green-300">Celkové príjmy</h3>
-                  <p className="text-2xl font-bold text-green-600">€328,000</p>
-                  <p className="text-sm text-green-600">Tento rok</p>
-                </div>
-                <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-6 rounded-lg">
-                  <h3 className="font-semibold text-blue-800 dark:text-blue-300">Mesačný priemer</h3>
-                  <p className="text-2xl font-bold text-blue-600">€54,667</p>
-                  <p className="text-sm text-blue-600">Posledných 6 mesiacov</p>
-                </div>
-                <div className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 p-6 rounded-lg">
-                  <h3 className="font-semibold text-purple-800 dark:text-purple-300">Prognóza</h3>
-                  <p className="text-2xl font-bold text-purple-600">€72,000</p>
-                  <p className="text-sm text-purple-600">Budúci mesiac</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+      <div className="grid grid-cols-1 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Trend transakcií</CardTitle>
+            <CardDescription>Počet transakcií za posledných 6 mesiacov</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={monthlyData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip formatter={(value) => [value?.toLocaleString(), 'Transakcie']} />
+                <Line type="monotone" dataKey="transactions" stroke="#82ca9d" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

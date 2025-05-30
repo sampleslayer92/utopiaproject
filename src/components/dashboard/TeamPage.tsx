@@ -141,11 +141,12 @@ export const TeamPage: React.FC = () => {
 
   const otherMembers = mockTeamMembers.filter(m => m.id !== memberToDelete?.id);
 
-  if (!user || user.role !== 'business_partner') {
+  // Only admins (ISO Organizácia) can view team management
+  if (!user || user.role !== 'admin') {
     return (
       <div className="text-center py-8">
         <p className="text-gray-600 dark:text-gray-400">
-          Nemáte oprávnenie na zobrazenie tejto stránky.
+          Nemáte oprávnenie na zobrazenie tejto stránky. Správa tímu je dostupná len pre ISO Organizáciu.
         </p>
       </div>
     );

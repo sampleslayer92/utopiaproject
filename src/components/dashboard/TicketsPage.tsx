@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -77,7 +78,6 @@ export const TicketsPage: React.FC = () => {
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Tikety</h1>
           <p className="text-gray-600 dark:text-gray-400">
             {user?.role === 'admin' && 'Spravujte všetky tikety v systéme'}
-            {user?.role === 'business_partner' && 'Spravujte tikety vašich klientov'}
             {user?.role === 'client' && 'Vaše tikety a požiadavky'}
           </p>
         </div>
