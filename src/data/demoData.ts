@@ -71,7 +71,9 @@ export const demoClients = [
     status: 'active' as const,
     joinedDate: '2023-06-15',
     monthlyVolume: 25000,
-    devicesCount: 2
+    monthlyRevenue: 2500,
+    devicesCount: 2,
+    industry: 'restaurant'
   },
   {
     id: 'usr-client-2',
@@ -84,7 +86,9 @@ export const demoClients = [
     status: 'active' as const,
     joinedDate: '2023-08-20',
     monthlyVolume: 85000,
-    devicesCount: 5
+    monthlyRevenue: 8500,
+    devicesCount: 5,
+    industry: 'hospitality'
   },
   {
     id: 'usr-client-3',
@@ -97,7 +101,9 @@ export const demoClients = [
     status: 'active' as const,
     joinedDate: '2023-07-10',
     monthlyVolume: 45000,
-    devicesCount: 3
+    monthlyRevenue: 4500,
+    devicesCount: 3,
+    industry: 'retail'
   },
   {
     id: 'usr-client-4',
@@ -110,7 +116,9 @@ export const demoClients = [
     status: 'active' as const,
     joinedDate: '2023-09-05',
     monthlyVolume: 32000,
-    devicesCount: 2
+    monthlyRevenue: 3200,
+    devicesCount: 2,
+    industry: 'pharmacy'
   }
 ];
 
@@ -123,7 +131,10 @@ export const demoLocations = [
     clientId: 'usr-client-1',
     businessPartnerId: 'usr-bp-1',
     devicesCount: 2,
-    status: 'active' as const
+    status: 'active' as const,
+    type: 'retail' as const,
+    monthlyRevenue: 2500,
+    manager: 'Jana Svobodová'
   },
   {
     id: 'loc-2',
@@ -132,7 +143,10 @@ export const demoLocations = [
     clientId: 'usr-client-2',
     businessPartnerId: 'usr-bp-1',
     devicesCount: 3,
-    status: 'active' as const
+    status: 'active' as const,
+    type: 'hospitality' as const,
+    monthlyRevenue: 5000,
+    manager: 'Martin Tatra'
   },
   {
     id: 'loc-3',
@@ -141,7 +155,10 @@ export const demoLocations = [
     clientId: 'usr-client-2',
     businessPartnerId: 'usr-bp-1',
     devicesCount: 2,
-    status: 'active' as const
+    status: 'active' as const,
+    type: 'hospitality' as const,
+    monthlyRevenue: 3500,
+    manager: 'Martin Tatra'
   },
   {
     id: 'loc-4',
@@ -150,7 +167,10 @@ export const demoLocations = [
     clientId: 'usr-client-3',
     businessPartnerId: 'usr-bp-2',
     devicesCount: 3,
-    status: 'active' as const
+    status: 'active' as const,
+    type: 'retail' as const,
+    monthlyRevenue: 4500,
+    manager: 'Eva Športová'
   },
   {
     id: 'loc-5',
@@ -159,7 +179,10 @@ export const demoLocations = [
     clientId: 'usr-client-4',
     businessPartnerId: 'usr-bp-2',
     devicesCount: 2,
-    status: 'active' as const
+    status: 'active' as const,
+    type: 'retail' as const,
+    monthlyRevenue: 3200,
+    manager: 'Tomáš Zdravý'
   }
 ];
 
@@ -169,37 +192,56 @@ export const demoDevices = [
     id: 'dev-1',
     name: 'Terminal 1',
     type: 'terminal' as const,
-    model: 'Ingenico iWL250',
+    brand: 'Ingenico',
+    model: 'iWL250',
     tid: 'T1001',
-    status: 'active' as const,
+    status: 'online' as const,
     locationId: 'loc-1',
     clientId: 'usr-client-1',
     businessPartnerId: 'usr-bp-1',
-    lastTransaction: '2024-01-15T14:30:00Z'
+    lastTransaction: '2024-01-15T14:30:00Z',
+    transactions: 1250,
+    revenue: 15600,
+    uptime: 98.5,
+    serialNumber: 'IGN-2023-001',
+    installDate: '2023-06-15',
+    lastMaintenance: '2024-01-01'
   },
   {
     id: 'dev-2',
     name: 'Terminal 2',
     type: 'terminal' as const,
-    model: 'Verifone V240m',
+    brand: 'Verifone',
+    model: 'V240m',
     tid: 'T1002',
-    status: 'active' as const,
+    status: 'online' as const,
     locationId: 'loc-1',
     clientId: 'usr-client-1',
     businessPartnerId: 'usr-bp-1',
-    lastTransaction: '2024-01-15T16:45:00Z'
+    lastTransaction: '2024-01-15T16:45:00Z',
+    transactions: 980,
+    revenue: 12400,
+    uptime: 97.2,
+    serialNumber: 'VRF-2023-002',
+    installDate: '2023-06-16'
   },
   {
     id: 'dev-3',
     name: 'Recepcia Terminal',
     type: 'terminal' as const,
-    model: 'PAX A920Pro',
+    brand: 'PAX',
+    model: 'A920Pro',
     tid: 'T2001',
-    status: 'active' as const,
+    status: 'online' as const,
     locationId: 'loc-2',
     clientId: 'usr-client-2',
     businessPartnerId: 'usr-bp-1',
-    lastTransaction: '2024-01-15T18:20:00Z'
+    lastTransaction: '2024-01-15T18:20:00Z',
+    transactions: 2150,
+    revenue: 28900,
+    uptime: 99.1,
+    serialNumber: 'PAX-2023-003',
+    installDate: '2023-08-20'
   }
 ];
 
@@ -218,6 +260,7 @@ export interface DemoContract {
   clientId: string;
   clientName: string;
   businessPartnerId: string;
+  createdBy: string;
 }
 
 export const demoContracts: DemoContract[] = [
@@ -234,7 +277,8 @@ export const demoContracts: DemoContract[] = [
     endDate: '2025-06-15',
     clientId: 'usr-client-1',
     clientName: 'Reštaurácia U Jána',
-    businessPartnerId: 'usr-bp-1'
+    businessPartnerId: 'usr-bp-1',
+    createdBy: 'usr-bp-1'
   },
   {
     id: 'contract-2',
@@ -249,7 +293,8 @@ export const demoContracts: DemoContract[] = [
     endDate: '2025-08-20',
     clientId: 'usr-client-2',
     clientName: 'Hotel Tatra',
-    businessPartnerId: 'usr-bp-1'
+    businessPartnerId: 'usr-bp-1',
+    createdBy: 'usr-bp-1'
   }
 ];
 
