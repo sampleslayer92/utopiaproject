@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Search, Filter, Clock, AlertCircle, CheckCircle, User } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { mockTickets } from '@/data/demoData';
+import { mockTickets, getClientName, getAssignedToName } from '@/data/demoData';
 import { getFilteredData } from '@/utils/roleUtils';
 import { designSystem } from '@/styles/design-system';
 
@@ -19,9 +18,10 @@ export const TicketsPage: React.FC = () => {
 
   // Filter tickets based on user role
   const filteredTickets = getFilteredData(mockTickets, user!).filter(ticket => {
+    const clientName = getClientName(ticket.clientId);
     const matchesSearch = ticket.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          ticket.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         ticket.clientName.toLowerCase().includes(searchTerm.toLowerCase());
+                         clientName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || ticket.status === statusFilter;
     const matchesPriority = priorityFilter === 'all' || ticket.priority === priorityFilter;
     
@@ -43,7 +43,7 @@ export const TicketsPage: React.FC = () => {
       case 'low': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400';
       case 'medium': return 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400';
       case 'high': return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400';
-      case 'critical': return 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400';
+      case 'urgent': return 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400';
       default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400';
     }
   };
@@ -183,7 +183,7 @@ export const TicketsPage: React.FC = () => {
                 <SelectItem value="low">Nízka</SelectItem>
                 <SelectItem value="medium">Stredná</SelectItem>
                 <SelectItem value="high">Vysoká</SelectItem>
-                <SelectItem value="critical">Kritická</SelectItem>
+                <SelectItem value="urgent">Urgentná</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -214,7 +214,7 @@ export const TicketsPage: React.FC = () => {
                       {ticket.priority === 'low' && 'Nízka'}
                       {ticket.priority === 'medium' && 'Stredná'}
                       {ticket.priority === 'high' && 'Vysoká'}
-                      {ticket.priority === 'critical' && 'Kritická'}
+                      {ticket.priority === 'urgent' && 'Urgentná'}
                     </Badge>
                   </div>
                   
@@ -225,12 +225,12 @@ export const TicketsPage: React.FC = () => {
                   <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                     <span className="flex items-center gap-1">
                       <User className="h-4 w-4" />
-                      {ticket.clientName}
+                      {getClientName(ticket.clientId)}
                     </span>
                     <span>#{ticket.id}</span>
                     <span>Vytvorené: {new Date(ticket.createdAt).toLocaleDateString('sk-SK')}</span>
-                    {ticket.assignedToName && (
-                      <span>Pridelené: {ticket.assignedToName}</span>
+                    {ticket.assignedTo && (
+                      <span>Pridelené: {getAssignedToName(ticket.assignedTo)}</span>
                     )}
                   </div>
                 </div>
