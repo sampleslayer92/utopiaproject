@@ -1,4 +1,3 @@
-
 import { Ticket } from '@/types/tickets';
 
 // Users data
@@ -303,7 +302,7 @@ export interface DemoTransaction {
   id: string;
   amount: number;
   currency: string;
-  status: 'completed' | 'pending' | 'failed';
+  status: 'completed' | 'pending' | 'failed' | 'refunded';
   type: 'payment' | 'refund';
   timestamp: string;
   merchantId: string;
@@ -311,6 +310,10 @@ export interface DemoTransaction {
   deviceId: string;
   locationId: string;
   businessPartnerId: string;
+  clientId: string;
+  reference: string;
+  paymentMethod: 'card' | 'contactless' | 'mobile' | 'cash';
+  fee: number;
 }
 
 export const demoTransactions: DemoTransaction[] = [
@@ -325,7 +328,11 @@ export const demoTransactions: DemoTransaction[] = [
     merchantName: 'Reštaurácia U Jána',
     deviceId: 'dev-1',
     locationId: 'loc-1',
-    businessPartnerId: 'usr-bp-1'
+    businessPartnerId: 'usr-bp-1',
+    clientId: 'usr-client-1',
+    reference: 'TXN-240115-001',
+    paymentMethod: 'card',
+    fee: 0.51
   },
   {
     id: 'txn-2',
@@ -338,7 +345,11 @@ export const demoTransactions: DemoTransaction[] = [
     merchantName: 'Hotel Tatra',
     deviceId: 'dev-3',
     locationId: 'loc-2',
-    businessPartnerId: 'usr-bp-1'
+    businessPartnerId: 'usr-bp-1',
+    clientId: 'usr-client-2',
+    reference: 'TXN-240115-002',
+    paymentMethod: 'contactless',
+    fee: 2.40
   }
 ];
 
@@ -351,7 +362,7 @@ export const getLocationDevices = (locationId: string) => {
   return demoDevices.filter(device => device.locationId === locationId);
 };
 
-// Updated mockTickets with proper Ticket type
+// Updated mockTickets with proper Ticket type including businessPartnerId
 export const mockTickets: Ticket[] = [
   {
     id: 'TKT-001',

@@ -9,6 +9,7 @@ export interface Ticket {
   createdBy: string; // User ID
   assignedTo?: string; // Business Partner ID
   clientId?: string;
+  businessPartnerId?: string; // Added businessPartnerId property
   locationId?: string;
   deviceId?: string;
   attachments?: string[];
