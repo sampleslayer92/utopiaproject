@@ -22,7 +22,7 @@ export const DashboardLayout: React.FC = () => {
           {/* Header */}
           <header className="h-16 bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 border-b border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between px-6 shadow-sm">
             <div className="flex items-center gap-4">
-              {(user?.role === 'client' || user?.role === 'location') && <LocationSelector />}
+              {user?.role === 'client' && <LocationSelector />}
             </div>
             
             <div className="flex items-center gap-3">

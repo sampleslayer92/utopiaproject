@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { LayoutDashboard, CreditCard, Monitor, Users, MapPin, FileText, Ticket, Settings, Building2, UserCheck, UsersRound, BarChart3 } from 'lucide-react';
+import { LayoutDashboard, CreditCard, Monitor, Users, MapPin, FileText, Ticket, Settings, Building2, UsersRound, BarChart3 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarHeader, SidebarFooter } from '@/components/ui/sidebar';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
@@ -30,11 +30,11 @@ export const AppSidebar: React.FC = () => {
         url: '/dashboard/devices',
         icon: Monitor
       }, {
-        title: 'Obchodní partneri',
+        title: 'ISO Organizácie',
         url: '/dashboard/business-partners',
         icon: Building2
       }, {
-        title: 'Merchanti',
+        title: 'Klienti',
         url: '/dashboard/clients',
         icon: Users
       }, {
@@ -62,7 +62,7 @@ export const AppSidebar: React.FC = () => {
         url: '/dashboard/team',
         icon: UsersRound
       }, {
-        title: 'Merchanti',
+        title: 'Klienti',
         url: '/dashboard/clients',
         icon: Users
       }, {
@@ -122,13 +122,12 @@ export const AppSidebar: React.FC = () => {
     <Sidebar className="border-r-0">
       <SidebarHeader className="p-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className={designSystem.spacing.cardPadding}>
-          <div className="flex items-center space-x-3 mb-6">
+          <div className="flex items-center mb-6">
             <img 
               src="https://cdn.prod.website-files.com/65bb58bd9feeda1fd2e1b551/65bb58bd9feeda1fd2e1b5ad_logo-header.svg" 
               alt="Onepos Logo" 
               className="h-8 w-auto" 
             />
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Utopia</h2>
           </div>
           
           {user && (
@@ -138,9 +137,8 @@ export const AppSidebar: React.FC = () => {
                 <p className="text-white/90 text-sm">{user.email}</p>
                 <p className="text-white/80 text-xs">
                   {user.role === 'admin' && 'Onepos Admin'}
-                  {user.role === 'business_partner' && 'Onepos, ISO Organizácia'}
-                  {user.role === 'client' && 'Merchant Partner'}
-                  {user.role === 'location' && 'Prevádzka'}
+                  {user.role === 'business_partner' && 'ISO Organizácia'}
+                  {user.role === 'client' && 'Klient'}
                 </p>
                 <div className="inline-flex items-center px-2 py-1 bg-white/20 rounded-full text-xs text-white">
                   <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
@@ -161,27 +159,21 @@ export const AppSidebar: React.FC = () => {
                   <SidebarMenuButton 
                     asChild 
                     isActive={location.pathname === item.url} 
-                    className={`group relative overflow-hidden ${designSystem.borderRadius.card} ${designSystem.transitions.default} ${
+                    className={`group relative overflow-hidden rounded-xl transition-all duration-300 ${
                       location.pathname === item.url 
-                        ? `bg-gradient-to-r ${roleGradient} text-white ${designSystem.shadows.button}` 
-                        : `hover:bg-gradient-to-r hover:${roleGradient.replace('from-', 'from-').replace('to-', 'to-')}/10 dark:hover:${roleGradient}/20`
+                        ? `bg-gradient-to-r ${roleGradient} text-white shadow-lg` 
+                        : `hover:bg-gradient-to-r hover:${roleGradient.replace('from-', 'from-').replace('to-', 'to-')}/10 dark:hover:${roleGradient}/20 hover:shadow-md`
                     }`}
                   >
                     <button 
                       onClick={() => navigate(item.url)} 
-                      className="flex items-center space-x-4 w-full p-4"
+                      className="flex items-center space-x-3 w-full p-3"
                     >
-                      <div className={`p-3 ${designSystem.borderRadius.button} ${designSystem.transitions.default} ${
+                      <item.icon className={`w-5 h-5 ${
                         location.pathname === item.url 
-                          ? 'bg-white/20' 
-                          : 'bg-gray-100 dark:bg-gray-700 group-hover:bg-gray-200 dark:group-hover:bg-gray-600'
-                      }`}>
-                        <item.icon className={`${designSystem.spacing.iconSize} ${
-                          location.pathname === item.url 
-                            ? 'text-white' 
-                            : 'text-gray-600 dark:text-gray-300 group-hover:text-gray-700 dark:group-hover:text-gray-200'
-                        }`} />
-                      </div>
+                          ? 'text-white' 
+                          : 'text-gray-600 dark:text-gray-300 group-hover:text-gray-700 dark:group-hover:text-gray-200'
+                      }`} />
                       <span className={`font-medium ${
                         location.pathname === item.url 
                           ? 'text-white' 
@@ -200,13 +192,13 @@ export const AppSidebar: React.FC = () => {
       
       <SidebarFooter className={`p-4 ${designSystem.gradients.background} border-t border-gray-200 dark:border-gray-600`}>
         <div className="space-y-4">
-          <div className="space-y-2">
+          <div className="flex justify-center space-x-2">
             <ThemeToggle />
             <LanguageSwitcher />
           </div>
           <div className="text-center">
             <div className="text-xs text-gray-500 dark:text-gray-400">
-              © 2025 Utopia
+              © 2025 Onepos
             </div>
             <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
               Verzia 2.1.0

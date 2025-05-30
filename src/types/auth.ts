@@ -1,13 +1,13 @@
 
-export type UserRole = 'admin' | 'business_partner' | 'client' | 'location';
+export type UserRole = 'admin' | 'business_partner' | 'client';
 
 export interface User {
   id: string;
   email: string;
   fullName: string;
   role: UserRole;
-  businessPartnerId?: string; // For clients and locations - ID of their business partner
-  clientId?: string; // For locations - ID of their parent client
+  businessPartnerId?: string; // For clients - ID of their business partner
+  clientId?: string; // For sub-entities - ID of their parent client
   parentId?: string; // Generic parent ID for hierarchical structure
   organizationId?: string; // For admin users
   createdAt: string;
