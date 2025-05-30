@@ -2,7 +2,6 @@
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { AdminDashboard } from '@/components/dashboard/AdminDashboard';
-import { BusinessPartnerDashboard } from '@/components/dashboard/BusinessPartnerDashboard';
 import { ClientDashboard } from '@/components/dashboard/ClientDashboard';
 import { OnboardingProgress } from './OnboardingProgress';
 
@@ -25,8 +24,6 @@ export const DashboardPage: React.FC = () => {
     switch (user.role) {
       case 'admin':
         return <AdminDashboard />;
-      case 'business_partner':
-        return <BusinessPartnerDashboard />;
       case 'client':
         return <ClientDashboard />;
       default:

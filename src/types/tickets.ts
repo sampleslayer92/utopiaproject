@@ -1,39 +1,32 @@
 
+export type TicketStatus = 'open' | 'in_progress' | 'resolved' | 'closed';
+export type TicketPriority = 'low' | 'medium' | 'high' | 'urgent';
+export type TicketCategory = 'technical' | 'billing' | 'device' | 'contract' | 'other';
+
+export interface TicketComment {
+  id: string;
+  content: string;
+  authorId: string;
+  authorName: string;
+  createdAt: string;
+  attachments?: string[];
+}
+
 export interface Ticket {
   id: string;
   title: string;
   description: string;
-  status: 'open' | 'in_progress' | 'resolved' | 'closed';
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  category: 'device' | 'location' | 'contract' | 'technical' | 'billing';
-  createdBy: string; // User ID
-  assignedTo?: string; // Business Partner ID
-  clientId?: string;
-  businessPartnerId?: string; // Added businessPartnerId property
+  status: TicketStatus;
+  priority: TicketPriority;
+  category: TicketCategory;
+  createdBy: string;
+  assignedTo?: string;
+  clientId: string;
+  organizationId: string; // Added missing property
   locationId?: string;
   deviceId?: string;
-  attachments?: string[];
   createdAt: string;
   updatedAt: string;
   resolvedAt?: string;
   comments: TicketComment[];
-}
-
-export interface TicketComment {
-  id: string;
-  ticketId: string;
-  userId: string;
-  content: string;
-  isInternal: boolean; // Internal notes vs client-visible comments
-  createdAt: string;
-}
-
-export interface CreateTicketData {
-  title: string;
-  description: string;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  category: 'device' | 'location' | 'contract' | 'technical' | 'billing';
-  deviceId?: string;
-  locationId?: string;
-  attachments?: File[];
 }

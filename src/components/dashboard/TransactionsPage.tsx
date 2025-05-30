@@ -34,13 +34,12 @@ export const TransactionsPage: React.FC = () => {
   const getFilteredTransactions = (): DemoTransaction[] => {
     let transactions = demoTransactions;
 
-    if (user?.role === 'business_partner') {
-      const partnerClients = demoClients.filter(client => client.businessPartnerId === user.id);
-      const clientIds = partnerClients.map(client => client.id);
-      transactions = transactions.filter(tx => clientIds.includes(tx.clientId));
-    } else if (user?.role === 'client') {
+    // Admin (ISO Organizácia) sees all transactions
+    // Client sees only their own transactions
+    if (user?.role === 'client') {
       transactions = transactions.filter(tx => tx.clientId === user.id);
     }
+    // Admin sees all transactions (no filtering needed)
 
     // Apply filters
     if (searchTerm) {

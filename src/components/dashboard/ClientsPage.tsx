@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -79,8 +78,10 @@ export const ClientsPage: React.FC = () => {
   const getFilteredClients = () => {
     let clients = mockClients;
     
-    if (user?.role === 'business_partner') {
-      clients = clients.filter(client => client.businessPartnerId === user.businessPartnerId);
+    // Only admin (ISO Organizácia) can see all clients
+    // Clients cannot see this page at all
+    if (user?.role === 'client') {
+      return [];
     }
     
     return clients.filter(client =>
@@ -114,7 +115,7 @@ export const ClientsPage: React.FC = () => {
   };
 
   // Check if user has access to this page
-  if (!user || !['admin', 'business_partner'].includes(user.role)) {
+  if (!user || user.role !== 'admin') {
     return (
       <div className="text-center py-8">
         <p className="text-gray-600 dark:text-gray-400">

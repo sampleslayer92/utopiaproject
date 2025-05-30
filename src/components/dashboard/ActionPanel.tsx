@@ -29,21 +29,14 @@ export const ActionPanel: React.FC = () => {
     if (user?.role === 'admin') {
       return {
         title: 'Vitajte späť, Admin!',
-        subtitle: 'Systémová správa • Administrator',
-        description: 'Spravujte celý systém, business partnerov a monitorujte všetky aktivity'
-      };
-    }
-    if (user?.role === 'business_partner') {
-      return {
-        title: 'Vitajte späť, Marián!',
-        subtitle: 'ISO Organizácia • Business Partner',
-        description: 'Spravujte svoj tím a merchantov jednoducho a efektívne'
+        subtitle: 'ISO Organizácia • Administrator',
+        description: 'Spravujte celý systém, klientov a monitorujte všetky aktivity'
       };
     }
     if (user?.role === 'client') {
       return {
         title: 'Vitajte späť!',
-        subtitle: 'Merchant • Klient',
+        subtitle: 'Klient • Merchant',
         description: 'Spravujte svoje prevádzky, zariadenia a sledujte transakcie'
       };
     }
@@ -72,7 +65,7 @@ export const ActionPanel: React.FC = () => {
           </div>
           
           <div className="flex items-center space-x-3">
-            {(user?.role === 'business_partner' || user?.role === 'admin') && (
+            {user?.role === 'admin' && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button 
@@ -85,30 +78,18 @@ export const ActionPanel: React.FC = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-gray-800 border shadow-lg">
-                  {user?.role === 'business_partner' && (
-                    <>
-                      <DropdownMenuItem onClick={handleAddTeamMember} className="cursor-pointer">
-                        <UserPlus className="h-4 w-4 mr-2" />
-                        <span>Člen Teamu</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={handleAddMerchant} className="cursor-pointer">
-                        <Building2 className="h-4 w-4 mr-2" />
-                        <span>Merchant</span>
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                  {user?.role === 'admin' && (
-                    <>
-                      <DropdownMenuItem onClick={() => console.log('Add business partner')} className="cursor-pointer">
-                        <Users className="h-4 w-4 mr-2" />
-                        <span>Business Partner</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={handleAddMerchant} className="cursor-pointer">
-                        <Building className="h-4 w-4 mr-2" />
-                        <span>Organizácia</span>
-                      </DropdownMenuItem>
-                    </>
-                  )}
+                  <DropdownMenuItem onClick={handleAddTeamMember} className="cursor-pointer">
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    <span>Nový klient</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleAddMerchant} className="cursor-pointer">
+                    <Building2 className="h-4 w-4 mr-2" />
+                    <span>Nová lokácia</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => console.log('Add device')} className="cursor-pointer">
+                    <Building className="h-4 w-4 mr-2" />
+                    <span>Nové zariadenie</span>
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
