@@ -107,6 +107,11 @@ export const AppSidebar: React.FC = () => {
           icon: Monitor,
         },
         {
+          title: 'Zmluvy',
+          url: '/dashboard/contracts',
+          icon: FileText,
+        },
+        {
           title: 'Tikety',
           url: '/dashboard/tickets',
           icon: Ticket,

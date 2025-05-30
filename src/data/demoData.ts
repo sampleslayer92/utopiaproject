@@ -161,6 +161,7 @@ export interface DemoContract {
   monthlyFee: number;
   autoRenewal: boolean;
   notes?: string;
+  businessPartnerId?: string;
 }
 
 export interface DemoTransaction {
@@ -401,7 +402,7 @@ export const demoTickets: DemoTicket[] = [
   }
 ];
 
-// Demo contracts
+// Enhanced demo contracts with more entries for business partners
 export const demoContracts: DemoContract[] = [
   {
     id: 'C-001',
@@ -419,7 +420,8 @@ export const demoContracts: DemoContract[] = [
     locationId: 'loc-1',
     monthlyFee: 450,
     autoRenewal: true,
-    notes: 'Preferovaný klient, priority support'
+    notes: 'Preferovaný klient, priority support',
+    businessPartnerId: 'bp-1'
   },
   {
     id: 'C-002',
@@ -436,7 +438,8 @@ export const demoContracts: DemoContract[] = [
     clientName: 'RetailMax a.s.',
     locationId: 'loc-3',
     monthlyFee: 1200,
-    autoRenewal: false
+    autoRenewal: false,
+    businessPartnerId: 'bp-1'
   },
   {
     id: 'C-003',
@@ -453,7 +456,127 @@ export const demoContracts: DemoContract[] = [
     locationId: 'loc-5',
     monthlyFee: 500,
     autoRenewal: true,
-    notes: 'Zahŕňa emergency response'
+    notes: 'Zahŕňa emergency response',
+    businessPartnerId: 'bp-1'
+  },
+  {
+    id: 'C-004',
+    title: 'Software licencie POS systém',
+    clientId: 'client-1',
+    status: 'active',
+    startDate: '2024-06-01',
+    endDate: '2025-05-31',
+    value: 18000,
+    type: 'software',
+    description: 'Ročné licencie pre POS software s podporou.',
+    contractNumber: 'SW-2024-004',
+    clientName: 'TechCorp s.r.o.',
+    monthlyFee: 750,
+    autoRenewal: true,
+    notes: 'Zahŕňa updates a online support',
+    businessPartnerId: 'bp-1'
+  },
+  {
+    id: 'C-005',
+    title: 'Komplexné platobné riešenie - Eurovea',
+    clientId: 'client-2',
+    status: 'active',
+    startDate: '2024-02-15',
+    endDate: '2027-02-14',
+    value: 85000,
+    type: 'service',
+    description: 'Trojročná zmluva na kompletné platobné služby pre Eurovea centrum.',
+    contractNumber: 'SRV-2024-005',
+    clientName: 'RetailMax a.s.',
+    locationId: 'loc-3',
+    monthlyFee: 2800,
+    autoRenewal: false,
+    notes: 'Veľký objem transakcií, špeciálne pricing',
+    businessPartnerId: 'bp-1'
+  },
+  {
+    id: 'C-006',
+    title: 'Mobile payment riešenie',
+    clientId: 'client-3',
+    status: 'active',
+    startDate: '2024-04-01',
+    endDate: '2025-03-31',
+    value: 15000,
+    type: 'hardware',
+    description: 'Mobilné terminály pre káviarne a delivery služby.',
+    contractNumber: 'MOB-2024-006',
+    clientName: 'CafeChain Ltd.',
+    monthlyFee: 650,
+    autoRenewal: true,
+    businessPartnerId: 'bp-1'
+  },
+  {
+    id: 'C-007',
+    title: 'E-commerce platobná brána',
+    clientId: 'client-3',
+    status: 'active',
+    startDate: '2024-04-01',
+    endDate: '2025-03-31',
+    value: 8500,
+    type: 'software',
+    description: 'Online platobná brána pre e-shop s API integráciou.',
+    contractNumber: 'GATE-2024-007',
+    clientName: 'CafeChain Ltd.',
+    locationId: 'loc-4',
+    monthlyFee: 420,
+    autoRenewal: true,
+    notes: 'Online transakcie, nízke poplatky',
+    businessPartnerId: 'bp-1'
+  },
+  {
+    id: 'C-008',
+    title: 'Rozšírená podpora a monitoring',
+    clientId: 'client-4',
+    status: 'expired',
+    startDate: '2023-08-01',
+    endDate: '2024-07-31',
+    value: 6000,
+    type: 'maintenance',
+    description: 'Rozšírená technická podpora s 24/7 monitoringom.',
+    contractNumber: 'SUP-2023-008',
+    clientName: 'ShopEasy s.r.o.',
+    monthlyFee: 300,
+    autoRenewal: false,
+    notes: 'Potrebuje obnovenie',
+    businessPartnerId: 'bp-1'
+  },
+  {
+    id: 'C-009',
+    title: 'Leasing terminálov - základný balík',
+    clientId: 'client-4',
+    status: 'active',
+    startDate: '2024-08-01',
+    endDate: '2026-07-31',
+    value: 24000,
+    type: 'hardware',
+    description: 'Dvojročný leasing 8 platobných terminálov.',
+    contractNumber: 'LEASE-2024-009',
+    clientName: 'ShopEasy s.r.o.',
+    monthlyFee: 800,
+    autoRenewal: false,
+    businessPartnerId: 'bp-1'
+  },
+  {
+    id: 'C-010',
+    title: 'Konzultačné služby - digitalizácia',
+    clientId: 'client-2',
+    status: 'terminated',
+    startDate: '2024-01-01',
+    endDate: '2024-06-30',
+    value: 12000,
+    type: 'service',
+    description: 'Konzultácie pre digitalizáciu platobných procesov.',
+    contractNumber: 'CONS-2024-010',
+    clientName: 'RetailMax a.s.',
+    monthlyFee: 2000,
+    autoRenewal: false,
+    notes: 'Ukončené predčasne na žiadosť klienta',
+    businessPartnerId: 'bp-1'
   }
 ];
 
@@ -534,4 +657,8 @@ export const getClientContracts = (clientId: string) => {
 
 export const getClientTransactions = (clientId: string) => {
   return demoTransactions.filter(transaction => transaction.clientId === clientId);
+};
+
+export const getBusinessPartnerContracts = (businessPartnerId: string) => {
+  return demoContracts.filter(contract => contract.businessPartnerId === businessPartnerId);
 };

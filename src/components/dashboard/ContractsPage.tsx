@@ -1,146 +1,164 @@
-
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Plus, Search, Filter, Calendar, FileText, User, MapPin, DollarSign, Clock } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, FileText, Calendar, DollarSign, TrendingUp, AlertTriangle, CheckCircle, Eye } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { demoContracts, demoLocations } from '@/data/demoData';
+import { BusinessPartnerContractsPage } from './BusinessPartnerContractsPage';
+import { demoContracts, demoClients, type DemoContract } from '@/data/demoData';
 
 export const ContractsPage: React.FC = () => {
   const { user } = useAuth();
+  
+  // If user is a business partner, show the specialized view
+  if (user?.role === 'business_partner') {
+    return <BusinessPartnerContractsPage />;
+  }
+
+  // Keep existing code for admin and other roles
+  const [contracts] = useState<DemoContract[]>(demoContracts);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [typeFilter, setTypeFilter] = useState<string>('all');
 
-  // Filter contracts based on search and filters
-  const filteredContracts = demoContracts.filter(contract => {
-    const matchesSearch = contract.contractNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         contract.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  const filteredContracts = contracts.filter(contract => {
+    const matchesSearch = contract.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         contract.contractNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          contract.clientName.toLowerCase().includes(searchTerm.toLowerCase());
-    
     const matchesStatus = statusFilter === 'all' || contract.status === statusFilter;
+    const matchesType = typeFilter === 'all' || contract.type === typeFilter;
     
-    return matchesSearch && matchesStatus;
+    return matchesSearch && matchesStatus && matchesType;
   });
-
-  const activeContracts = demoContracts.filter(c => c.status === 'active').length;
-  const pendingContracts = demoContracts.filter(c => c.status === 'pending').length;
-  const expiringSoon = demoContracts.filter(c => {
-    const endDate = new Date(c.endDate);
-    const now = new Date();
-    const daysDiff = Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 3600 * 24));
-    return daysDiff <= 30 && daysDiff > 0;
-  }).length;
-  const totalValue = demoContracts.reduce((sum, c) => sum + c.value, 0);
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
-      case 'expired':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
-      case 'terminated':
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+      case 'active': return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+      case 'pending': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
+      case 'expired': return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+      case 'terminated': return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
-  const isExpiringSoon = (endDate: string) => {
-    const end = new Date(endDate);
-    const now = new Date();
-    const daysDiff = Math.ceil((end.getTime() - now.getTime()) / (1000 * 3600 * 24));
-    return daysDiff <= 30 && daysDiff > 0;
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case 'hardware': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+      case 'software': return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400';
+      case 'service': return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400';
+      case 'maintenance': return 'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-400';
+      default: return 'bg-gray-100 text-gray-800';
+    }
   };
 
+  const activeContracts = contracts.filter(c => c.status === 'active').length;
+  const totalValue = contracts.reduce((sum, c) => sum + c.value, 0);
+  const expiringContracts = contracts.filter(c => {
+    const endDate = new Date(c.endDate);
+    const threeMonthsFromNow = new Date();
+    threeMonthsFromNow.setMonth(threeMonthsFromNow.getMonth() + 3);
+    return endDate <= threeMonthsFromNow && c.status === 'active';
+  }).length;
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Zmluvy
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Správa zmlúv a kontraktov
-          </p>
+    <div className="space-y-8 p-6">
+      {/* Header Section */}
+      <div className="bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 rounded-3xl p-8 border border-blue-100 dark:border-gray-700 shadow-lg">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl">
+                <FileText className="h-8 w-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  Zmluvy
+                </h1>
+                <p className="text-gray-600 dark:text-gray-300 text-lg">
+                  Vítajte späť, {user?.fullName}! Správa zmlúv a kontraktov.
+                </p>
+              </div>
+            </div>
+            
+            {/* Stats Overview */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                    <FileText className="h-5 w-5 text-green-600 dark:text-green-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Aktívne zmluvy</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white">{activeContracts}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                    <DollarSign className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Celková hodnota</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white">€{totalValue.toLocaleString()}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
+                    <Clock className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Expirujú čoskoro</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white">{expiringContracts}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Quick Actions */}
+          <div className="flex flex-wrap gap-3">
+            <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg">
+              <Plus className="h-4 w-4 mr-2" />
+              Nová zmluva
+            </Button>
+            <Button variant="outline" className="border-gray-200 dark:border-gray-700">
+              <Calendar className="h-4 w-4 mr-2" />
+              Kalender
+            </Button>
+            <Button variant="outline" className="border-gray-200 dark:border-gray-700">
+              <Filter className="h-4 w-4 mr-2" />
+              Reporty
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-green-600 dark:text-green-400">Aktívne zmluvy</p>
-                <p className="text-2xl font-bold text-green-700 dark:text-green-300">{activeContracts}</p>
-                <p className="text-xs text-green-600 dark:text-green-400">Platné kontrakty</p>
-              </div>
-              <CheckCircle className="h-8 w-8 text-green-500" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-yellow-200 dark:border-yellow-800">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-yellow-600 dark:text-yellow-400">Čakajúce</p>
-                <p className="text-2xl font-bold text-yellow-700 dark:text-yellow-300">{pendingContracts}</p>
-                <p className="text-xs text-yellow-600 dark:text-yellow-400">Na podpis</p>
-              </div>
-              <Calendar className="h-8 w-8 text-yellow-500" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20 border-red-200 dark:border-red-800">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-red-600 dark:text-red-400">Končia čoskoro</p>
-                <p className="text-2xl font-bold text-red-700 dark:text-red-300">{expiringSoon}</p>
-                <p className="text-xs text-red-600 dark:text-red-400">Do 30 dní</p>
-              </div>
-              <AlertTriangle className="h-8 w-8 text-red-500" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-800">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-blue-600 dark:text-blue-400">Celková hodnota</p>
-                <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">€{totalValue.toLocaleString()}</p>
-                <p className="text-xs text-blue-600 dark:text-blue-400">Všetky zmluvy</p>
-              </div>
-              <DollarSign className="h-8 w-8 text-blue-500" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Filters */}
-      <Card className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm">
-        <CardHeader>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                placeholder="Hľadať zmluvy..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-white/80 dark:bg-gray-900/80"
-              />
+      <Card className="border-0 shadow-lg">
+        <CardContent className="p-6">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Vyhľadať zmluvy..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
             </div>
+            
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="Status" />
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter status" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Všetky statusy</SelectItem>
@@ -150,106 +168,73 @@ export const ContractsPage: React.FC = () => {
                 <SelectItem value="terminated">Ukončené</SelectItem>
               </SelectContent>
             </Select>
+            
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter typ" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Všetky typy</SelectItem>
+                <SelectItem value="hardware">Hardware</SelectItem>
+                <SelectItem value="software">Software</SelectItem>
+                <SelectItem value="service">Služby</SelectItem>
+                <SelectItem value="maintenance">Údržba</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-        </CardHeader>
+        </CardContent>
       </Card>
 
-      {/* Contracts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {filteredContracts.map((contract) => {
-          const location = demoLocations.find(loc => loc.id === contract.locationId);
-          const expiring = isExpiringSoon(contract.endDate);
-          
-          return (
-            <Card key={contract.id} className={`bg-white dark:bg-gray-800 hover:shadow-lg transition-all duration-300 border-l-4 ${expiring ? 'border-l-red-500' : 'border-l-blue-500'}`}>
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-lg font-semibold mb-2">{contract.contractNumber}</CardTitle>
-                    <div className="flex items-center gap-2 mb-2">
-                      <Badge className={getStatusColor(contract.status)}>
-                        {contract.status === 'active' ? 'Aktívne' :
-                         contract.status === 'pending' ? 'Čakajúce' :
-                         contract.status === 'expired' ? 'Expirované' : 'Ukončené'}
-                      </Badge>
-                      {expiring && (
-                        <Badge className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
-                          <AlertTriangle className="h-3 w-3 mr-1" />
-                          Končí čoskoro
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                      <p><strong>Klient:</strong> {contract.clientName}</p>
-                      <p><strong>Typ:</strong> {contract.type}</p>
-                      <p><strong>Prevádzka:</strong> {location?.name}</p>
-                    </div>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <p className="text-lg font-bold text-blue-600">€{contract.value.toLocaleString()}</p>
-                    <p className="text-xs text-gray-500">Hodnota zmluvy</p>
-                  </div>
-                  <div className="text-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <p className="text-lg font-bold text-green-600">€{contract.monthlyFee}</p>
-                    <p className="text-xs text-gray-500">Mesačný poplatok</p>
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Začiatok zmluvy</span>
-                    <span className="font-semibold">{new Date(contract.startDate).toLocaleDateString('sk-SK')}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Koniec zmluvy</span>
-                    <span className={`font-semibold ${expiring ? 'text-red-600' : ''}`}>
-                      {new Date(contract.endDate).toLocaleDateString('sk-SK')}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Automatické predĺženie</span>
-                    <span className="font-semibold">{contract.autoRenewal ? 'Áno' : 'Nie'}</span>
-                  </div>
-                </div>
-
-                {contract.notes && (
-                  <div className="text-sm text-gray-600 dark:text-gray-400 border-t pt-2">
-                    <p><strong>Poznámky:</strong> {contract.notes}</p>
-                  </div>
-                )}
-
-                <div className="flex gap-2 pt-2">
-                  <Button variant="outline" size="sm" className="flex-1">
-                    <Eye className="h-3 w-3 mr-1" />
-                    Zobraziť
-                  </Button>
-                  <Button size="sm" className="flex-1">
-                    Upraviť
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+      {/* Contracts List */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        {filteredContracts.map((contract) => (
+          <Card key={contract.id} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 group">
+            <CardHeader className="pb-3">
+              <div className="flex items-start justify-between">
+                <CardTitle className="text-lg font-semibold group-hover:text-blue-600 transition-colors">
+                  {contract.title}
+                </CardTitle>
+                <Badge className={getStatusColor(contract.status)}>
+                  {contract.status}
+                </Badge>
+              </div>
+              <p className="text-sm text-gray-500">{contract.contractNumber}</p>
+            </CardHeader>
+            
+            <CardContent className="space-y-3">
+              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                <User className="h-4 w-4" />
+                <span>{contract.clientName}</span>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <Badge className={getTypeColor(contract.type)}>
+                  {contract.type}
+                </Badge>
+                <span className="font-semibold text-lg">€{contract.value.toLocaleString()}</span>
+              </div>
+              
+              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                <Calendar className="h-4 w-4" />
+                <span>Do: {new Date(contract.endDate).toLocaleDateString('sk')}</span>
+              </div>
+              
+              <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
+                {contract.description}
+              </p>
+              
+              <div className="flex gap-2 pt-2">
+                <Button size="sm" variant="outline" className="flex-1">
+                  Zobraziť
+                </Button>
+                <Button size="sm" variant="outline">
+                  Upraviť
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
-
-      {filteredContracts.length === 0 && (
-        <Card className="p-8 text-center">
-          <FileText className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-            Žiadne zmluvy
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">
-            {searchTerm || statusFilter !== 'all' 
-              ? 'Neboli nájdené žiadne zmluvy pre zadané kritériá.' 
-              : 'Zatiaľ nemáte žiadne zmluvy.'}
-          </p>
-        </Card>
-      )}
     </div>
   );
 };
