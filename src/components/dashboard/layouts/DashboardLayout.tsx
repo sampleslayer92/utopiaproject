@@ -6,6 +6,7 @@ import { AppSidebar } from './AppSidebar';
 import { NotificationCenter } from '@/components/notifications/NotificationCenter';
 import { GlobalChatbot } from '@/components/chat/GlobalChatbot';
 import { LocationSelector } from '../LocationSelector';
+import { AppBreadcrumb } from '@/components/ui/app-breadcrumb';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { LogOut, User } from 'lucide-react';
@@ -50,7 +51,10 @@ export const DashboardLayout: React.FC = () => {
           
           {/* Main Content */}
           <main className="flex-1 overflow-auto">
-            <Outlet />
+            <div className="p-6">
+              <AppBreadcrumb />
+              <Outlet />
+            </div>
           </main>
         </div>
         

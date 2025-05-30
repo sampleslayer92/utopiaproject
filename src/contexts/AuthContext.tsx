@@ -221,3 +221,33 @@ const getMockClientId = (email: string): string | undefined => {
   if (email.includes('location2')) return 'client-2';
   return undefined;
 };
+
+const mockUsers = [
+  {
+    id: 'admin-1',
+    email: 'admin@utopia.sk',
+    fullName: 'Admin User',
+    role: 'admin' as const,
+    businessPartnerId: null,
+    locationId: null,
+    organizationName: 'Onepos Admin'
+  },
+  {
+    id: 'bp-1',
+    email: 'marian.lapos@iso-org.sk',
+    fullName: 'Marián Lapoš',
+    role: 'business_partner' as const,
+    businessPartnerId: 'bp-1',
+    locationId: null,
+    organizationName: 'Iso Organizacia'
+  },
+  {
+    id: 'client-1',
+    email: 'client@utopia.sk',
+    fullName: 'Client User',
+    role: 'client' as const,
+    businessPartnerId: 'bp-1',
+    locationId: 'loc-1',
+    organizationName: 'Client Company'
+  }
+];

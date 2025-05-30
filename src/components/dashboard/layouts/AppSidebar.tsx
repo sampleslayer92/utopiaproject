@@ -10,7 +10,9 @@ import {
   Ticket, 
   Settings,
   Building2,
-  UserCheck
+  UserCheck,
+  UsersRound,
+  BarChart3
 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -92,19 +94,14 @@ export const AppSidebar: React.FC = () => {
       return [
         ...baseItems,
         {
-          title: 'Klienti',
+          title: 'Team',
+          url: '/dashboard/team',
+          icon: UsersRound,
+        },
+        {
+          title: 'Merchanti',
           url: '/dashboard/clients',
           icon: Users,
-        },
-        {
-          title: 'Prevádzky',
-          url: '/dashboard/locations',
-          icon: MapPin,
-        },
-        {
-          title: 'Zariadenia',
-          url: '/dashboard/devices',
-          icon: Monitor,
         },
         {
           title: 'Zmluvy',
@@ -112,7 +109,12 @@ export const AppSidebar: React.FC = () => {
           icon: FileText,
         },
         {
-          title: 'Tikety',
+          title: 'Reporty',
+          url: '/dashboard/reports',
+          icon: BarChart3,
+        },
+        {
+          title: 'Tickety',
           url: '/dashboard/tickets',
           icon: Ticket,
         },
@@ -174,7 +176,7 @@ export const AppSidebar: React.FC = () => {
               <UserCheck className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h2 className="text-xl font-bold">PaymentHub</h2>
+              <h2 className="text-xl font-bold">Onepos</h2>
               <p className="text-blue-100 text-sm capitalize">
                 {user?.role?.replace('_', ' ')} Panel
               </p>
@@ -247,7 +249,7 @@ export const AppSidebar: React.FC = () => {
           </div>
           <div className="text-center">
             <div className="text-xs text-gray-500 dark:text-gray-400">
-              © 2024 PaymentHub
+              © 2024 Onepos
             </div>
             <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
               Verzia 2.1.0

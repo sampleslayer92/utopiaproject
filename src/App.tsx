@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -20,6 +21,9 @@ import { LocationsPage } from "./components/dashboard/LocationsPage";
 import { ContractsPage } from "./components/dashboard/ContractsPage";
 import { TicketsPage } from "./components/dashboard/TicketsPage";
 import { SettingsPage } from "./components/dashboard/SettingsPage";
+import { TeamPage } from "./components/dashboard/TeamPage";
+import { TeamMemberDetail } from "./components/dashboard/TeamMemberDetail";
+import { ReportsPage } from "./components/dashboard/ReportsPage";
 import { ErrorBoundary } from "react-error-boundary";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { DashboardLayout } from "./components/dashboard/layouts/DashboardLayout";
@@ -75,6 +79,9 @@ const App = () => (
                         <Route path="contracts" element={<ContractsPage />} />
                         <Route path="tickets" element={<TicketsPage />} />
                         <Route path="settings" element={<SettingsPage />} />
+                        <Route path="team" element={<TeamPage />} />
+                        <Route path="team/:memberId" element={<TeamMemberDetail />} />
+                        <Route path="reports" element={<ReportsPage />} />
                       </Route>
                       
                       {/* Onboarding routes */}
