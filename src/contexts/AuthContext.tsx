@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, AuthState, LoginCredentials, RegisterData, AuthContextType, UserRole } from '@/types/auth';
@@ -61,9 +62,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         email: credentials.email,
         fullName: getMockUserName(credentials.email),
         role: getMockUserRole(credentials.email),
-        businessPartnerId: getMockBusinessPartnerId(credentials.email),
-        clientId: getMockClientId(credentials.email),
-        organizationId: credentials.email.includes('admin') ? 'org-1' : undefined,
+        organizationId: getMockOrganizationId(credentials.email),
         createdAt: new Date().toISOString(),
         lastLogin: new Date().toISOString(),
         isActive: true
@@ -114,9 +113,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         email: getMockEmailByRole(role),
         fullName: getMockUserNameByRole(role),
         role: role,
-        businessPartnerId: getMockBusinessPartnerIdByRole(role),
-        clientId: getMockClientIdByRole(role),
-        organizationId: role === 'admin' ? 'org-1' : undefined,
+        organizationId: getMockOrganizationIdByRole(role),
         createdAt: new Date().toISOString(),
         lastLogin: new Date().toISOString(),
         isActive: true
@@ -164,8 +161,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         email: data.email,
         fullName: data.fullName,
         role: data.role,
-        businessPartnerId: data.businessPartnerId,
-        clientId: data.clientId,
         organizationId: data.organizationId,
         createdAt: new Date().toISOString(),
         isActive: true
@@ -223,7 +218,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 const getMockUserIdByRole = (role: UserRole): string => {
   switch (role) {
     case 'admin': return 'admin-1';
-    case 'business_partner': return 'bp-1';
     case 'client': return 'client-1';
     default: return 'user-' + Date.now();
   }
@@ -232,7 +226,6 @@ const getMockUserIdByRole = (role: UserRole): string => {
 const getMockEmailByRole = (role: UserRole): string => {
   switch (role) {
     case 'admin': return 'admin@utopia.sk';
-    case 'business_partner': return 'marian.lapos@onepos.eu';
     case 'client': return 'client@utopia.sk';
     default: return 'demo@utopia.sk';
   }
@@ -240,28 +233,22 @@ const getMockEmailByRole = (role: UserRole): string => {
 
 const getMockUserNameByRole = (role: UserRole): string => {
   switch (role) {
-    case 'admin': return 'Admin Používateľ';
-    case 'business_partner': return 'Marián Lapoš';
+    case 'admin': return 'ISO Organizácia Admin';
     case 'client': return 'TechCorp s.r.o.';
     default: return 'Demo Používateľ';
   }
 };
 
-const getMockBusinessPartnerIdByRole = (role: UserRole): string | undefined => {
+const getMockOrganizationIdByRole = (role: UserRole): string | undefined => {
   switch (role) {
-    case 'client': return 'bp-1';
+    case 'client': return 'org-1';
     default: return undefined;
   }
-};
-
-const getMockClientIdByRole = (role: UserRole): string | undefined => {
-  return undefined;
 };
 
 const getRoleDisplayName = (role: UserRole): string => {
   switch (role) {
     case 'admin': return 'ISO Organizácia';
-    case 'business_partner': return 'Servisný partner';
     case 'client': return 'Klient';
     default: return 'Používateľ';
   }
@@ -270,61 +257,22 @@ const getRoleDisplayName = (role: UserRole): string => {
 // Helper functions for mock data with hierarchical structure
 const getMockUserId = (email: string): string => {
   if (email.includes('admin')) return 'admin-1';
-  if (email.includes('partner1')) return 'bp-1';
-  if (email.includes('partner2')) return 'bp-2';
-  if (email.includes('client1')) return 'client-1';
-  if (email.includes('client2')) return 'client-2';
+  if (email.includes('client')) return 'client-1';
   return 'user-' + Date.now();
 };
 
 const getMockUserName = (email: string): string => {
-  if (email.includes('admin')) return 'Admin Používateľ';
-  if (email.includes('partner1') || email.includes('marian.lapos')) return 'Marián Lapoš';
-  if (email.includes('partner2')) return 'Jana Svoboda - Partner';
-  if (email.includes('client1')) return 'TechCorp s.r.o.';
-  if (email.includes('client2')) return 'RetailMax a.s.';
+  if (email.includes('admin')) return 'ISO Organizácia Admin';
+  if (email.includes('client')) return 'TechCorp s.r.o.';
   return 'Demo Používateľ';
 };
 
 const getMockUserRole = (email: string) => {
   if (email.includes('admin')) return 'admin' as const;
-  if (email.includes('partner')) return 'business_partner' as const;
   return 'client' as const;
 };
 
-const getMockBusinessPartnerId = (email: string): string | undefined => {
-  if (email.includes('client1')) return 'bp-1';
-  if (email.includes('client2')) return 'bp-2';
+const getMockOrganizationId = (email: string): string | undefined => {
+  if (email.includes('client')) return 'org-1';
   return undefined;
 };
-
-const getMockClientId = (email: string): string | undefined => {
-  return undefined;
-};
-
-const mockUsers = [
-  {
-    id: 'admin-1',
-    email: 'admin@utopia.sk',
-    fullName: 'Admin User',
-    role: 'admin' as const,
-    businessPartnerId: null,
-    organizationName: 'Onepos Admin'
-  },
-  {
-    id: 'bp-1',
-    email: 'marian.lapos@onepos.eu',
-    fullName: 'Marián Lapoš',
-    role: 'business_partner' as const,
-    businessPartnerId: 'bp-1',
-    organizationName: 'ISO Organizácia'
-  },
-  {
-    id: 'client-1',
-    email: 'client@utopia.sk',
-    fullName: 'Client User',
-    role: 'client' as const,
-    businessPartnerId: 'bp-1',
-    organizationName: 'Client Company'
-  }
-];

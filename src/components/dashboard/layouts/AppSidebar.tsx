@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { LayoutDashboard, CreditCard, Monitor, Users, MapPin, FileText, Ticket, Settings, Building2, UsersRound, BarChart3 } from 'lucide-react';
+import { LayoutDashboard, CreditCard, Monitor, Users, MapPin, FileText, Ticket, Settings, Building2, BarChart3 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarHeader, SidebarFooter } from '@/components/ui/sidebar';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
@@ -30,10 +30,6 @@ export const AppSidebar: React.FC = () => {
         url: '/dashboard/devices',
         icon: Monitor
       }, {
-        title: 'ISO Organizácie',
-        url: '/dashboard/business-partners',
-        icon: Building2
-      }, {
         title: 'Klienti',
         url: '/dashboard/clients',
         icon: Users
@@ -41,30 +37,6 @@ export const AppSidebar: React.FC = () => {
         title: 'Prevádzky',
         url: '/dashboard/locations',
         icon: MapPin
-      }, {
-        title: 'Zmluvy',
-        url: '/dashboard/contracts',
-        icon: FileText
-      }, {
-        title: 'Tikety',
-        url: '/dashboard/tickets',
-        icon: Ticket
-      }, {
-        title: 'Nastavenia',
-        url: '/dashboard/settings',
-        icon: Settings
-      }];
-    }
-
-    if (user?.role === 'business_partner') {
-      return [...baseItems, {
-        title: 'Team',
-        url: '/dashboard/team',
-        icon: UsersRound
-      }, {
-        title: 'Klienti',
-        url: '/dashboard/clients',
-        icon: Users
       }, {
         title: 'Zmluvy',
         url: '/dashboard/contracts',
@@ -136,8 +108,7 @@ export const AppSidebar: React.FC = () => {
                 <p className="font-semibold text-white">{user.fullName}</p>
                 <p className="text-white/90 text-sm">{user.email}</p>
                 <p className="text-white/80 text-xs">
-                  {user.role === 'admin' && 'Onepos Admin'}
-                  {user.role === 'business_partner' && 'ISO Organizácia'}
+                  {user.role === 'admin' && 'ISO Organizácia'}
                   {user.role === 'client' && 'Klient'}
                 </p>
                 <div className="inline-flex items-center px-2 py-1 bg-white/20 rounded-full text-xs text-white">

@@ -1,34 +1,20 @@
 import { Ticket } from '@/types/tickets';
 
-// Users data
+// Users data - updated to new 2-level structure
 export const demoUsers = [
   {
     id: 'usr-admin-1',
-    name: 'Systémový Admin',
-    email: 'admin@system.sk',
+    name: 'ISO Organizácia Admin',
+    email: 'admin@isoorg.sk',
     role: 'admin' as const,
     avatar: '/avatars/admin.jpg'
-  },
-  {
-    id: 'usr-bp-1',
-    name: 'Marián Novák',
-    email: 'marian.novak@isoorg.sk',
-    role: 'business_partner' as const,
-    avatar: '/avatars/marian.jpg'
-  },
-  {
-    id: 'usr-bp-2',
-    name: 'Peter Kováč',
-    email: 'peter.kovac@isoorg.sk',
-    role: 'business_partner' as const,
-    avatar: '/avatars/peter.jpg'
   },
   {
     id: 'usr-client-1',
     name: 'Jana Svobodová',
     email: 'jana@restacia.sk',
     role: 'client' as const,
-    businessPartnerId: 'usr-bp-1',
+    organizationId: 'org-1',
     avatar: '/avatars/jana.jpg'
   },
   {
@@ -36,7 +22,7 @@ export const demoUsers = [
     name: 'Martin Tatra',
     email: 'martin@hoteltatra.sk',
     role: 'client' as const,
-    businessPartnerId: 'usr-bp-1',
+    organizationId: 'org-1',
     avatar: '/avatars/martin.jpg'
   },
   {
@@ -44,7 +30,7 @@ export const demoUsers = [
     name: 'Eva Športová',
     email: 'eva@sportshop.sk',
     role: 'client' as const,
-    businessPartnerId: 'usr-bp-2',
+    organizationId: 'org-1',
     avatar: '/avatars/eva.jpg'
   },
   {
@@ -52,12 +38,12 @@ export const demoUsers = [
     name: 'Tomáš Zdravý',
     email: 'tomas@lekaren.sk',
     role: 'client' as const,
-    businessPartnerId: 'usr-bp-2',
+    organizationId: 'org-1',
     avatar: '/avatars/tomas.jpg'
   }
 ];
 
-// Clients/Merchants data
+// Clients/Merchants data - updated structure
 export const demoClients = [
   {
     id: 'usr-client-1',
@@ -66,7 +52,7 @@ export const demoClients = [
     email: 'jana@restacia.sk',
     phone: '+421 905 123 456',
     address: 'Hlavná 15, 811 01 Bratislava',
-    businessPartnerId: 'usr-bp-1',
+    organizationId: 'org-1',
     status: 'active' as const,
     joinedDate: '2023-06-15',
     monthlyVolume: 25000,
@@ -81,7 +67,7 @@ export const demoClients = [
     email: 'martin@hoteltatra.sk',
     phone: '+421 905 234 567',
     address: 'Námestie SNP 8, 811 06 Bratislava',
-    businessPartnerId: 'usr-bp-1',
+    organizationId: 'org-1',
     status: 'active' as const,
     joinedDate: '2023-08-20',
     monthlyVolume: 85000,
@@ -96,7 +82,7 @@ export const demoClients = [
     email: 'eva@sportshop.sk',
     phone: '+421 905 345 678',
     address: 'Obchodná 22, 811 02 Bratislava',
-    businessPartnerId: 'usr-bp-2',
+    organizationId: 'org-1',
     status: 'active' as const,
     joinedDate: '2023-07-10',
     monthlyVolume: 45000,
@@ -111,7 +97,7 @@ export const demoClients = [
     email: 'tomas@lekaren.sk',
     phone: '+421 905 456 789',
     address: 'Lekárska 5, 811 08 Bratislava',
-    businessPartnerId: 'usr-bp-2',
+    organizationId: 'org-1',
     status: 'active' as const,
     joinedDate: '2023-09-05',
     monthlyVolume: 32000,
@@ -121,14 +107,14 @@ export const demoClients = [
   }
 ];
 
-// Locations data
+// Locations data - updated with organizationId
 export const demoLocations = [
   {
     id: 'loc-1',
     name: 'Hlavná prevádzka',
     address: 'Hlavná 15, 811 01 Bratislava',
     clientId: 'usr-client-1',
-    businessPartnerId: 'usr-bp-1',
+    organizationId: 'org-1',
     devicesCount: 2,
     status: 'active' as const,
     type: 'retail' as const,
@@ -140,7 +126,7 @@ export const demoLocations = [
     name: 'Hotel - Recepcia',
     address: 'Námestie SNP 8, 811 06 Bratislava',
     clientId: 'usr-client-2',
-    businessPartnerId: 'usr-bp-1',
+    organizationId: 'org-1',
     devicesCount: 3,
     status: 'active' as const,
     type: 'hospitality' as const,
@@ -152,7 +138,7 @@ export const demoLocations = [
     name: 'Hotel - Reštaurácia',
     address: 'Námestie SNP 8, 811 06 Bratislava',
     clientId: 'usr-client-2',
-    businessPartnerId: 'usr-bp-1',
+    organizationId: 'org-1',
     devicesCount: 2,
     status: 'active' as const,
     type: 'hospitality' as const,
@@ -164,7 +150,7 @@ export const demoLocations = [
     name: 'Predajňa',
     address: 'Obchodná 22, 811 02 Bratislava',
     clientId: 'usr-client-3',
-    businessPartnerId: 'usr-bp-2',
+    organizationId: 'org-1',
     devicesCount: 3,
     status: 'active' as const,
     type: 'retail' as const,
@@ -176,7 +162,7 @@ export const demoLocations = [
     name: 'Lekáreň',
     address: 'Lekárska 5, 811 08 Bratislava',
     clientId: 'usr-client-4',
-    businessPartnerId: 'usr-bp-2',
+    organizationId: 'org-1',
     devicesCount: 2,
     status: 'active' as const,
     type: 'retail' as const,
@@ -185,7 +171,7 @@ export const demoLocations = [
   }
 ];
 
-// Devices data
+// Devices data - updated with organizationId
 export const demoDevices = [
   {
     id: 'dev-1',
@@ -197,7 +183,7 @@ export const demoDevices = [
     status: 'online' as const,
     locationId: 'loc-1',
     clientId: 'usr-client-1',
-    businessPartnerId: 'usr-bp-1',
+    organizationId: 'org-1',
     lastTransaction: '2024-01-15T14:30:00Z',
     transactions: 1250,
     revenue: 15600,
@@ -216,7 +202,7 @@ export const demoDevices = [
     status: 'online' as const,
     locationId: 'loc-1',
     clientId: 'usr-client-1',
-    businessPartnerId: 'usr-bp-1',
+    organizationId: 'org-1',
     lastTransaction: '2024-01-15T16:45:00Z',
     transactions: 980,
     revenue: 12400,
@@ -234,7 +220,7 @@ export const demoDevices = [
     status: 'online' as const,
     locationId: 'loc-2',
     clientId: 'usr-client-2',
-    businessPartnerId: 'usr-bp-1',
+    organizationId: 'org-1',
     lastTransaction: '2024-01-15T18:20:00Z',
     transactions: 2150,
     revenue: 28900,
@@ -258,7 +244,7 @@ export interface DemoContract {
   endDate: string;
   clientId: string;
   clientName: string;
-  businessPartnerId: string;
+  organizationId: string;
   createdBy: string;
 }
 
@@ -276,8 +262,8 @@ export const demoContracts: DemoContract[] = [
     endDate: '2025-06-15',
     clientId: 'usr-client-1',
     clientName: 'Reštaurácia U Jána',
-    businessPartnerId: 'usr-bp-1',
-    createdBy: 'usr-bp-1'
+    organizationId: 'org-1',
+    createdBy: 'usr-admin-1'
   },
   {
     id: 'contract-2',
@@ -292,8 +278,8 @@ export const demoContracts: DemoContract[] = [
     endDate: '2025-08-20',
     clientId: 'usr-client-2',
     clientName: 'Hotel Tatra',
-    businessPartnerId: 'usr-bp-1',
-    createdBy: 'usr-bp-1'
+    organizationId: 'org-1',
+    createdBy: 'usr-admin-1'
   }
 ];
 
@@ -309,7 +295,7 @@ export interface DemoTransaction {
   merchantName: string;
   deviceId: string;
   locationId: string;
-  businessPartnerId: string;
+  organizationId: string;
   clientId: string;
   reference: string;
   paymentMethod: 'card' | 'contactless' | 'mobile' | 'cash';
@@ -328,7 +314,7 @@ export const demoTransactions: DemoTransaction[] = [
     merchantName: 'Reštaurácia U Jána',
     deviceId: 'dev-1',
     locationId: 'loc-1',
-    businessPartnerId: 'usr-bp-1',
+    organizationId: 'org-1',
     clientId: 'usr-client-1',
     reference: 'TXN-240115-001',
     paymentMethod: 'card',
@@ -345,7 +331,7 @@ export const demoTransactions: DemoTransaction[] = [
     merchantName: 'Hotel Tatra',
     deviceId: 'dev-3',
     locationId: 'loc-2',
-    businessPartnerId: 'usr-bp-1',
+    organizationId: 'org-1',
     clientId: 'usr-client-2',
     reference: 'TXN-240115-002',
     paymentMethod: 'contactless',
@@ -362,7 +348,7 @@ export const getLocationDevices = (locationId: string) => {
   return demoDevices.filter(device => device.locationId === locationId);
 };
 
-// Updated mockTickets with proper Ticket type including businessPartnerId
+// Updated mockTickets with new structure
 export const mockTickets: Ticket[] = [
   {
     id: 'TKT-001',
@@ -372,9 +358,9 @@ export const mockTickets: Ticket[] = [
     priority: 'high' as const,
     category: 'device' as const,
     createdBy: 'usr-client-1',
-    assignedTo: 'usr-bp-1',
+    assignedTo: 'usr-admin-1',
     clientId: 'usr-client-1',
-    businessPartnerId: 'usr-bp-1',
+    organizationId: 'org-1',
     locationId: 'loc-1',
     deviceId: 'dev-1',
     createdAt: '2024-01-15T10:30:00Z',
@@ -389,9 +375,9 @@ export const mockTickets: Ticket[] = [
     priority: 'medium' as const,
     category: 'device' as const,
     createdBy: 'usr-client-2',
-    assignedTo: 'usr-bp-1',
+    assignedTo: 'usr-admin-1',
     clientId: 'usr-client-2',
-    businessPartnerId: 'usr-bp-1',
+    organizationId: 'org-1',
     locationId: 'loc-2',
     createdAt: '2024-01-14T14:20:00Z',
     updatedAt: '2024-01-15T09:15:00Z',
@@ -405,9 +391,9 @@ export const mockTickets: Ticket[] = [
     priority: 'high' as const,
     category: 'billing' as const,
     createdBy: 'usr-client-3',
-    assignedTo: 'usr-bp-2',
+    assignedTo: 'usr-admin-1',
     clientId: 'usr-client-3',
-    businessPartnerId: 'usr-bp-2',
+    organizationId: 'org-1',
     createdAt: '2024-01-12T16:45:00Z',
     updatedAt: '2024-01-13T11:30:00Z',
     resolvedAt: '2024-01-13T11:30:00Z',
@@ -421,9 +407,9 @@ export const mockTickets: Ticket[] = [
     priority: 'medium' as const,
     category: 'technical' as const,
     createdBy: 'usr-client-1',
-    assignedTo: 'usr-bp-1',
+    assignedTo: 'usr-admin-1',
     clientId: 'usr-client-1',
-    businessPartnerId: 'usr-bp-1',
+    organizationId: 'org-1',
     createdAt: '2024-01-13T08:00:00Z',
     updatedAt: '2024-01-13T08:00:00Z',
     comments: []
@@ -436,9 +422,9 @@ export const mockTickets: Ticket[] = [
     priority: 'medium' as const,
     category: 'contract' as const,
     createdBy: 'usr-client-4',
-    assignedTo: 'usr-bp-2',
+    assignedTo: 'usr-admin-1',
     clientId: 'usr-client-4',
-    businessPartnerId: 'usr-bp-2',
+    organizationId: 'org-1',
     createdAt: '2024-01-11T13:15:00Z',
     updatedAt: '2024-01-14T10:20:00Z',
     comments: []

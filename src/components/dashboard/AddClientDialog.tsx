@@ -20,18 +20,11 @@ export const AddClientDialog: React.FC<AddClientDialogProps> = ({ onClientAdded 
     name: '',
     email: '',
     businessType: '',
-    businessPartnerId: user?.role === 'business_partner' ? user.businessPartnerId : '',
+    organizationId: user?.role === 'admin' ? 'org-1' : user?.organizationId || '',
     contactPerson: '',
     phone: '',
     address: ''
   });
-
-  // Mock business partners for admin users
-  const mockBusinessPartners = [
-    { id: 'bp-1', name: 'Martin Novák' },
-    { id: 'bp-2', name: 'Jana Svoboda' },
-    { id: 'bp-3', name: 'TechSolutions Ltd.' }
-  ];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,8 +34,9 @@ export const AddClientDialog: React.FC<AddClientDialogProps> = ({ onClientAdded 
       return;
     }
 
-    if (user?.role === 'admin' && !formData.businessPartnerId) {
-      toast.error('Vyberte obchodného partnera');
+    // Only ISO Organizácia (admin) can create clients
+    if (user?.role !== 'admin') {
+      toast.error('Nemáte oprávnenie na pridanie klienta');
       return;
     }
 
@@ -54,7 +48,7 @@ export const AddClientDialog: React.FC<AddClientDialogProps> = ({ onClientAdded 
       name: '',
       email: '',
       businessType: '',
-      businessPartnerId: user?.role === 'business_partner' ? user.businessPartnerId : '',
+      organizationId: 'org-1',
       contactPerson: '',
       phone: '',
       address: ''
@@ -63,6 +57,11 @@ export const AddClientDialog: React.FC<AddClientDialogProps> = ({ onClientAdded 
     setOpen(false);
     onClientAdded?.();
   };
+
+  // Only show dialog for ISO Organizácia
+  if (user?.role !== 'admin') {
+    return null;
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -119,27 +118,6 @@ export const AddClientDialog: React.FC<AddClientDialogProps> = ({ onClientAdded 
               </SelectContent>
             </Select>
           </div>
-          
-          {user?.role === 'admin' && (
-            <div>
-              <Label htmlFor="businessPartnerId">Obchodný partner *</Label>
-              <Select 
-                value={formData.businessPartnerId} 
-                onValueChange={(value) => setFormData(prev => ({ ...prev, businessPartnerId: value }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Vyberte obchodného partnera" />
-                </SelectTrigger>
-                <SelectContent>
-                  {mockBusinessPartners.map((partner) => (
-                    <SelectItem key={partner.id} value={partner.id}>
-                      {partner.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
           
           <div>
             <Label htmlFor="contactPerson">Kontaktná osoba</Label>

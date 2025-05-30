@@ -1,15 +1,12 @@
 
-export type UserRole = 'admin' | 'business_partner' | 'client';
+export type UserRole = 'admin' | 'client';
 
 export interface User {
   id: string;
   email: string;
   fullName: string;
   role: UserRole;
-  businessPartnerId?: string; // For clients - ID of their business partner
-  clientId?: string; // For sub-entities - ID of their parent client
-  parentId?: string; // Generic parent ID for hierarchical structure
-  organizationId?: string; // For admin users
+  organizationId?: string; // For clients - ID of their ISO organization
   createdAt: string;
   lastLogin?: string;
   isActive: boolean;
@@ -32,8 +29,6 @@ export interface RegisterData {
   password: string;
   fullName: string;
   role: UserRole;
-  businessPartnerId?: string;
-  clientId?: string;
   organizationId?: string;
 }
 

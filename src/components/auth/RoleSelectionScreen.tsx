@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Building2, Wrench, Users } from 'lucide-react';
+import { ArrowLeft, Building2, Users } from 'lucide-react';
 import { LanguageSwitcher } from '@/components/ui/language-switcher';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { motion } from 'framer-motion';
@@ -17,23 +17,16 @@ const roleData = [
   {
     role: 'admin' as UserRole,
     title: 'ISO Organizácia',
-    description: 'Hlavná administrácia systému',
+    description: 'Správa klientov a celého systému',
     icon: Building2,
-    gradient: 'from-purple-500 to-indigo-500'
-  },
-  {
-    role: 'business_partner' as UserRole,
-    title: 'Servisný partner',
-    description: 'Partner poskytujúci služby klientom',
-    icon: Wrench,
-    gradient: 'from-emerald-500 to-blue-500'
+    gradient: 'from-blue-500 to-indigo-500'
   },
   {
     role: 'client' as UserRole,
     title: 'Klient',
     description: 'Koncový používateľ systému',
     icon: Users,
-    gradient: 'from-blue-500 to-cyan-500'
+    gradient: 'from-emerald-500 to-blue-500'
   }
 ];
 
@@ -81,7 +74,7 @@ export const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({ onBack
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
             {roleData.map((roleInfo, index) => {
               const IconComponent = roleInfo.icon;
               

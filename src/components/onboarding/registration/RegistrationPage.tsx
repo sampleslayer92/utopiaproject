@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -99,16 +98,14 @@ export const RegistrationPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      let role: 'admin' | 'business_partner' | 'client' = 'client';
-      if (userData.businessType === 'business_partner') {
-        role = 'business_partner';
-      }
-
+      // All new registrations will be clients by default
+      // They will be assigned to the default ISO organization
       await register({
         email: userData.email,
         password: 'defaultPassword123',
         fullName: userData.fullName,
-        role
+        role: 'client',
+        organizationId: 'org-1' // Default ISO organization
       });
       
       localStorage.setItem('onboarding_progress', JSON.stringify({
