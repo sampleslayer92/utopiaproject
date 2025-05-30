@@ -1,11 +1,12 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Search, Edit, Eye, Building2, Smartphone, DollarSign, MapPin } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Search, Edit, Eye, Building2, Smartphone, DollarSign, MapPin, Calendar } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Client } from '@/types/dashboard';
 import { AddClientDialog } from './AddClientDialog';
@@ -106,6 +107,10 @@ export const ClientsPage: React.FC = () => {
   const handleClientAdded = () => {
     console.log('Client added successfully');
     // Refresh data if needed
+  };
+
+  const handleRowClick = (client: Client) => {
+    setSelectedClient(client);
   };
 
   // Check if user has access to this page
@@ -211,7 +216,11 @@ export const ClientsPage: React.FC = () => {
             </TableHeader>
             <TableBody>
               {filteredClients.map((client) => (
-                <TableRow key={client.id}>
+                <TableRow 
+                  key={client.id}
+                  className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                  onClick={() => handleRowClick(client)}
+                >
                   <TableCell>
                     <div>
                       <div className="font-medium">{client.name}</div>
@@ -234,53 +243,10 @@ export const ClientsPage: React.FC = () => {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center space-x-2">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setSelectedClient(client)}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-2xl">
-                          <DialogHeader>
-                            <DialogTitle>Detail klienta</DialogTitle>
-                          </DialogHeader>
-                          {selectedClient && (
-                            <div className="space-y-4">
-                              <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                  <p className="text-sm font-medium text-gray-500">Názov</p>
-                                  <p>{selectedClient.name}</p>
-                                </div>
-                                <div>
-                                  <p className="text-sm font-medium text-gray-500">Email</p>
-                                  <p>{selectedClient.email}</p>
-                                </div>
-                                <div>
-                                  <p className="text-sm font-medium text-gray-500">Počet prevádzok</p>
-                                  <p>{selectedClient.locationsCount}</p>
-                                </div>
-                                <div>
-                                  <p className="text-sm font-medium text-gray-500">Počet zariadení</p>
-                                  <p>{selectedClient.devicesCount}</p>
-                                </div>
-                                <div>
-                                  <p className="text-sm font-medium text-gray-500">Celkové tržby</p>
-                                  <p>€{selectedClient.totalRevenue.toLocaleString()}</p>
-                                </div>
-                                <div>
-                                  <p className="text-sm font-medium text-gray-500">Vytvorený</p>
-                                  <p>{new Date(selectedClient.createdAt).toLocaleDateString('sk-SK')}</p>
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                        </DialogContent>
-                      </Dialog>
+                    <div className="flex items-center space-x-2" onClick={(e) => e.stopPropagation()}>
+                      <Button variant="outline" size="sm">
+                        <Eye className="h-4 w-4" />
+                      </Button>
                       <Button variant="outline" size="sm">
                         <Edit className="h-4 w-4" />
                       </Button>
@@ -292,6 +258,102 @@ export const ClientsPage: React.FC = () => {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Client Detail Dialog */}
+      <Dialog open={!!selectedClient} onOpenChange={() => setSelectedClient(null)}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Detail klienta</DialogTitle>
+          </DialogHeader>
+          {selectedClient && (
+            <div className="grid grid-cols-2 gap-6 p-4">
+              <div className="space-y-4">
+                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                    <Building2 className="h-4 w-4" />
+                    Základné informácie
+                  </h3>
+                  <div className="space-y-2">
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Názov</p>
+                      <p className="font-medium">{selectedClient.name}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Email</p>
+                      <p className="font-medium">{selectedClient.email}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Status</p>
+                      <Badge className={getStatusColor(selectedClient.status)}>
+                        {selectedClient.status === 'active' ? 'Aktívny' : 
+                         selectedClient.status === 'inactive' ? 'Neaktívny' : 'Pozastavený'}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    Dátumy
+                  </h3>
+                  <div className="space-y-2">
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Vytvorený</p>
+                      <p className="font-medium">{new Date(selectedClient.createdAt).toLocaleDateString('sk-SK')}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Posledná aktivita</p>
+                      <p className="font-medium">
+                        {selectedClient.lastActivity 
+                          ? new Date(selectedClient.lastActivity).toLocaleDateString('sk-SK')
+                          : 'Nikdy'
+                        }
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                    <MapPin className="h-4 w-4" />
+                    Prevádzky a zariadenia
+                  </h3>
+                  <div className="space-y-2">
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Počet prevádzok</p>
+                      <p className="text-2xl font-bold text-blue-600">{selectedClient.locationsCount}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Počet zariadení</p>
+                      <p className="text-2xl font-bold text-purple-600">{selectedClient.devicesCount}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                    <DollarSign className="h-4 w-4" />
+                    Finančné údaje
+                  </h3>
+                  <div className="space-y-2">
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Celkové tržby</p>
+                      <p className="text-2xl font-bold text-green-600">€{selectedClient.totalRevenue.toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Mesačné tržby</p>
+                      <p className="text-xl font-bold text-orange-600">€{selectedClient.monthlyRevenue.toLocaleString()}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

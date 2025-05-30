@@ -4,7 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Search, MapPin, Building, Users, TrendingUp, Plus, Settings } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Search, MapPin, Building, Users, TrendingUp, Plus, Settings, Eye, Smartphone, DollarSign } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocation } from '@/contexts/LocationContext';
 import { demoLocations, demoDevices, getClientLocations, getLocationDevices } from '@/data/demoData';
@@ -14,6 +16,7 @@ export const LocationsPage: React.FC = () => {
   const { user } = useAuth();
   const { selectedLocation, isOverviewMode } = useLocation();
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedLocationDetail, setSelectedLocationDetail] = useState<any>(null);
 
   // Get locations based on user role
   const getLocationsForUser = () => {
@@ -61,6 +64,10 @@ export const LocationsPage: React.FC = () => {
 
   const handleLocationAdded = () => {
     console.log('Location added successfully');
+  };
+
+  const handleRowClick = (location: any) => {
+    setSelectedLocationDetail(location);
   };
 
   return (
@@ -153,71 +160,176 @@ export const LocationsPage: React.FC = () => {
         </CardHeader>
       </Card>
 
-      {/* Locations Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {locations.map((location) => {
-          const devices = getLocationDevices(location.id);
-          const onlineDevices = devices.filter(d => d.status === 'online').length;
-          
-          return (
-            <Card key={location.id} className="bg-white dark:bg-gray-800 hover:shadow-lg transition-all duration-300 border-l-4 border-l-blue-500">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg font-semibold">{location.name}</CardTitle>
-                  <Badge className={getStatusColor(location.status)}>
-                    {location.status === 'active' ? 'Aktívne' : 
-                     location.status === 'inactive' ? 'Neaktívne' : 'Nastavovanie'}
-                  </Badge>
-                </div>
-                <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
-                  <p className="flex items-center gap-1">
-                    <MapPin className="h-3 w-3" />
-                    {location.address}
-                  </p>
-                  <p><strong>Typ:</strong> {location.type}</p>
-                  <p><strong>Manažér:</strong> {location.manager}</p>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <p className="text-2xl font-bold text-blue-600">{devices.length}</p>
-                    <p className="text-xs text-gray-500">Zariadenia</p>
-                  </div>
-                  <div className="text-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <p className="text-2xl font-bold text-green-600">{onlineDevices}</p>
-                    <p className="text-xs text-gray-500">Online</p>
-                  </div>
-                </div>
+      {/* Locations Table */}
+      <Card className="border-0 shadow-lg">
+        <CardHeader>
+          <CardTitle>Zoznam prevádzok</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Názov</TableHead>
+                <TableHead>Adresa</TableHead>
+                <TableHead>Typ</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Zariadenia</TableHead>
+                <TableHead>Online</TableHead>
+                <TableHead>Tržby</TableHead>
+                <TableHead>Manažér</TableHead>
+                <TableHead>Akcie</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {locations.map((location) => {
+                const devices = getLocationDevices(location.id);
+                const onlineDevices = devices.filter(d => d.status === 'online').length;
                 
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Mesačné tržby</span>
-                    <span className="font-semibold">€{location.monthlyRevenue.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Transakcie/deň</span>
-                    <span className="font-semibold">{location.dailyTransactions}</span>
+                return (
+                  <TableRow 
+                    key={location.id} 
+                    className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                    onClick={() => handleRowClick(location)}
+                  >
+                    <TableCell className="font-medium">{location.name}</TableCell>
+                    <TableCell>{location.address}</TableCell>
+                    <TableCell>{location.type}</TableCell>
+                    <TableCell>
+                      <Badge className={getStatusColor(location.status)}>
+                        {location.status === 'active' ? 'Aktívne' : 
+                         location.status === 'inactive' ? 'Neaktívne' : 'Nastavovanie'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{devices.length}</TableCell>
+                    <TableCell>{onlineDevices}</TableCell>
+                    <TableCell>€{location.monthlyRevenue.toLocaleString()}</TableCell>
+                    <TableCell>{location.manager}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                        <Button variant="outline" size="sm">
+                          <Eye className="h-3 w-3" />
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          <Settings className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Location Detail Dialog */}
+      <Dialog open={!!selectedLocationDetail} onOpenChange={() => setSelectedLocationDetail(null)}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Detail prevádzky</DialogTitle>
+          </DialogHeader>
+          {selectedLocationDetail && (
+            <div className="grid grid-cols-2 gap-6 p-4">
+              <div className="space-y-4">
+                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                    <Building className="h-4 w-4" />
+                    Základné informácie
+                  </h3>
+                  <div className="space-y-2">
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Názov</p>
+                      <p className="font-medium">{selectedLocationDetail.name}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Adresa</p>
+                      <p className="font-medium">{selectedLocationDetail.address}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Typ</p>
+                      <p className="font-medium">{selectedLocationDetail.type}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Status</p>
+                      <Badge className={getStatusColor(selectedLocationDetail.status)}>
+                        {selectedLocationDetail.status === 'active' ? 'Aktívne' : 
+                         selectedLocationDetail.status === 'inactive' ? 'Neaktívne' : 'Nastavovanie'}
+                      </Badge>
+                    </div>
                   </div>
                 </div>
 
-                <div className="text-xs text-gray-500 space-y-1">
-                  <p><strong>Telefón:</strong> {location.phone}</p>
-                  <p><strong>Email:</strong> {location.email}</p>
-                  <p><strong>Otvorené:</strong> {new Date(location.openDate).toLocaleDateString('sk-SK')}</p>
+                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                    <MapPin className="h-4 w-4" />
+                    Kontaktné údaje
+                  </h3>
+                  <div className="space-y-2">
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Telefón</p>
+                      <p className="font-medium">{selectedLocationDetail.phone}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Email</p>
+                      <p className="font-medium">{selectedLocationDetail.email}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Manažér</p>
+                      <p className="font-medium">{selectedLocationDetail.manager}</p>
+                    </div>
+                  </div>
                 </div>
-                
-                <div className="flex gap-2 pt-2">
-                  <Button variant="outline" size="sm" className="flex-1">
-                    <Settings className="h-3 w-3 mr-1" />
-                    Nastavenia
-                  </Button>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                    <Smartphone className="h-4 w-4" />
+                    Zariadenia
+                  </h3>
+                  <div className="space-y-2">
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Celkové zariadenia</p>
+                      <p className="text-2xl font-bold text-blue-600">{getLocationDevices(selectedLocationDetail.id).length}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Online zariadenia</p>
+                      <p className="text-xl font-bold text-green-600">{getLocationDevices(selectedLocationDetail.id).filter(d => d.status === 'online').length}</p>
+                    </div>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+
+                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                    <DollarSign className="h-4 w-4" />
+                    Finančné údaje
+                  </h3>
+                  <div className="space-y-2">
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Mesačné tržby</p>
+                      <p className="text-2xl font-bold text-green-600">€{selectedLocationDetail.monthlyRevenue.toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Denné transakcie</p>
+                      <p className="text-xl font-bold">{selectedLocationDetail.dailyTransactions}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                  <h3 className="font-semibold mb-3">Dátumy</h3>
+                  <div className="space-y-2">
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Otvorené</p>
+                      <p className="font-medium">{new Date(selectedLocationDetail.openDate).toLocaleDateString('sk-SK')}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {locations.length === 0 && (
         <Card className="p-8 text-center">

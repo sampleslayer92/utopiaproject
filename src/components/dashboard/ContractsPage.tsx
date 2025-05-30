@@ -1,9 +1,12 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Search, Filter, Calendar, FileText, User, MapPin, DollarSign, Clock } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Plus, Search, Filter, Calendar, FileText, User, MapPin, DollarSign, Clock, Eye, Edit } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/contexts/AuthContext';
 import { BusinessPartnerContractsPage } from './BusinessPartnerContractsPage';
@@ -11,6 +14,7 @@ import { demoContracts, demoClients, type DemoContract } from '@/data/demoData';
 
 export const ContractsPage: React.FC = () => {
   const { user } = useAuth();
+  const [selectedContract, setSelectedContract] = useState<DemoContract | null>(null);
   
   // If user is a business partner, show the specialized view
   if (user?.role === 'business_partner') {
@@ -61,6 +65,10 @@ export const ContractsPage: React.FC = () => {
     threeMonthsFromNow.setMonth(threeMonthsFromNow.getMonth() + 3);
     return endDate <= threeMonthsFromNow && c.status === 'active';
   }).length;
+
+  const handleRowClick = (contract: DemoContract) => {
+    setSelectedContract(contract);
+  };
 
   return (
     <div className="space-y-8 p-6">
@@ -185,56 +193,159 @@ export const ContractsPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Contracts List */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {filteredContracts.map((contract) => (
-          <Card key={contract.id} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 group">
-            <CardHeader className="pb-3">
-              <div className="flex items-start justify-between">
-                <CardTitle className="text-lg font-semibold group-hover:text-blue-600 transition-colors">
-                  {contract.title}
-                </CardTitle>
-                <Badge className={getStatusColor(contract.status)}>
-                  {contract.status}
-                </Badge>
+      {/* Contracts Table */}
+      <Card className="border-0 shadow-lg">
+        <CardHeader>
+          <CardTitle>Zoznam zmlúv</CardTitle>
+          <CardDescription>
+            Kliknite na riadok pre zobrazenie detailu zmluvy
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Názov</TableHead>
+                <TableHead>Číslo zmluvy</TableHead>
+                <TableHead>Klient</TableHead>
+                <TableHead>Typ</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Hodnota</TableHead>
+                <TableHead>Koniec</TableHead>
+                <TableHead>Akcie</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredContracts.map((contract) => (
+                <TableRow 
+                  key={contract.id} 
+                  className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                  onClick={() => handleRowClick(contract)}
+                >
+                  <TableCell className="font-medium">{contract.title}</TableCell>
+                  <TableCell>{contract.contractNumber}</TableCell>
+                  <TableCell>{contract.clientName}</TableCell>
+                  <TableCell>
+                    <Badge className={getTypeColor(contract.type)}>
+                      {contract.type}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge className={getStatusColor(contract.status)}>
+                      {contract.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>€{contract.value.toLocaleString()}</TableCell>
+                  <TableCell>{new Date(contract.endDate).toLocaleDateString('sk')}</TableCell>
+                  <TableCell>
+                    <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                      <Button size="sm" variant="outline">
+                        <Eye className="h-3 w-3" />
+                      </Button>
+                      <Button size="sm" variant="outline">
+                        <Edit className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Contract Detail Dialog */}
+      <Dialog open={!!selectedContract} onOpenChange={() => setSelectedContract(null)}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Detail zmluvy</DialogTitle>
+          </DialogHeader>
+          {selectedContract && (
+            <div className="grid grid-cols-2 gap-6 p-4">
+              <div className="space-y-4">
+                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    Základné informácie
+                  </h3>
+                  <div className="space-y-2">
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Názov</p>
+                      <p className="font-medium">{selectedContract.title}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Číslo zmluvy</p>
+                      <p className="font-medium">{selectedContract.contractNumber}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Typ</p>
+                      <Badge className={getTypeColor(selectedContract.type)}>
+                        {selectedContract.type}
+                      </Badge>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Status</p>
+                      <Badge className={getStatusColor(selectedContract.status)}>
+                        {selectedContract.status}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    Klient
+                  </h3>
+                  <div className="space-y-2">
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Názov</p>
+                      <p className="font-medium">{selectedContract.clientName}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <p className="text-sm text-gray-500">{contract.contractNumber}</p>
-            </CardHeader>
-            
-            <CardContent className="space-y-3">
-              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                <User className="h-4 w-4" />
-                <span>{contract.clientName}</span>
+
+              <div className="space-y-4">
+                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                    <DollarSign className="h-4 w-4" />
+                    Finančné informácie
+                  </h3>
+                  <div className="space-y-2">
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Hodnota zmluvy</p>
+                      <p className="text-2xl font-bold text-green-600">€{selectedContract.value.toLocaleString()}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    Časové údaje
+                  </h3>
+                  <div className="space-y-2">
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Začiatok</p>
+                      <p className="font-medium">{new Date(selectedContract.startDate).toLocaleDateString('sk')}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Koniec</p>
+                      <p className="font-medium">{new Date(selectedContract.endDate).toLocaleDateString('sk')}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                  <h3 className="font-semibold mb-3">Popis</h3>
+                  <p className="text-gray-600 dark:text-gray-300">{selectedContract.description}</p>
+                </div>
               </div>
-              
-              <div className="flex justify-between items-center">
-                <Badge className={getTypeColor(contract.type)}>
-                  {contract.type}
-                </Badge>
-                <span className="font-semibold text-lg">€{contract.value.toLocaleString()}</span>
-              </div>
-              
-              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                <Calendar className="h-4 w-4" />
-                <span>Do: {new Date(contract.endDate).toLocaleDateString('sk')}</span>
-              </div>
-              
-              <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
-                {contract.description}
-              </p>
-              
-              <div className="flex gap-2 pt-2">
-                <Button size="sm" variant="outline" className="flex-1">
-                  Zobraziť
-                </Button>
-                <Button size="sm" variant="outline">
-                  Upraviť
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
