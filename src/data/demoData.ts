@@ -612,3 +612,272 @@ export const getClientTransactions = (clientId: string) => {
 export const getBusinessPartnerContracts = (businessPartnerId: string) => {
   return demoContracts.filter(contract => contract.businessPartnerId === businessPartnerId);
 };
+
+// Enhanced demo data with proper relationships
+export const mockTeamMembers = [
+  {
+    id: 'tm-1',
+    name: 'Marián Lapoš',
+    email: 'marian.lapos@onepos.eu',
+    role: 'Business Partner Lead' as const,
+    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+    status: 'active' as const,
+    department: 'Vedenie',
+    joinDate: '2020-01-15',
+    lastActive: new Date().toISOString(),
+    phone: '+421 901 234 567',
+    businessPartnerId: 'bp-1',
+    permissions: ['manage_clients', 'view_reports', 'manage_team'],
+    performance: {
+      clientsManaged: 25,
+      monthlyRevenue: 45000,
+      satisfactionRating: 4.8,
+      tasksCompleted: 124
+    }
+  },
+  {
+    id: 'tm-2',
+    name: 'Anna Kováčová',
+    email: 'anna.kovacova@onepos.eu',
+    role: 'Account Manager' as const,
+    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+    status: 'active' as const,
+    department: 'Sales',
+    joinDate: '2021-03-10',
+    lastActive: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+    phone: '+421 902 345 678',
+    businessPartnerId: 'bp-1',
+    permissions: ['manage_clients', 'view_reports'],
+    performance: {
+      clientsManaged: 18,
+      monthlyRevenue: 32000,
+      satisfactionRating: 4.6,
+      tasksCompleted: 98
+    }
+  },
+  {
+    id: 'tm-3',
+    name: 'Peter Novák',
+    email: 'peter.novak@onepos.eu',
+    role: 'Technical Support' as const,
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+    status: 'away' as const,
+    department: 'Support',
+    joinDate: '2021-07-20',
+    lastActive: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+    phone: '+421 903 456 789',
+    businessPartnerId: 'bp-1',
+    permissions: ['view_tickets', 'manage_devices'],
+    performance: {
+      clientsManaged: 35,
+      monthlyRevenue: 0,
+      satisfactionRating: 4.9,
+      tasksCompleted: 156
+    }
+  }
+];
+
+export const mockClients = [
+  {
+    id: 'client-1',
+    name: 'TechCorp s.r.o.',
+    email: 'info@techcorp.sk',
+    phone: '+421 2 1234 5678',
+    address: 'Technická 1, 811 07 Bratislava',
+    businessPartnerId: 'bp-1',
+    assignedTo: 'tm-1',
+    status: 'active' as const,
+    type: 'retail' as const,
+    joinDate: '2023-01-15',
+    lastActivity: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    totalRevenue: 125000,
+    monthlyRevenue: 12500,
+    devicesCount: 5,
+    locationsCount: 3,
+    contractStatus: 'active' as const,
+    satisfactionRating: 4.7,
+    notes: 'Veľmi spokojný klient, pravidelné platby, plánuje rozšírenie.',
+    avatar: 'https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=150&h=150&fit=crop'
+  },
+  {
+    id: 'client-2',
+    name: 'RetailMax a.s.',
+    email: 'contact@retailmax.sk',
+    phone: '+421 2 2345 6789',
+    address: 'Obchodná 15, 811 06 Bratislava',
+    businessPartnerId: 'bp-1',
+    assignedTo: 'tm-2',
+    status: 'active' as const,
+    type: 'restaurant' as const,
+    joinDate: '2023-03-22',
+    lastActivity: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
+    totalRevenue: 89000,
+    monthlyRevenue: 8900,
+    devicesCount: 8,
+    locationsCount: 2,
+    contractStatus: 'active' as const,
+    satisfactionRating: 4.5,
+    notes: 'Rastúci reťazec reštaurácií, záujem o nové služby.',
+    avatar: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=150&h=150&fit=crop'
+  },
+  {
+    id: 'client-3',
+    name: 'CafeStreet s.r.o.',
+    email: 'hello@cafestreet.sk',
+    phone: '+421 2 3456 7890',
+    address: 'Hlavná 28, 040 01 Košice',
+    businessPartnerId: 'bp-1',
+    assignedTo: 'tm-2',
+    status: 'pending' as const,
+    type: 'cafe' as const,
+    joinDate: '2024-01-10',
+    lastActivity: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
+    totalRevenue: 15000,
+    monthlyRevenue: 5000,
+    devicesCount: 2,
+    locationsCount: 1,
+    contractStatus: 'pending' as const,
+    satisfactionRating: 4.2,
+    notes: 'Nový klient, momentálne v procese nastavenia.',
+    avatar: 'https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=150&h=150&fit=crop'
+  },
+  {
+    id: 'client-4',
+    name: 'SportZone Ltd.',
+    email: 'admin@sportzone.sk',
+    phone: '+421 2 4567 8901',
+    address: 'Športová 5, 010 01 Žilina',
+    businessPartnerId: 'bp-1',
+    assignedTo: 'tm-1',
+    status: 'inactive' as const,
+    type: 'retail' as const,
+    joinDate: '2022-11-05',
+    lastActivity: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+    totalRevenue: 67000,
+    monthlyRevenue: 0,
+    devicesCount: 3,
+    locationsCount: 1,
+    contractStatus: 'suspended' as const,
+    satisfactionRating: 3.8,
+    notes: 'Dočasne pozastavené služby kvôli finančným problémom.',
+    avatar: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=150&h=150&fit=crop'
+  }
+];
+
+export const mockContracts = [
+  {
+    id: 'contract-1',
+    clientId: 'client-1',
+    clientName: 'TechCorp s.r.o.',
+    businessPartnerId: 'bp-1',
+    assignedTo: 'tm-1',
+    title: 'POS Systém - Kompletné riešenie',
+    type: 'pos_system' as const,
+    status: 'active' as const,
+    startDate: '2023-01-15',
+    endDate: '2025-01-15',
+    value: 125000,
+    monthlyFee: 2500,
+    description: 'Kompletné POS riešenie pre 3 prevádzky s cloudovým systémom.',
+    services: ['POS terminály', 'Cloudový systém', 'Technická podpora', 'Školenie'],
+    lastUpdated: '2024-01-15',
+    nextReview: '2024-07-15'
+  },
+  {
+    id: 'contract-2',
+    clientId: 'client-2',
+    clientName: 'RetailMax a.s.',
+    businessPartnerId: 'bp-1',
+    assignedTo: 'tm-2',
+    title: 'Reštauračný systém Premium',
+    type: 'restaurant_system' as const,
+    status: 'active' as const,
+    startDate: '2023-03-22',
+    endDate: '2025-03-22',
+    value: 89000,
+    monthlyFee: 1800,
+    description: 'Špecializovaný systém pre reštaurácie s objednávkovým systémom.',
+    services: ['POS terminály', 'Online objednávky', 'Inventory systém', 'Analytics'],
+    lastUpdated: '2024-03-22',
+    nextReview: '2024-09-22'
+  },
+  {
+    id: 'contract-3',
+    clientId: 'client-3',
+    clientName: 'CafeStreet s.r.o.',
+    businessPartnerId: 'bp-1',
+    assignedTo: 'tm-2',
+    title: 'Kaviareň Starter Package',
+    type: 'basic_pos' as const,
+    status: 'pending' as const,
+    startDate: '2024-01-10',
+    endDate: '2026-01-10',
+    value: 15000,
+    monthlyFee: 650,
+    description: 'Základný POS systém pre malé kaviarne.',
+    services: ['Jeden POS terminál', 'Základný reporting', 'Email podpora'],
+    lastUpdated: '2024-01-10',
+    nextReview: '2024-07-10'
+  }
+];
+
+// Enhanced tickets with proper role-based assignment
+export const mockTickets = [
+  {
+    id: 'ticket-1',
+    title: 'POS terminál nefunguje',
+    description: 'POS terminál v hlavnej prevádzke sa zasekáva pri platbách kartou.',
+    status: 'open' as const,
+    priority: 'high' as const,
+    category: 'technical' as const,
+    clientId: 'client-1',
+    clientName: 'TechCorp s.r.o.',
+    businessPartnerId: 'bp-1',
+    assignedTo: 'tm-3',
+    assignedToName: 'Peter Novák',
+    createdBy: 'client-1',
+    createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+    updatedAt: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+    dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    tags: ['urgent', 'hardware'],
+    attachments: ['error_log.txt', 'terminal_photo.jpg']
+  },
+  {
+    id: 'ticket-2',
+    title: 'Žiadosť o školenie nových zamestnancov',
+    description: 'Potrebujeme zaškoliť 3 nových zamestnancov na prácu s POS systémom.',
+    status: 'in_progress' as const,
+    priority: 'medium' as const,
+    category: 'training' as const,
+    clientId: 'client-2',
+    clientName: 'RetailMax a.s.',
+    businessPartnerId: 'bp-1',
+    assignedTo: 'tm-2',
+    assignedToName: 'Anna Kováčová',
+    createdBy: 'client-2',
+    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+    updatedAt: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+    tags: ['training', 'scheduled'],
+    attachments: []
+  },
+  {
+    id: 'ticket-3',
+    title: 'Problém s cloudovým systémom',
+    description: 'Dáta sa nesynchronizujú medzi prevádzkami.',
+    status: 'resolved' as const,
+    priority: 'high' as const,
+    category: 'technical' as const,
+    clientId: 'client-1',
+    clientName: 'TechCorp s.r.o.',
+    businessPartnerId: 'bp-1',
+    assignedTo: 'tm-3',
+    assignedToName: 'Peter Novák',
+    createdBy: 'client-1',
+    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+    updatedAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
+    dueDate: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
+    tags: ['cloud', 'sync', 'resolved'],
+    attachments: ['solution_steps.pdf']
+  }
+];

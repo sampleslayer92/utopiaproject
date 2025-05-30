@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { LayoutDashboard, CreditCard, Monitor, Users, MapPin, FileText, Ticket, Settings, Building2, UserCheck, UsersRound, BarChart3 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -5,18 +6,20 @@ import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarMenu
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { LanguageSwitcher } from '@/components/ui/language-switcher';
 import { useAuth } from '@/contexts/AuthContext';
+import { designSystem, roleColors } from '@/styles/design-system';
+
 export const AppSidebar: React.FC = () => {
-  const {
-    user
-  } = useAuth();
+  const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+
   const getMenuItems = () => {
     const baseItems = [{
       title: 'Dashboard',
       url: '/dashboard',
       icon: LayoutDashboard
     }];
+
     if (user?.role === 'admin') {
       return [...baseItems, {
         title: 'Transakcie',
@@ -52,6 +55,7 @@ export const AppSidebar: React.FC = () => {
         icon: Settings
       }];
     }
+
     if (user?.role === 'business_partner') {
       return [...baseItems, {
         title: 'Team',
@@ -70,7 +74,7 @@ export const AppSidebar: React.FC = () => {
         url: '/dashboard/reports',
         icon: BarChart3
       }, {
-        title: 'Tickety',
+        title: 'Tikety',
         url: '/dashboard/tickets',
         icon: Ticket
       }, {
@@ -79,6 +83,7 @@ export const AppSidebar: React.FC = () => {
         icon: Settings
       }];
     }
+
     if (user?.role === 'client') {
       return [...baseItems, {
         title: 'Transakcie',
@@ -106,52 +111,94 @@ export const AppSidebar: React.FC = () => {
         icon: Settings
       }];
     }
+
     return baseItems;
   };
+
   const menuItems = getMenuItems();
-  return <Sidebar className="border-r-0">
+  const roleGradient = user?.role ? roleColors[user.role] : roleColors.client;
+
+  return (
+    <Sidebar className="border-r-0">
       <SidebarHeader className="p-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="p-6">
+        <div className={designSystem.spacing.cardPadding}>
           <div className="flex items-center space-x-3 mb-6">
-            <img src="https://cdn.prod.website-files.com/65bb58bd9feeda1fd2e1b551/65bb58bd9feeda1fd2e1b5ad_logo-header.svg" alt="Onepos Logo" className="h-8 w-auto" />
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white"></h2>
+            <img 
+              src="https://cdn.prod.website-files.com/65bb58bd9feeda1fd2e1b551/65bb58bd9feeda1fd2e1b5ad_logo-header.svg" 
+              alt="Onepos Logo" 
+              className="h-8 w-auto" 
+            />
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Utopia</h2>
           </div>
-          {user && <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 border border-gray-200 dark:border-gray-600">
+          
+          {user && (
+            <div className={`${designSystem.borderRadius.card} ${designSystem.spacing.cardPadding} bg-gradient-to-r ${roleGradient} text-white shadow-lg`}>
               <div className="space-y-2">
-                <p className="font-semibold text-gray-900 dark:text-white">Marián Lapoš</p>
-                <p className="text-gray-600 dark:text-gray-300 text-sm">marian.lapos@onepos.eu</p>
-                <p className="text-gray-500 dark:text-gray-400 text-xs">Onepos, ISO Organizácia</p>
-                <div className="inline-flex items-center px-2 py-1 bg-green-100 dark:bg-green-900/30 rounded-full text-xs text-green-800 dark:text-green-400">
-                  <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                <p className="font-semibold text-white">{user.fullName}</p>
+                <p className="text-white/90 text-sm">{user.email}</p>
+                <p className="text-white/80 text-xs">
+                  {user.role === 'admin' && 'Onepos Admin'}
+                  {user.role === 'business_partner' && 'Onepos, ISO Organizácia'}
+                  {user.role === 'client' && 'Merchant Partner'}
+                  {user.role === 'location' && 'Prevádzka'}
+                </p>
+                <div className="inline-flex items-center px-2 py-1 bg-white/20 rounded-full text-xs text-white">
+                  <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
                   Online
                 </div>
               </div>
-            </div>}
+            </div>
+          )}
         </div>
       </SidebarHeader>
       
-      <SidebarContent className="bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+      <SidebarContent className={designSystem.gradients.background}>
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu className="space-y-2 p-6">
-              {menuItems.map(item => <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={location.pathname === item.url} className={`group relative overflow-hidden rounded-xl transition-all duration-300 ${location.pathname === item.url ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg' : 'hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-blue-900/20 dark:hover:to-purple-900/20'}`}>
-                    <button onClick={() => navigate(item.url)} className="flex items-center space-x-4 w-full p-6">
-                      <div className={`p-3 rounded-lg transition-colors ${location.pathname === item.url ? 'bg-white/20' : 'bg-gray-100 dark:bg-gray-700 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30'}`}>
-                        <item.icon className={`h-5 w-5 ${location.pathname === item.url ? 'text-white' : 'text-gray-600 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400'}`} />
+            <SidebarMenu className={`${designSystem.spacing.sectionSpacing} ${designSystem.spacing.cardPadding}`}>
+              {menuItems.map(item => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton 
+                    asChild 
+                    isActive={location.pathname === item.url} 
+                    className={`group relative overflow-hidden ${designSystem.borderRadius.card} ${designSystem.transitions.default} ${
+                      location.pathname === item.url 
+                        ? `bg-gradient-to-r ${roleGradient} text-white ${designSystem.shadows.button}` 
+                        : `hover:bg-gradient-to-r hover:${roleGradient.replace('from-', 'from-').replace('to-', 'to-')}/10 dark:hover:${roleGradient}/20`
+                    }`}
+                  >
+                    <button 
+                      onClick={() => navigate(item.url)} 
+                      className="flex items-center space-x-4 w-full p-4"
+                    >
+                      <div className={`p-3 ${designSystem.borderRadius.button} ${designSystem.transitions.default} ${
+                        location.pathname === item.url 
+                          ? 'bg-white/20' 
+                          : 'bg-gray-100 dark:bg-gray-700 group-hover:bg-gray-200 dark:group-hover:bg-gray-600'
+                      }`}>
+                        <item.icon className={`${designSystem.spacing.iconSize} ${
+                          location.pathname === item.url 
+                            ? 'text-white' 
+                            : 'text-gray-600 dark:text-gray-300 group-hover:text-gray-700 dark:group-hover:text-gray-200'
+                        }`} />
                       </div>
-                      <span className={`font-medium ${location.pathname === item.url ? 'text-white' : 'text-gray-700 dark:text-gray-200 group-hover:text-blue-700 dark:group-hover:text-blue-300'}`}>
+                      <span className={`font-medium ${
+                        location.pathname === item.url 
+                          ? 'text-white' 
+                          : 'text-gray-700 dark:text-gray-200 group-hover:text-gray-800 dark:group-hover:text-gray-100'
+                      }`}>
                         {item.title}
                       </span>
                     </button>
                   </SidebarMenuButton>
-                </SidebarMenuItem>)}
+                </SidebarMenuItem>
+              ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
       
-      <SidebarFooter className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 border-t border-gray-200 dark:border-gray-600">
+      <SidebarFooter className={`p-4 ${designSystem.gradients.background} border-t border-gray-200 dark:border-gray-600`}>
         <div className="space-y-4">
           <div className="space-y-2">
             <ThemeToggle />
@@ -167,5 +214,6 @@ export const AppSidebar: React.FC = () => {
           </div>
         </div>
       </SidebarFooter>
-    </Sidebar>;
+    </Sidebar>
+  );
 };
