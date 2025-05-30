@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,7 +34,7 @@ export const RegistrationPage: React.FC = () => {
   const { t } = useLanguage();
   const { register } = useAuth();
   const navigate = useNavigate();
-  const [currentView, setCurrentView] = useState<'choice' | 'roleSelection' | 'register' | 'forgot-password'>('choice');
+  const [currentView, setCurrentView] = useState<'choice' | 'roleSelection' | 'login' | 'register' | 'forgot-password'>('choice');
   const [step, setStep] = useState(0);
   const [userData, setUserData] = useState<UserData>({
     country: 'SK',
