@@ -20,13 +20,14 @@ import {
   MapPin
 } from 'lucide-react';
 import { TeamMember } from '@/types/team';
+import { demoClients, demoContracts } from '@/data/demoData';
 
 const mockTeamMembers: TeamMember[] = [
   {
     id: 'team-1',
     firstName: 'Peter',
-    lastName: 'Novák',
-    email: 'peter.novak@iso-org.sk',
+    lastName: 'Fekiač',
+    email: 'peter.fekiac@iso-org.sk',
     phone: '+421 900 123 456',
     position: 'Senior Account Manager',
     department: 'Sales',
@@ -34,17 +35,68 @@ const mockTeamMembers: TeamMember[] = [
     status: 'active',
     hireDate: '2023-01-15',
     performance: {
-      monthlyRevenue: 15000,
-      totalRevenue: 180000,
-      merchantsManaged: 12,
+      monthlyRevenue: 23800,
+      totalRevenue: 286000,
+      merchantsManaged: 3,
+      contractsSigned: 12,
+      efficiency: 95
+    },
+    assignedMerchants: ['merchant-1', 'merchant-2', 'merchant-6'],
+    lastActivity: '2024-11-28T14:30:00Z',
+    permissions: ['view_merchants', 'edit_contracts', 'create_reports', 'manage_team'],
+    salary: 3200,
+    commissionRate: 8,
+    notes: 'Výborný senior account manager s dlhoročnými skúsenosťami. Špecializuje sa na veľkých klientov v reštauračnom a retail sektore. Má najvyšší conversion rate v tíme.'
+  },
+  {
+    id: 'team-2',
+    firstName: 'Ladislav',
+    lastName: 'Mathis',
+    email: 'ladislav.mathis@iso-org.sk',
+    phone: '+421 900 234 567',
+    position: 'Account Manager',
+    department: 'Sales',
+    businessPartnerId: 'bp-1',
+    status: 'active',
+    hireDate: '2023-06-01',
+    performance: {
+      monthlyRevenue: 18800,
+      totalRevenue: 131600,
+      merchantsManaged: 3,
       contractsSigned: 8,
       efficiency: 92
     },
-    assignedMerchants: ['client-1', 'client-2'],
-    lastActivity: '2024-11-28T14:30:00Z',
+    assignedMerchants: ['merchant-3', 'merchant-5', 'merchant-7'],
+    lastActivity: '2024-11-28T16:45:00Z',
     permissions: ['view_merchants', 'edit_contracts', 'create_reports'],
     salary: 2800,
-    notes: 'Výborný account manager s dlhoročnými skúsenosťami. Špecializuje sa na veľkých klientov.'
+    commissionRate: 6,
+    notes: 'Rýchlo sa rozvíjajúci account manager so silnými komunikačnými schopnosťami. Špecializuje sa na tech a retail segmenty. Výborný v cross-selling produktov.'
+  },
+  {
+    id: 'team-3',
+    firstName: 'Richie',
+    lastName: 'Plichta ❤️',
+    email: 'richie.plichta@iso-org.sk',
+    phone: '+421 900 345 678',
+    position: 'Technical Support Manager',
+    department: 'Support',
+    businessPartnerId: 'bp-1',
+    status: 'active',
+    hireDate: '2023-03-20',
+    performance: {
+      monthlyRevenue: 16600,
+      totalRevenue: 132800,
+      merchantsManaged: 2,
+      contractsSigned: 6,
+      efficiency: 98
+    },
+    assignedMerchants: ['merchant-4', 'merchant-8'],
+    lastActivity: '2024-11-28T12:20:00Z',
+    permissions: ['view_merchants', 'technical_support', 'maintenance_contracts'],
+    salary: 3000,
+    commissionRate: 5,
+    notes: 'Expert na technické riešenia s najvyššou customer satisfaction v tíme. Špecializuje sa na komplexné integrácie a maintenance zmluvy. Výborný problem solver.'
   }
 ];
 
@@ -67,6 +119,16 @@ export const TeamMemberDetail: React.FC = () => {
       </div>
     );
   }
+
+  // Get assigned merchants
+  const assignedMerchants = demoClients.filter(client => 
+    member.assignedMerchants.includes(client.id)
+  );
+
+  // Get contracts created by this team member
+  const createdContracts = demoContracts.filter(contract => 
+    contract.createdBy === member.id
+  );
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -172,7 +234,7 @@ export const TeamMemberDetail: React.FC = () => {
           <TabsTrigger value="overview">Prehľad</TabsTrigger>
           <TabsTrigger value="performance">Výkonnosť</TabsTrigger>
           <TabsTrigger value="merchants">Merchanti</TabsTrigger>
-          <TabsTrigger value="settings">Nastavenia</TabsTrigger>
+          <TabsTrigger value="contracts">Zmluvy</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -237,6 +299,10 @@ export const TeamMemberDetail: React.FC = () => {
                   </div>
                 )}
                 <div>
+                  <p className="text-sm font-medium text-gray-500">Provízia</p>
+                  <p className="font-medium">{member.commissionRate}%</p>
+                </div>
+                <div>
                   <p className="text-sm font-medium text-gray-500">Posledná aktivita</p>
                   <p className="font-medium">
                     {member.lastActivity 
@@ -281,6 +347,12 @@ export const TeamMemberDetail: React.FC = () => {
                     <p className="text-sm font-medium text-gray-500">Mesačné tržby</p>
                     <p className="text-xl font-bold text-blue-600">€{member.performance.monthlyRevenue.toLocaleString()}</p>
                   </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Mesačná provízia</p>
+                    <p className="text-lg font-bold text-purple-600">
+                      €{Math.round(member.performance.monthlyRevenue * (member.commissionRate! / 100)).toLocaleString()}
+                    </p>
+                  </div>
                 </div>
                 <div className="space-y-4">
                   <div>
@@ -295,6 +367,12 @@ export const TeamMemberDetail: React.FC = () => {
                       <span className="text-lg font-bold">{member.performance.efficiency}%</span>
                     </div>
                   </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Priemerná hodnota zmluvy</p>
+                    <p className="text-lg font-bold text-orange-600">
+                      €{Math.round(member.performance.totalRevenue / member.performance.contractsSigned).toLocaleString()}
+                    </p>
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -304,28 +382,55 @@ export const TeamMemberDetail: React.FC = () => {
         <TabsContent value="merchants" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Pridelení merchanti</CardTitle>
+              <CardTitle>Pridelení merchanti ({assignedMerchants.length})</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600 dark:text-gray-400">
-                Spravuje {member.performance.merchantsManaged} merchantov
-              </p>
-              {/* Here you would list the actual merchants */}
+              <div className="space-y-4">
+                {assignedMerchants.map((merchant) => (
+                  <div key={merchant.id} className="border rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-semibold">{merchant.name}</h3>
+                        <p className="text-sm text-gray-600">{merchant.industry} • {merchant.address}</p>
+                        <p className="text-sm text-gray-500">{merchant.email}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-semibold text-green-600">€{merchant.monthlyRevenue.toLocaleString()}/mes</p>
+                        <p className="text-sm text-gray-500">{merchant.devicesCount} zariadení</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="settings" className="space-y-6">
+        <TabsContent value="contracts" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Oprávnenia</CardTitle>
+              <CardTitle>Vytvorené zmluvy ({createdContracts.length})</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-wrap gap-2">
-                {member.permissions.map((permission) => (
-                  <Badge key={permission} variant="outline">
-                    {permission}
-                  </Badge>
+              <div className="space-y-4">
+                {createdContracts.map((contract) => (
+                  <div key={contract.id} className="border rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-semibold">{contract.title}</h3>
+                        <p className="text-sm text-gray-600">{contract.clientName}</p>
+                        <p className="text-sm text-gray-500">
+                          {new Date(contract.startDate).toLocaleDateString('sk-SK')} - {new Date(contract.endDate).toLocaleDateString('sk-SK')}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-semibold text-green-600">€{contract.value.toLocaleString()}</p>
+                        <Badge variant={contract.status === 'active' ? 'default' : 'secondary'}>
+                          {contract.status === 'active' ? 'Aktívna' : 'Neaktívna'}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
                 ))}
               </div>
             </CardContent>

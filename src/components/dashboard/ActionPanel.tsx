@@ -23,21 +23,14 @@ export const ActionPanel: React.FC = () => {
     <Card className="bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-600 text-white border-0 shadow-lg">
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <img 
-              src="https://cdn.prod.website-files.com/65bb58bd9feeda1fd2e1b551/668549d26dee517c49833a53_Lapos-p-500.webp"
-              alt="Marián Lapoš"
-              className="w-16 h-16 rounded-full object-cover border-3 border-white/30"
-            />
-            <div>
-              <h2 className="text-2xl font-bold">Vitajte späť, Marián!</h2>
-              <p className="text-blue-100 text-lg">
-                ISO Organizácia • Business Partner
-              </p>
-              <p className="text-blue-200 text-sm mt-1">
-                Spravujte svoj tím a merchantov jednoducho a efektívne
-              </p>
-            </div>
+          <div>
+            <h2 className="text-2xl font-bold">Vitajte späť, Marián!</h2>
+            <p className="text-blue-100 text-lg">
+              ISO Organizácia • Business Partner
+            </p>
+            <p className="text-blue-200 text-sm mt-1">
+              Spravujte svoj tím a merchantov jednoducho a efektívne
+            </p>
           </div>
           
           <div className="flex items-center space-x-3">

@@ -25,17 +25,18 @@ const mockTeamMembers: TeamMember[] = [
     status: 'active',
     hireDate: '2023-01-15',
     performance: {
-      monthlyRevenue: 15000,
-      totalRevenue: 180000,
-      merchantsManaged: 5,
-      contractsSigned: 8,
-      efficiency: 92
+      monthlyRevenue: 23800,
+      totalRevenue: 286000,
+      merchantsManaged: 3,
+      contractsSigned: 12,
+      efficiency: 95
     },
-    assignedMerchants: ['merchant-1', 'merchant-2'],
+    assignedMerchants: ['merchant-1', 'merchant-2', 'merchant-6'],
     lastActivity: '2024-11-28T14:30:00Z',
-    permissions: ['view_merchants', 'edit_contracts', 'create_reports'],
-    salary: 2800,
-    commissionRate: 8
+    permissions: ['view_merchants', 'edit_contracts', 'create_reports', 'manage_team'],
+    salary: 3200,
+    commissionRate: 8,
+    notes: 'Výborný senior account manager s dlhoročnými skúsenosťami. Špecializuje sa na veľkých klientov v reštauračnom a retail sektore. Má najvyšší conversion rate v tíme.'
   },
   {
     id: 'team-2',
@@ -49,17 +50,18 @@ const mockTeamMembers: TeamMember[] = [
     status: 'active',
     hireDate: '2023-06-01',
     performance: {
-      monthlyRevenue: 12000,
-      totalRevenue: 72000,
-      merchantsManaged: 4,
-      contractsSigned: 5,
-      efficiency: 88
+      monthlyRevenue: 18800,
+      totalRevenue: 131600,
+      merchantsManaged: 3,
+      contractsSigned: 8,
+      efficiency: 92
     },
-    assignedMerchants: ['merchant-3'],
+    assignedMerchants: ['merchant-3', 'merchant-5', 'merchant-7'],
     lastActivity: '2024-11-28T16:45:00Z',
-    permissions: ['view_merchants', 'edit_contracts'],
-    salary: 2400,
-    commissionRate: 6
+    permissions: ['view_merchants', 'edit_contracts', 'create_reports'],
+    salary: 2800,
+    commissionRate: 6,
+    notes: 'Rýchlo sa rozvíjajúci account manager so silnými komunikačnými schopnosťami. Špecializuje sa na tech a retail segmenty. Výborný v cross-selling produktov.'
   },
   {
     id: 'team-3',
@@ -73,17 +75,18 @@ const mockTeamMembers: TeamMember[] = [
     status: 'active',
     hireDate: '2023-03-20',
     performance: {
-      monthlyRevenue: 8000,
-      totalRevenue: 64000,
-      merchantsManaged: 3,
-      contractsSigned: 2,
-      efficiency: 95
+      monthlyRevenue: 16600,
+      totalRevenue: 132800,
+      merchantsManaged: 2,
+      contractsSigned: 6,
+      efficiency: 98
     },
-    assignedMerchants: ['merchant-4'],
+    assignedMerchants: ['merchant-4', 'merchant-8'],
     lastActivity: '2024-11-28T12:20:00Z',
-    permissions: ['view_merchants', 'technical_support'],
-    salary: 2600,
-    commissionRate: 5
+    permissions: ['view_merchants', 'technical_support', 'maintenance_contracts'],
+    salary: 3000,
+    commissionRate: 5,
+    notes: 'Expert na technické riešenia s najvyššou customer satisfaction v tíme. Špecializuje sa na komplexné integrácie a maintenance zmluvy. Výborný problem solver.'
   }
 ];
 

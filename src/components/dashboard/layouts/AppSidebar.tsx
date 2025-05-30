@@ -172,31 +172,22 @@ export const AppSidebar: React.FC = () => {
       <SidebarHeader className="p-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="p-6">
           <div className="flex items-center space-x-3 mb-6">
-            <div className="flex items-center space-x-3">
-              <img 
-                src="https://cdn.prod.website-files.com/65bb58bd9feeda1fd2e1b551/65bb58bd9feeda1fd2e1b5ad_logo-header.svg" 
-                alt="Onepos Logo" 
-                className="h-8 w-auto"
-              />
-              <div>
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white">Onepos</h2>
-              </div>
-            </div>
+            <img 
+              src="https://cdn.prod.website-files.com/65bb58bd9feeda1fd2e1b551/65bb58bd9feeda1fd2e1b5ad_logo-header.svg" 
+              alt="Onepos Logo" 
+              className="h-8 w-auto"
+            />
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Onepos</h2>
           </div>
           {user && (
             <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 border border-gray-200 dark:border-gray-600">
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                  <span className="text-white font-semibold text-lg">ML</span>
-                </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-gray-900 dark:text-white">Marián Lapoš</p>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm">marian.lapos@onepos.eu</p>
-                  <p className="text-gray-500 dark:text-gray-400 text-xs mt-1">Onepos, ISO Organizácia</p>
-                  <div className="mt-2 inline-flex items-center px-2 py-1 bg-green-100 dark:bg-green-900/30 rounded-full text-xs text-green-800 dark:text-green-400">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                    Online
-                  </div>
+              <div className="space-y-2">
+                <p className="font-semibold text-gray-900 dark:text-white">Marián Lapoš</p>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">marian.lapos@onepos.eu</p>
+                <p className="text-gray-500 dark:text-gray-400 text-xs">Onepos, ISO Organizácia</p>
+                <div className="inline-flex items-center px-2 py-1 bg-green-100 dark:bg-green-900/30 rounded-full text-xs text-green-800 dark:text-green-400">
+                  <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                  Online
                 </div>
               </div>
             </div>
@@ -207,7 +198,7 @@ export const AppSidebar: React.FC = () => {
       <SidebarContent className="bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu className="space-y-2 p-4">
+            <SidebarMenu className="space-y-2 p-6">
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton 
@@ -221,7 +212,7 @@ export const AppSidebar: React.FC = () => {
                   >
                     <button 
                       onClick={() => navigate(item.url)}
-                      className="flex items-center space-x-4 w-full p-5"
+                      className="flex items-center space-x-4 w-full p-6"
                     >
                       <div className={`p-3 rounded-lg transition-colors ${
                         location.pathname === item.url 
