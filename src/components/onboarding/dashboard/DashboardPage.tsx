@@ -4,7 +4,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { AdminDashboard } from '@/components/dashboard/AdminDashboard';
 import { BusinessPartnerDashboard } from '@/components/dashboard/BusinessPartnerDashboard';
 import { ClientDashboard } from '@/components/dashboard/ClientDashboard';
-import { LocationDashboard } from '@/components/dashboard/LocationDashboard';
 import { OnboardingProgress } from './OnboardingProgress';
 
 export const DashboardPage: React.FC = () => {
@@ -30,8 +29,6 @@ export const DashboardPage: React.FC = () => {
         return <BusinessPartnerDashboard />;
       case 'client':
         return <ClientDashboard />;
-      case 'location':
-        return <LocationDashboard />;
       default:
         return (
           <div className="text-center py-8">

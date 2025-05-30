@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -41,8 +40,6 @@ export const TransactionsPage: React.FC = () => {
       transactions = transactions.filter(tx => clientIds.includes(tx.clientId));
     } else if (user?.role === 'client') {
       transactions = transactions.filter(tx => tx.clientId === user.id);
-    } else if (user?.role === 'location') {
-      transactions = transactions.filter(tx => tx.locationId === user.parentId);
     }
 
     // Apply filters

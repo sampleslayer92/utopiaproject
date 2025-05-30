@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -97,11 +98,9 @@ export const RegistrationPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      let role: 'admin' | 'business_partner' | 'client' | 'location' = 'client';
+      let role: 'admin' | 'business_partner' | 'client' = 'client';
       if (userData.businessType === 'business_partner') {
         role = 'business_partner';
-      } else if (userData.businessType === 'location') {
-        role = 'location';
       }
 
       await register({

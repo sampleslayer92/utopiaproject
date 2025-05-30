@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, AuthState, LoginCredentials, RegisterData, AuthContextType } from '@/types/auth';
@@ -187,8 +188,6 @@ const getMockUserId = (email: string): string => {
   if (email.includes('partner2')) return 'bp-2';
   if (email.includes('client1')) return 'client-1';
   if (email.includes('client2')) return 'client-2';
-  if (email.includes('location1')) return 'location-1';
-  if (email.includes('location2')) return 'location-2';
   return 'user-' + Date.now();
 };
 
@@ -198,27 +197,22 @@ const getMockUserName = (email: string): string => {
   if (email.includes('partner2')) return 'Jana Svoboda - Partner';
   if (email.includes('client1')) return 'TechCorp s.r.o.';
   if (email.includes('client2')) return 'RetailMax a.s.';
-  if (email.includes('location1')) return 'Prevádzka Centrum';
-  if (email.includes('location2')) return 'Prevádzka Východ';
   return 'Demo Používateľ';
 };
 
 const getMockUserRole = (email: string) => {
   if (email.includes('admin')) return 'admin' as const;
   if (email.includes('partner')) return 'business_partner' as const;
-  if (email.includes('location')) return 'location' as const;
   return 'client' as const;
 };
 
 const getMockBusinessPartnerId = (email: string): string | undefined => {
-  if (email.includes('client1') || email.includes('location1')) return 'bp-1';
-  if (email.includes('client2') || email.includes('location2')) return 'bp-2';
+  if (email.includes('client1')) return 'bp-1';
+  if (email.includes('client2')) return 'bp-2';
   return undefined;
 };
 
 const getMockClientId = (email: string): string | undefined => {
-  if (email.includes('location1')) return 'client-1';
-  if (email.includes('location2')) return 'client-2';
   return undefined;
 };
 
@@ -229,7 +223,6 @@ const mockUsers = [
     fullName: 'Admin User',
     role: 'admin' as const,
     businessPartnerId: null,
-    locationId: null,
     organizationName: 'Onepos Admin'
   },
   {
@@ -238,7 +231,6 @@ const mockUsers = [
     fullName: 'Marián Lapoš',
     role: 'business_partner' as const,
     businessPartnerId: 'bp-1',
-    locationId: null,
     organizationName: 'ISO Organizácia'
   },
   {
@@ -247,7 +239,6 @@ const mockUsers = [
     fullName: 'Client User',
     role: 'client' as const,
     businessPartnerId: 'bp-1',
-    locationId: 'loc-1',
     organizationName: 'Client Company'
   }
 ];
