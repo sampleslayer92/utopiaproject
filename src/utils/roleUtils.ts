@@ -47,8 +47,8 @@ export const getFilteredData = <T extends { businessPartnerId?: string; clientId
 
 export const getRoleDisplayName = (role: UserRole): string => {
   switch (role) {
-    case 'admin': return 'Administrátor';
-    case 'business_partner': return 'ISO Organizácia';
+    case 'admin': return 'ISO Organizácia';
+    case 'business_partner': return 'Servisný partner';
     case 'client': return 'Klient';
     default: return 'Používateľ';
   }

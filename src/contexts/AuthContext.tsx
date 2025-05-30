@@ -1,7 +1,6 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, AuthState, LoginCredentials, RegisterData, AuthContextType } from '@/types/auth';
+import { User, AuthState, LoginCredentials, RegisterData, AuthContextType, UserRole } from '@/types/auth';
 import { toast } from 'sonner';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -104,6 +103,44 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const loginWithRole = async (role: UserRole): Promise<void> => {
+    try {
+      setAuthState(prev => ({ ...prev, isLoading: true }));
+      
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      const mockUser: User = {
+        id: getMockUserIdByRole(role),
+        email: getMockEmailByRole(role),
+        fullName: getMockUserNameByRole(role),
+        role: role,
+        businessPartnerId: getMockBusinessPartnerIdByRole(role),
+        clientId: getMockClientIdByRole(role),
+        organizationId: role === 'admin' ? 'org-1' : undefined,
+        createdAt: new Date().toISOString(),
+        lastLogin: new Date().toISOString(),
+        isActive: true
+      };
+
+      localStorage.setItem('utopia_user', JSON.stringify(mockUser));
+      localStorage.setItem('utopia_remember_me', 'true');
+
+      setAuthState({
+        user: mockUser,
+        isAuthenticated: true,
+        isLoading: false
+      });
+
+      toast.success(`Úspešne ste sa prihlásili ako ${getRoleDisplayName(role)}`);
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Role login error:', error);
+      setAuthState(prev => ({ ...prev, isLoading: false }));
+      toast.error('Chyba pri prihlásení');
+      throw error;
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('utopia_user');
     localStorage.removeItem('utopia_remember_me');
@@ -169,6 +206,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isAuthenticated: authState.isAuthenticated,
     isLoading: authState.isLoading,
     login,
+    loginWithRole,
     logout,
     register,
     forgotPassword
@@ -179,6 +217,54 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
+};
+
+// Helper functions for role-based mock data
+const getMockUserIdByRole = (role: UserRole): string => {
+  switch (role) {
+    case 'admin': return 'admin-1';
+    case 'business_partner': return 'bp-1';
+    case 'client': return 'client-1';
+    default: return 'user-' + Date.now();
+  }
+};
+
+const getMockEmailByRole = (role: UserRole): string => {
+  switch (role) {
+    case 'admin': return 'admin@utopia.sk';
+    case 'business_partner': return 'marian.lapos@onepos.eu';
+    case 'client': return 'client@utopia.sk';
+    default: return 'demo@utopia.sk';
+  }
+};
+
+const getMockUserNameByRole = (role: UserRole): string => {
+  switch (role) {
+    case 'admin': return 'Admin Používateľ';
+    case 'business_partner': return 'Marián Lapoš';
+    case 'client': return 'TechCorp s.r.o.';
+    default: return 'Demo Používateľ';
+  }
+};
+
+const getMockBusinessPartnerIdByRole = (role: UserRole): string | undefined => {
+  switch (role) {
+    case 'client': return 'bp-1';
+    default: return undefined;
+  }
+};
+
+const getMockClientIdByRole = (role: UserRole): string | undefined => {
+  return undefined;
+};
+
+const getRoleDisplayName = (role: UserRole): string => {
+  switch (role) {
+    case 'admin': return 'ISO Organizácia';
+    case 'business_partner': return 'Servisný partner';
+    case 'client': return 'Klient';
+    default: return 'Používateľ';
+  }
 };
 
 // Helper functions for mock data with hierarchical structure

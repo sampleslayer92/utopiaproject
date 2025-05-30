@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,6 +17,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useNavigate } from 'react-router-dom';
+import { RoleSelectionScreen } from '@/components/auth/RoleSelectionScreen';
 
 interface UserData {
   country: string;
@@ -33,7 +33,7 @@ export const RegistrationPage: React.FC = () => {
   const { t } = useLanguage();
   const { register } = useAuth();
   const navigate = useNavigate();
-  const [currentView, setCurrentView] = useState<'choice' | 'login' | 'register' | 'forgot-password'>('choice');
+  const [currentView, setCurrentView] = useState<'choice' | 'roleSelection' | 'register' | 'forgot-password'>('choice');
   const [step, setStep] = useState(0);
   const [userData, setUserData] = useState<UserData>({
     country: 'SK',
@@ -139,7 +139,15 @@ export const RegistrationPage: React.FC = () => {
           setCurrentView('register');
           setStep(0);
         }}
-        onExistingClient={() => setCurrentView('login')}
+        onExistingClient={() => setCurrentView('roleSelection')}
+      />
+    );
+  }
+
+  if (currentView === 'roleSelection') {
+    return (
+      <RoleSelectionScreen 
+        onBack={() => setCurrentView('choice')}
       />
     );
   }
