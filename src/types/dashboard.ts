@@ -1,4 +1,3 @@
-
 import { LucideIcon } from 'lucide-react';
 
 export interface DashboardCard {
@@ -21,6 +20,7 @@ export interface Client {
   id: string;
   name: string;
   email: string;
+  phone?: string;
   businessPartnerId: string;
   locationsCount: number;
   devicesCount: number;
@@ -30,6 +30,11 @@ export interface Client {
   createdAt: string;
   lastActivity?: string;
   contracts: Contract[];
+  industry?: string;
+  address?: string;
+  website?: string;
+  contactPerson?: string;
+  assignedTeamMemberId?: string;
 }
 
 export interface Location {
