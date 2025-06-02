@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -67,14 +68,13 @@ export const AdminDashboard: React.FC = () => {
   const getFilteredPerformanceData = () => {
     let data = [...teamPerformanceData];
     
-    // Filter by period
-    if (filters.period === '1month') {
+    // Filter by period using correct values
+    if (filters.period === 'month') {
       data = data.slice(-1);
-    } else if (filters.period === '3months') {
+    } else if (filters.period === 'quarter') {
       data = data.slice(-3);
-    } else if (filters.period === '6months') {
-      data = data.slice(-6);
     }
+    // For 'custom' we show all data by default
     
     return data;
   };
@@ -82,13 +82,13 @@ export const AdminDashboard: React.FC = () => {
   const getFilteredRevenueData = () => {
     let data = [...revenueAndProfitData];
     
-    if (filters.period === '1month') {
+    // Filter by period using correct values
+    if (filters.period === 'month') {
       data = data.slice(-1);
-    } else if (filters.period === '3months') {
+    } else if (filters.period === 'quarter') {
       data = data.slice(-3);
-    } else if (filters.period === '6months') {
-      data = data.slice(-6);
     }
+    // For 'custom' we show all data by default
     
     return data;
   };
