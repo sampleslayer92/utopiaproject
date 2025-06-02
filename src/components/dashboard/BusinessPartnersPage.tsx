@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -33,7 +32,10 @@ const mockBusinessPartners: BusinessPartner[] = [
     status: 'active',
     createdAt: '2024-01-15',
     tier: 'gold',
-    region: 'Bratislava'
+    region: 'Bratislava',
+    totalSales: 25000,
+    commission: 21.0,
+    clients: 24
   },
   {
     id: 'bp-2',
@@ -52,7 +54,10 @@ const mockBusinessPartners: BusinessPartner[] = [
     status: 'active',
     createdAt: '2024-02-20',
     tier: 'silver',
-    region: 'Praha'
+    region: 'Praha',
+    totalSales: 19600,
+    commission: 16.5,
+    clients: 18
   },
   {
     id: 'bp-3',
@@ -71,7 +76,10 @@ const mockBusinessPartners: BusinessPartner[] = [
     status: 'active',
     createdAt: '2024-03-10',
     tier: 'bronze',
-    region: 'Košice'
+    region: 'Košice',
+    totalSales: 13400,
+    commission: 10.5,
+    clients: 12
   }
 ];
 
@@ -415,4 +423,3 @@ export const BusinessPartnersPage: React.FC = () => {
     </div>
   );
 };
-
