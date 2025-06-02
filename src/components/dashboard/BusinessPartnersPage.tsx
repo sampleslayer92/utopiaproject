@@ -5,10 +5,13 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Search, Edit, Eye, MapPin, Users, Smartphone, DollarSign } from 'lucide-react';
+import { Search, Edit, Eye, MapPin, Users, Smartphone, DollarSign, Trash2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 import { BusinessPartner } from '@/types/dashboard';
 import { AddBusinessPartnerDialog } from './AddBusinessPartnerDialog';
+import { EditBusinessPartnerDialog } from './EditBusinessPartnerDialog';
+import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog';
 
 const mockBusinessPartners: BusinessPartner[] = [
   {
@@ -60,10 +63,16 @@ const mockBusinessPartners: BusinessPartner[] = [
 
 export const BusinessPartnersPage: React.FC = () => {
   const { user } = useAuth();
+  const { toast } = useToast();
+  const [partners, setPartners] = useState<BusinessPartner[]>(mockBusinessPartners);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPartner, setSelectedPartner] = useState<BusinessPartner | null>(null);
+  const [editingPartner, setEditingPartner] = useState<BusinessPartner | null>(null);
+  const [deletingPartner, setDeletingPartner] = useState<BusinessPartner | null>(null);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  const filteredPartners = mockBusinessPartners.filter(partner =>
+  const filteredPartners = partners.filter(partner =>
     partner.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     partner.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
     partner.region.toLowerCase().includes(searchTerm.toLowerCase())
@@ -96,6 +105,32 @@ export const BusinessPartnersPage: React.FC = () => {
   const handlePartnerAdded = () => {
     console.log('Business partner added successfully');
     // Refresh data if needed
+  };
+
+  const handleEditPartner = (partner: BusinessPartner) => {
+    setEditingPartner(partner);
+    setShowEditDialog(true);
+  };
+
+  const handleSavePartner = (updatedPartner: BusinessPartner) => {
+    setPartners(prev => prev.map(p => p.id === updatedPartner.id ? updatedPartner : p));
+  };
+
+  const handleDeletePartner = (partner: BusinessPartner) => {
+    setDeletingPartner(partner);
+    setShowDeleteDialog(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deletingPartner) {
+      setPartners(prev => prev.filter(p => p.id !== deletingPartner.id));
+      toast({
+        title: "Úspech",
+        description: "Obchodný partner bol úspešne vymazaný.",
+      });
+      setDeletingPartner(null);
+      setShowDeleteDialog(false);
+    }
   };
 
   // Only admins can see this page
@@ -131,7 +166,7 @@ export const BusinessPartnersPage: React.FC = () => {
               <Users className="h-8 w-8 text-blue-500" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Celkom partnerov</p>
-                <p className="text-2xl font-bold">{mockBusinessPartners.length}</p>
+                <p className="text-2xl font-bold">{partners.length}</p>
               </div>
             </div>
           </CardContent>
@@ -142,7 +177,7 @@ export const BusinessPartnersPage: React.FC = () => {
               <Smartphone className="h-8 w-8 text-green-500" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Celkom zariadení</p>
-                <p className="text-2xl font-bold">{mockBusinessPartners.reduce((sum, p) => sum + p.devicesCount, 0)}</p>
+                <p className="text-2xl font-bold">{partners.reduce((sum, p) => sum + p.devicesCount, 0)}</p>
               </div>
             </div>
           </CardContent>
@@ -153,7 +188,7 @@ export const BusinessPartnersPage: React.FC = () => {
               <DollarSign className="h-8 w-8 text-purple-500" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Mesačné tržby</p>
-                <p className="text-2xl font-bold">€{mockBusinessPartners.reduce((sum, p) => sum + p.monthlyRevenue, 0).toLocaleString()}</p>
+                <p className="text-2xl font-bold">€{partners.reduce((sum, p) => sum + p.monthlyRevenue, 0).toLocaleString()}</p>
               </div>
             </div>
           </CardContent>
@@ -164,7 +199,7 @@ export const BusinessPartnersPage: React.FC = () => {
               <MapPin className="h-8 w-8 text-orange-500" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Aktívni partneri</p>
-                <p className="text-2xl font-bold">{mockBusinessPartners.filter(p => p.status === 'active').length}</p>
+                <p className="text-2xl font-bold">{partners.filter(p => p.status === 'active').length}</p>
               </div>
             </div>
           </CardContent>
@@ -271,8 +306,20 @@ export const BusinessPartnersPage: React.FC = () => {
                           )}
                         </DialogContent>
                       </Dialog>
-                      <Button variant="outline" size="sm">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleEditPartner(partner)}
+                      >
                         <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleDeletePartner(partner)}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </TableCell>
@@ -282,6 +329,24 @@ export const BusinessPartnersPage: React.FC = () => {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Edit Dialog */}
+      <EditBusinessPartnerDialog
+        open={showEditDialog}
+        onOpenChange={setShowEditDialog}
+        partner={editingPartner}
+        onSave={handleSavePartner}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDeleteDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        onConfirm={handleConfirmDelete}
+        title="Vymazať obchodného partnera"
+        description="Ste si istí, že chcete vymazať tohto obchodného partnera? Táto akcia sa nedá vrátiť späť."
+        itemName={deletingPartner?.name}
+      />
     </div>
   );
 };

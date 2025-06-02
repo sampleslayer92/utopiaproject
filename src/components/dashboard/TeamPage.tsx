@@ -19,9 +19,14 @@ import {
   Grid3X3,
   List,
   Plus,
-  Download
+  Download,
+  Edit,
+  Trash2
 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 import { AddEmployeeDialog } from './AddEmployeeDialog';
+import { EditTeamMemberDialog } from './EditTeamMemberDialog';
+import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog';
 import { TeamMember } from '@/types/team';
 
 // Mock data pre tím
@@ -144,12 +149,43 @@ const mockTeamMembers: TeamMember[] = [
 ];
 
 export const TeamPage: React.FC = () => {
+  const { toast } = useToast();
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>(mockTeamMembers);
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
+  const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
+  const [deletingMember, setDeletingMember] = useState<TeamMember | null>(null);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const handleAddEmployee = (newEmployee: TeamMember) => {
     setTeamMembers(prev => [...prev, newEmployee]);
+  };
+
+  const handleEditMember = (member: TeamMember) => {
+    setEditingMember(member);
+    setShowEditDialog(true);
+  };
+
+  const handleSaveMember = (updatedMember: TeamMember) => {
+    setTeamMembers(prev => prev.map(m => m.id === updatedMember.id ? updatedMember : m));
+  };
+
+  const handleDeleteMember = (member: TeamMember) => {
+    setDeletingMember(member);
+    setShowDeleteDialog(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deletingMember) {
+      setTeamMembers(prev => prev.filter(m => m.id !== deletingMember.id));
+      toast({
+        title: "Úspech",
+        description: "Člen tímu bol úspešne vymazaný.",
+      });
+      setDeletingMember(null);
+      setShowDeleteDialog(false);
+    }
   };
 
   const filteredMembers = teamMembers.filter(member =>
@@ -343,11 +379,28 @@ export const TeamPage: React.FC = () => {
                   </div>
                 </div>
                 
-                <Link to={`/dashboard/team/${member.id}`}>
-                  <Button className="w-full" variant="outline">
-                    Zobraziť detail
+                <div className="flex space-x-2">
+                  <Link to={`/dashboard/team/${member.id}`} className="flex-1">
+                    <Button className="w-full" variant="outline" size="sm">
+                      Detail
+                    </Button>
+                  </Link>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleEditMember(member)}
+                  >
+                    <Edit className="h-4 w-4" />
                   </Button>
-                </Link>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleDeleteMember(member)}
+                    className="text-red-600 hover:text-red-700"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}
@@ -394,11 +447,28 @@ export const TeamPage: React.FC = () => {
                       <div className={`w-3 h-3 rounded-full ${getStatusColor(member.status)} inline-block`}></div>
                     </TableCell>
                     <TableCell>
-                      <Link to={`/dashboard/team/${member.id}`}>
-                        <Button size="sm" variant="outline">
-                          Detail
+                      <div className="flex space-x-2">
+                        <Link to={`/dashboard/team/${member.id}`}>
+                          <Button size="sm" variant="outline">
+                            Detail
+                          </Button>
+                        </Link>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => handleEditMember(member)}
+                        >
+                          <Edit className="h-4 w-4" />
                         </Button>
-                      </Link>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => handleDeleteMember(member)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -407,6 +477,24 @@ export const TeamPage: React.FC = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Edit Dialog */}
+      <EditTeamMemberDialog
+        open={showEditDialog}
+        onOpenChange={setShowEditDialog}
+        member={editingMember}
+        onSave={handleSaveMember}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDeleteDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        onConfirm={handleConfirmDelete}
+        title="Vymazať člena tímu"
+        description="Ste si istí, že chcete vymazať tohoto člena tímu? Táto akcia sa nedá vrátiť späť."
+        itemName={deletingMember ? `${deletingMember.firstName} ${deletingMember.lastName}` : undefined}
+      />
     </div>
   );
 };

@@ -5,10 +5,12 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Plus, Search, Filter, Calendar, FileText, User, MapPin, DollarSign, Clock, Eye, Edit } from 'lucide-react';
+import { Plus, Search, Filter, Calendar, FileText, User, MapPin, DollarSign, Clock, Eye, Edit, Trash2, Grid3X3, List } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 import { ContractForm } from './ContractForm';
+import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog';
 
 // Updated contract interface with creator info
 interface ContractWithCreator {
@@ -111,14 +113,19 @@ const mockContracts: ContractWithCreator[] = [
 
 export const ContractsPage: React.FC = () => {
   const { user } = useAuth();
+  const { toast } = useToast();
+  const [contracts, setContracts] = useState<ContractWithCreator[]>(mockContracts);
   const [selectedContract, setSelectedContract] = useState<ContractWithCreator | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [showContractForm, setShowContractForm] = useState(false);
   const [editingContract, setEditingContract] = useState<ContractWithCreator | null>(null);
+  const [deletingContract, setDeletingContract] = useState<ContractWithCreator | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
 
-  const filteredContracts = mockContracts.filter(contract => {
+  const filteredContracts = contracts.filter(contract => {
     const matchesSearch = contract.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          contract.contractNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          contract.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -169,9 +176,9 @@ export const ContractsPage: React.FC = () => {
     }
   };
 
-  const activeContracts = mockContracts.filter(c => c.status === 'active').length;
-  const totalValue = mockContracts.reduce((sum, c) => sum + c.value, 0);
-  const expiringContracts = mockContracts.filter(c => {
+  const activeContracts = contracts.filter(c => c.status === 'active').length;
+  const totalValue = contracts.reduce((sum, c) => sum + c.value, 0);
+  const expiringContracts = contracts.filter(c => {
     const endDate = new Date(c.endDate);
     const threeMonthsFromNow = new Date();
     threeMonthsFromNow.setMonth(threeMonthsFromNow.getMonth() + 3);
@@ -190,6 +197,23 @@ export const ContractsPage: React.FC = () => {
   const handleEditContract = (contract: ContractWithCreator) => {
     setEditingContract(contract);
     setShowContractForm(true);
+  };
+
+  const handleDeleteContract = (contract: ContractWithCreator) => {
+    setDeletingContract(contract);
+    setShowDeleteDialog(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deletingContract) {
+      setContracts(prev => prev.filter(c => c.id !== deletingContract.id));
+      toast({
+        title: "Úspech",
+        description: "Zmluva bola úspešne vymazaná.",
+      });
+      setDeletingContract(null);
+      setShowDeleteDialog(false);
+    }
   };
 
   const handleSaveContract = (contractData: any) => {
@@ -347,77 +371,175 @@ export const ContractsPage: React.FC = () => {
                 <SelectItem value="maintenance">Údržba</SelectItem>
               </SelectContent>
             </Select>
+
+            <div className="flex items-center space-x-2">
+              <Button
+                variant={viewMode === 'grid' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('grid')}
+              >
+                <Grid3X3 className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={viewMode === 'table' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('table')}
+              >
+                <List className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Contracts Table */}
-      <Card className="border-0 shadow-lg">
-        <CardHeader>
-          <CardTitle>Zoznam zmlúv</CardTitle>
-          <CardDescription>
-            Kliknite na riadok pre zobrazenie detailu zmluvy
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Názov</TableHead>
-                <TableHead>Číslo zmluvy</TableHead>
-                <TableHead>Klient</TableHead>
-                <TableHead>Vytvoril</TableHead>
-                <TableHead>Typ</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Hodnota</TableHead>
-                <TableHead>Koniec</TableHead>
-                <TableHead>Akcie</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredContracts.map((contract) => (
-                <TableRow 
-                  key={contract.id} 
-                  className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-                  onClick={() => handleRowClick(contract)}
-                >
-                  <TableCell className="font-medium">{contract.title}</TableCell>
-                  <TableCell>{contract.contractNumber}</TableCell>
-                  <TableCell>{contract.clientName}</TableCell>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{contract.createdBy.name}</div>
-                      <div className="text-sm text-gray-500">{contract.createdBy.email}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
+      {/* Contracts Display */}
+      {viewMode === 'grid' ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredContracts.map((contract) => (
+            <Card key={contract.id} className="hover:shadow-lg transition-shadow duration-200 cursor-pointer" onClick={() => handleRowClick(contract)}>
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <CardTitle className="text-lg line-clamp-2">{contract.title}</CardTitle>
+                    <p className="text-sm text-gray-600">{contract.contractNumber}</p>
+                  </div>
+                  <div className="flex space-x-1">
                     <Badge className={getTypeColor(contract.type)}>
                       {getTypeLabel(contract.type)}
                     </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={getStatusColor(contract.status)}>
-                      {getStatusLabel(contract.status)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>€{contract.value.toLocaleString()}</TableCell>
-                  <TableCell>{new Date(contract.endDate).toLocaleDateString('sk')}</TableCell>
-                  <TableCell>
-                    <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-                      <Button size="sm" variant="outline">
-                        <Eye className="h-3 w-3" />
-                      </Button>
-                      <Button size="sm" variant="outline">
-                        <Edit className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </TableCell>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2 text-sm">
+                    <User className="h-4 w-4 text-gray-400" />
+                    <span className="text-gray-600">{contract.clientName}</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm">
+                    <DollarSign className="h-4 w-4 text-gray-400" />
+                    <span className="text-gray-600 font-medium">€{contract.value.toLocaleString()}</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm">
+                    <Calendar className="h-4 w-4 text-gray-400" />
+                    <span className="text-gray-600">{new Date(contract.endDate).toLocaleDateString('sk')}</span>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between pt-3 border-t">
+                  <Badge className={getStatusColor(contract.status)}>
+                    {getStatusLabel(contract.status)}
+                  </Badge>
+                  <div className="text-sm text-gray-500">
+                    {contract.createdBy.name}
+                  </div>
+                </div>
+                
+                <div className="flex space-x-2" onClick={(e) => e.stopPropagation()}>
+                  <Button size="sm" variant="outline" className="flex-1">
+                    <Eye className="h-3 w-3 mr-1" />
+                    Detail
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    onClick={() => handleEditContract(contract)}
+                  >
+                    <Edit className="h-3 w-3" />
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    onClick={() => handleDeleteContract(contract)}
+                    className="text-red-600 hover:text-red-700"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <Card className="border-0 shadow-lg">
+          <CardHeader>
+            <CardTitle>Zoznam zmlúv</CardTitle>
+            <CardDescription>
+              Kliknite na riadok pre zobrazenie detailu zmluvy
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Názov</TableHead>
+                  <TableHead>Číslo zmluvy</TableHead>
+                  <TableHead>Klient</TableHead>
+                  <TableHead>Vytvoril</TableHead>
+                  <TableHead>Typ</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Hodnota</TableHead>
+                  <TableHead>Koniec</TableHead>
+                  <TableHead>Akcie</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+              </TableHeader>
+              <TableBody>
+                {filteredContracts.map((contract) => (
+                  <TableRow 
+                    key={contract.id} 
+                    className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                    onClick={() => handleRowClick(contract)}
+                  >
+                    <TableCell className="font-medium">{contract.title}</TableCell>
+                    <TableCell>{contract.contractNumber}</TableCell>
+                    <TableCell>{contract.clientName}</TableCell>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{contract.createdBy.name}</div>
+                        <div className="text-sm text-gray-500">{contract.createdBy.email}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={getTypeColor(contract.type)}>
+                        {getTypeLabel(contract.type)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={getStatusColor(contract.status)}>
+                        {getStatusLabel(contract.status)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>€{contract.value.toLocaleString()}</TableCell>
+                    <TableCell>{new Date(contract.endDate).toLocaleDateString('sk')}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                        <Button size="sm" variant="outline">
+                          <Eye className="h-3 w-3" />
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => handleEditContract(contract)}
+                        >
+                          <Edit className="h-3 w-3" />
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => handleDeleteContract(contract)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Contract Detail Dialog */}
       <Dialog open={!!selectedContract} onOpenChange={() => setSelectedContract(null)}>
@@ -557,6 +679,16 @@ export const ContractsPage: React.FC = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDeleteDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        onConfirm={handleConfirmDelete}
+        title="Vymazať zmluvu"
+        description="Ste si istí, že chcete vymazať túto zmluvu? Táto akcia sa nedá vrátiť späť."
+        itemName={deletingContract?.title}
+      />
     </div>
   );
 };

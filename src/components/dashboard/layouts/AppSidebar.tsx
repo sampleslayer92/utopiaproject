@@ -72,6 +72,12 @@ export function AppSidebar() {
         roles: ['admin']
       },
       {
+        title: "Pobočky",
+        url: "/dashboard/locations",
+        icon: MapPin,
+        roles: ['admin', 'client']
+      },
+      {
         title: "Reporty",
         url: "/dashboard/reports",
         icon: BarChart3,
@@ -90,6 +96,12 @@ export function AppSidebar() {
         title: "Transakcie",
         url: "/dashboard/transactions",
         icon: CreditCard,
+        roles: ['client']
+      },
+      {
+        title: "Pobočky",
+        url: "/dashboard/locations",
+        icon: MapPin,
         roles: ['client']
       },
       {

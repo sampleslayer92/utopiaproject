@@ -62,16 +62,16 @@ export const LocationsPage: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Lokácie
+            Pobočky
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            {user.role === 'admin' && 'Správa všetkých lokácií v systéme'}
-            {user.role === 'client' && 'Správa vašich prevádzok a lokácií'}
+            {user.role === 'admin' && 'Správa všetkých pobočiek v systéme'}
+            {user.role === 'client' && 'Správa vašich prevádzok a pobočiek'}
           </p>
         </div>
         <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600">
           <Plus className="h-4 w-4 mr-2" />
-          Pridať lokáciu
+          Pridať pobočku
         </Button>
       </div>
 
@@ -82,7 +82,7 @@ export const LocationsPage: React.FC = () => {
             <div className="flex items-center">
               <MapPin className="h-8 w-8 text-blue-500" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Aktívne lokácie</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Aktívne pobočky</p>
                 <p className="text-2xl font-bold">{activeLocations}</p>
               </div>
             </div>
@@ -132,7 +132,7 @@ export const LocationsPage: React.FC = () => {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
-                placeholder="Hľadať lokácie..."
+                placeholder="Hľadať pobočky..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
