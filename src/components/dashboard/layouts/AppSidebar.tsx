@@ -27,7 +27,7 @@ export const AppSidebar: React.FC = () => {
         icon: UserCheck
       }, {
         title: 'Merchanti',
-        url: '/dashboard/clients',
+        url: '/dashboard/merchants',
         icon: Users
       }, {
         title: 'Zmluvy',
@@ -155,7 +155,7 @@ export const AppSidebar: React.FC = () => {
       
       <SidebarFooter className={`p-4 ${designSystem.gradients.background} border-t border-gray-200 dark:border-gray-600`}>
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-2 justify-items-center">
+          <div className="flex justify-between">
             <ThemeToggle />
             <LanguageSwitcher />
           </div>

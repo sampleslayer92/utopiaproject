@@ -104,8 +104,9 @@ export const ClientsPage: React.FC = () => {
   };
 
   const handleAddClient = () => {
-    // Redirect to onboarding for new client
-    navigate('/onboarding');
+    // Set onboarding context for merchant
+    localStorage.setItem('onboarding_context', JSON.stringify({ type: 'merchant' }));
+    navigate('/onboarding/company');
   };
 
   // Only admins and business partners can see this page
@@ -136,7 +137,7 @@ export const ClientsPage: React.FC = () => {
             className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
           >
             <Plus className="h-4 w-4 mr-2" />
-            Pridať klienta
+            Pridať merchanta
           </Button>
         )}
       </div>
