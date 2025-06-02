@@ -257,7 +257,7 @@ export const TeamPage: React.FC = () => {
                   <SelectItem value="all">Všetky úrovne</SelectItem>
                   <SelectItem value="high">Vysoká (95%+)</SelectItem>
                   <SelectItem value="medium">Stredná (90-95%)</SelectItem>
-                  <SelectItem value="low">Nízka (<90%)</SelectItem>
+                  <SelectItem value="low">Nízka (&lt;90%)</SelectItem>
                 </SelectContent>
               </Select>
               <Select value={revenueFilter} onValueChange={setRevenueFilter}>
@@ -268,7 +268,7 @@ export const TeamPage: React.FC = () => {
                   <SelectItem value="all">Všetky tržby</SelectItem>
                   <SelectItem value="high">Vysoké (€20k+)</SelectItem>
                   <SelectItem value="medium">Stredné (€15-20k)</SelectItem>
-                  <SelectItem value="low">Nízke (<€15k)</SelectItem>
+                  <SelectItem value="low">Nízke (&lt;€15k)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
