@@ -129,12 +129,16 @@ const mockMerchantData = {
   contracts: [
     {
       id: 'contract-1',
+      clientId: 'client-1',
+      businessPartnerId: 'team-1',
       title: 'Základný POS balík',
-      type: 'subscription',
-      status: 'active',
+      type: 'subscription' as const,
+      status: 'active' as const,
       value: 1068,
       startDate: '2024-01-15',
-      endDate: '2025-01-15'
+      endDate: '2025-01-15',
+      autoRenewal: true,
+      terms: 'Štandardné podmienky pre POS systém s mesačným poplatkom.'
     }
   ]
 };
