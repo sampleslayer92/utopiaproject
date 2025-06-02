@@ -9,18 +9,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { 
   Search, 
   Filter, 
+  Plus, 
   Users, 
   TrendingUp, 
   DollarSign, 
   MapPin,
   Phone,
   Mail,
-  Calendar
+  Calendar,
+  Eye
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { AddMerchantDialog } from './AddMerchantDialog';
-import { PageHeader } from '@/components/ui/page-header';
-import { EntityActions } from '@/components/ui/entity-actions';
 
 // Mock data for merchants
 const mockMerchants = [
@@ -152,40 +152,71 @@ export const ClientsPage: React.FC = () => {
     );
   }
 
-  const stats = [
-    {
-      label: 'Celkom merchantov',
-      value: mockMerchants.length,
-      icon: Users,
-      color: 'text-blue-500'
-    },
-    {
-      label: 'Aktívni',
-      value: mockMerchants.filter(m => m.status === 'active').length,
-      icon: TrendingUp,
-      color: 'text-green-500'
-    },
-    {
-      label: 'Celkové tržby',
-      value: `€${mockMerchants.reduce((sum, m) => sum + m.monthlyRevenue, 0).toLocaleString()}`,
-      icon: DollarSign,
-      color: 'text-purple-500'
-    },
-    {
-      label: 'Lokácie',
-      value: mockMerchants.reduce((sum, m) => sum + m.locationsCount, 0),
-      icon: MapPin,
-      color: 'text-orange-500'
-    }
-  ];
-
   return (
-    <PageHeader
-      title="Merchanti"
-      description="Správa klientov a ich obchodných aktivít"
-      stats={stats}
-      actions={<AddMerchantDialog />}
-    >
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Merchanti
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            Správa klientov a ich obchodných aktivít
+          </p>
+        </div>
+        <AddMerchantDialog />
+      </div>
+
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <Users className="h-8 w-8 text-blue-500" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Celkom merchantov</p>
+                <p className="text-2xl font-bold">{mockMerchants.length}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <TrendingUp className="h-8 w-8 text-green-500" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Aktívni</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {mockMerchants.filter(m => m.status === 'active').length}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <DollarSign className="h-8 w-8 text-purple-500" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Celkové tržby</p>
+                <p className="text-2xl font-bold">€{mockMerchants.reduce((sum, m) => sum + m.monthlyRevenue, 0).toLocaleString()}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <MapPin className="h-8 w-8 text-orange-500" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Lokácie</p>
+                <p className="text-2xl font-bold">{mockMerchants.reduce((sum, m) => sum + m.locationsCount, 0)}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Filters */}
       <Card>
         <CardContent className="p-6">
@@ -307,28 +338,16 @@ export const ClientsPage: React.FC = () => {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <EntityActions
-                      actions={[
-                        {
-                          type: 'view',
-                          label: 'Zobraziť detail',
-                          onClick: () => handleMerchantClick(merchant.id)
-                        },
-                        {
-                          type: 'edit',
-                          label: 'Upraviť',
-                          onClick: () => console.log('Edit merchant', merchant.id)
-                        },
-                        {
-                          type: 'delete',
-                          label: 'Vymazať',
-                          onClick: () => console.log('Delete merchant', merchant.id)
-                        }
-                      ]}
-                      entityName="merchanta"
-                      entityId={merchant.name}
-                      compact={true}
-                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleMerchantClick(merchant.id);
+                      }}
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -336,7 +355,7 @@ export const ClientsPage: React.FC = () => {
           </Table>
         </CardContent>
       </Card>
-    </PageHeader>
+    </div>
   );
 };
 

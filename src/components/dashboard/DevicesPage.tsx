@@ -9,8 +9,6 @@ import { Plus, Search, Smartphone, Clock, CheckCircle, AlertTriangle, XCircle, A
 import { useAuth } from '@/contexts/AuthContext';
 import { demoDevices, demoLocations, DeviceData } from '@/data/demoData';
 import { getFilteredData } from '@/utils/roleUtils';
-import { PageHeader } from '@/components/ui/page-header';
-import { EntityActions } from '@/components/ui/entity-actions';
 
 export const DevicesPage: React.FC = () => {
   const { user } = useAuth();
@@ -72,48 +70,72 @@ export const DevicesPage: React.FC = () => {
   const maintenanceDevices = filteredDevices.filter(d => d.status === 'maintenance').length;
   const errorDevices = filteredDevices.filter(d => d.status === 'error').length;
 
-  const stats = [
-    {
-      label: 'Aktívne',
-      value: activeDevices,
-      icon: CheckCircle,
-      color: 'text-green-500'
-    },
-    {
-      label: 'Neaktívne',
-      value: inactiveDevices,
-      icon: Clock,
-      color: 'text-gray-500'
-    },
-    {
-      label: 'Údržba',
-      value: maintenanceDevices,
-      icon: AlertTriangle,
-      color: 'text-yellow-500'
-    },
-    {
-      label: 'Chyba',
-      value: errorDevices,
-      icon: XCircle,
-      color: 'text-red-500'
-    }
-  ];
-
-  const actions = (
-    <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600">
-      <Plus className="h-4 w-4 mr-2" />
-      Pridať zariadenie
-    </Button>
-  );
-
   return (
-    <PageHeader
-      title="Zariadenia"
-      description="Správa a monitoring všetkých platobných zariadení"
-      stats={stats}
-      actions={actions}
-    >
-      {/* Search */}
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Zariadenia
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            Správa a monitoring všetkých platobných zariadení
+          </p>
+        </div>
+        <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600">
+          <Plus className="h-4 w-4 mr-2" />
+          Pridať zariadenie
+        </Button>
+      </div>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <CheckCircle className="h-8 w-8 text-green-500" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Aktívne</p>
+                <p className="text-2xl font-bold">{activeDevices}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <Clock className="h-8 w-8 text-gray-500" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Neaktívne</p>
+                <p className="text-2xl font-bold">{inactiveDevices}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <AlertTriangle className="h-8 w-8 text-yellow-500" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Údržba</p>
+                <p className="text-2xl font-bold">{maintenanceDevices}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <XCircle className="h-8 w-8 text-red-500" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Chyba</p>
+                <p className="text-2xl font-bold">{errorDevices}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Search and Table */}
       <Card>
         <CardHeader>
           <div className="flex items-center space-x-4">
@@ -139,7 +161,6 @@ export const DevicesPage: React.FC = () => {
                 <TableHead>Status</TableHead>
                 <TableHead>Posledná aktivita</TableHead>
                 <TableHead>Firmware</TableHead>
-                <TableHead>Akcie</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -169,36 +190,12 @@ export const DevicesPage: React.FC = () => {
                     {new Date(device.lastActivity).toLocaleDateString('sk-SK')}
                   </TableCell>
                   <TableCell className="font-mono text-sm">{device.firmwareVersion}</TableCell>
-                  <TableCell>
-                    <EntityActions
-                      actions={[
-                        {
-                          type: 'view',
-                          label: 'Zobraziť detail',
-                          onClick: () => console.log('View device', device.id)
-                        },
-                        {
-                          type: 'edit',
-                          label: 'Upraviť',
-                          onClick: () => console.log('Edit device', device.id)
-                        },
-                        {
-                          type: 'delete',
-                          label: 'Vymazať',
-                          onClick: () => console.log('Delete device', device.id)
-                        }
-                      ]}
-                      entityName="zariadenie"
-                      entityId={device.name}
-                      compact={true}
-                    />
-                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
-    </PageHeader>
+    </div>
   );
 };

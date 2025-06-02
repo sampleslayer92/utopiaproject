@@ -9,8 +9,6 @@ import { Plus, Search, MapPin, Users, TrendingUp, DollarSign } from 'lucide-reac
 import { useAuth } from '@/contexts/AuthContext';
 import { demoLocations, demoDevices, demoTransactions, LocationData } from '@/data/demoData';
 import { getFilteredData } from '@/utils/roleUtils';
-import { PageHeader } from '@/components/ui/page-header';
-import { EntityActions } from '@/components/ui/entity-actions';
 
 export const LocationsPage: React.FC = () => {
   const { user } = useAuth();
@@ -24,6 +22,11 @@ export const LocationsPage: React.FC = () => {
         </p>
       </div>
     );
+  }
+
+  // Check if user is client - clients can view their locations
+  if (user.role === 'client') {
+    // Clients can view and manage their own locations
   }
 
   const filteredLocations: LocationData[] = getFilteredData(demoLocations, user).filter(location =>
@@ -53,52 +56,76 @@ export const LocationsPage: React.FC = () => {
   const totalVolume = filteredLocations.reduce((sum, location) => sum + getMonthlyVolume(location.id), 0);
   const totalDevices = filteredLocations.reduce((sum, location) => sum + getDeviceCount(location.id), 0);
 
-  const stats = [
-    {
-      label: 'Aktívne pobočky',
-      value: activeLocations,
-      icon: MapPin,
-      color: 'text-blue-500'
-    },
-    {
-      label: 'Celkom zariadení',
-      value: totalDevices,
-      icon: Users,
-      color: 'text-green-500'
-    },
-    {
-      label: 'Mesačný obrat',
-      value: `€${totalVolume.toLocaleString()}`,
-      icon: DollarSign,
-      color: 'text-purple-500'
-    },
-    {
-      label: 'Priemerný obrat',
-      value: `€${activeLocations > 0 ? Math.round(totalVolume / activeLocations).toLocaleString() : '0'}`,
-      icon: TrendingUp,
-      color: 'text-orange-500'
-    }
-  ];
-
-  const actions = (
-    <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600">
-      <Plus className="h-4 w-4 mr-2" />
-      Pridať pobočku
-    </Button>
-  );
-
-  const description = user.role === 'admin' 
-    ? 'Správa všetkých pobočiek v systéme'
-    : 'Správa vašich prevádzok a pobočiek';
-
   return (
-    <PageHeader
-      title="Pobočky"
-      description={description}
-      stats={stats}
-      actions={actions}
-    >
-      {/* Search */}
+    <div className="space-y-6">
+      {/* Header and Summary Cards */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Pobočky
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            {user.role === 'admin' && 'Správa všetkých pobočiek v systéme'}
+            {user.role === 'client' && 'Správa vašich prevádzok a pobočiek'}
+          </p>
+        </div>
+        <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600">
+          <Plus className="h-4 w-4 mr-2" />
+          Pridať pobočku
+        </Button>
+      </div>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <MapPin className="h-8 w-8 text-blue-500" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Aktívne pobočky</p>
+                <p className="text-2xl font-bold">{activeLocations}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <Users className="h-8 w-8 text-green-500" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Celkom zariadení</p>
+                <p className="text-2xl font-bold">{totalDevices}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <DollarSign className="h-8 w-8 text-purple-500" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Mesačný obrat</p>
+                <p className="text-2xl font-bold">€{totalVolume.toLocaleString()}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <TrendingUp className="h-8 w-8 text-orange-500" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Priemerný obrat</p>
+                <p className="text-2xl font-bold">
+                  €{activeLocations > 0 ? Math.round(totalVolume / activeLocations).toLocaleString() : '0'}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Search and Table */}
       <Card>
         <CardHeader>
           <div className="flex items-center space-x-4">
@@ -124,7 +151,6 @@ export const LocationsPage: React.FC = () => {
                 <TableHead>Mesačný obrat</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Vytvorené</TableHead>
-                <TableHead>Akcie</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -156,36 +182,12 @@ export const LocationsPage: React.FC = () => {
                   <TableCell>
                     {new Date(location.createdAt).toLocaleDateString('sk-SK')}
                   </TableCell>
-                  <TableCell>
-                    <EntityActions
-                      actions={[
-                        {
-                          type: 'view',
-                          label: 'Zobraziť detail',
-                          onClick: () => console.log('View location', location.id)
-                        },
-                        {
-                          type: 'edit',
-                          label: 'Upraviť',
-                          onClick: () => console.log('Edit location', location.id)
-                        },
-                        {
-                          type: 'delete',
-                          label: 'Vymazať',
-                          onClick: () => console.log('Delete location', location.id)
-                        }
-                      ]}
-                      entityName="pobočku"
-                      entityId={location.name}
-                      compact={true}
-                    />
-                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
-    </PageHeader>
+    </div>
   );
 };
