@@ -1,20 +1,25 @@
 
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { 
   Users, 
   Search, 
   Mail, 
   Phone, 
   MapPin,
-  UserPlus,
   Settings,
   FileText,
   Calendar,
-  Target
+  Target,
+  Grid3X3,
+  List,
+  Plus,
+  Download
 } from 'lucide-react';
 import { AddEmployeeDialog } from './AddEmployeeDialog';
 import { TeamMember } from '@/types/team';
@@ -89,12 +94,59 @@ const mockTeamMembers: TeamMember[] = [
     permissions: ['technical_support', 'maintenance_contracts'],
     salary: 3000,
     commissionRate: 4.0
+  },
+  {
+    id: 'team-4',
+    firstName: 'Mária',
+    lastName: 'Novotná',
+    email: 'maria.novotna@iso-org.sk',
+    phone: '+421 900 555 777',
+    position: 'Sales Representative',
+    department: 'Sales',
+    businessPartnerId: 'bp-1',
+    status: 'active',
+    hireDate: '2023-06-01',
+    performance: {
+      monthlyRevenue: 14200,
+      totalRevenue: 85200,
+      merchantsManaged: 6,
+      contractsSigned: 4,
+      efficiency: 87
+    },
+    assignedMerchants: ['merchant-6'],
+    permissions: ['view_merchants'],
+    salary: 2400,
+    commissionRate: 4.5
+  },
+  {
+    id: 'team-5',
+    firstName: 'Ján',
+    lastName: 'Kováč',
+    email: 'jan.kovac@iso-org.sk',
+    phone: '+421 900 333 444',
+    position: 'Customer Success Manager',
+    department: 'Support',
+    businessPartnerId: 'bp-1',
+    status: 'active',
+    hireDate: '2023-09-15',
+    performance: {
+      monthlyRevenue: 12800,
+      totalRevenue: 38400,
+      merchantsManaged: 5,
+      contractsSigned: 3,
+      efficiency: 89
+    },
+    assignedMerchants: ['merchant-7'],
+    permissions: ['technical_support', 'view_merchants'],
+    salary: 2600,
+    commissionRate: 3.5
   }
 ];
 
 export const TeamPage: React.FC = () => {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>(mockTeamMembers);
   const [searchTerm, setSearchTerm] = useState('');
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
 
   const handleAddEmployee = (newEmployee: TeamMember) => {
     setTeamMembers(prev => [...prev, newEmployee]);
@@ -134,7 +186,7 @@ export const TeamPage: React.FC = () => {
             </div>
             <div className="flex items-center space-x-3">
               <Button variant="outline" className="bg-white/20 hover:bg-white/30 border-white/30 text-white">
-                <FileText className="h-4 w-4 mr-2" />
+                <Download className="h-4 w-4 mr-2" />
                 Export tímu
               </Button>
               <Button variant="outline" className="bg-white/20 hover:bg-white/30 border-white/30 text-white">
@@ -204,81 +256,157 @@ export const TeamPage: React.FC = () => {
         </Card>
       </div>
 
-      {/* Search and Filter */}
+      {/* Search and View Toggle */}
       <Card>
         <CardContent className="p-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              placeholder="Hľadať člena tímu..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
+          <div className="flex items-center justify-between">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                placeholder="Hľadať člena tímu..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button
+                variant={viewMode === 'grid' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('grid')}
+              >
+                <Grid3X3 className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={viewMode === 'table' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('table')}
+              >
+                <List className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Team Members Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredMembers.map((member) => (
-          <Card key={member.id} className="hover:shadow-lg transition-shadow duration-200">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
-                    {member.firstName[0]}{member.lastName[0]}
+      {/* Team Members Display */}
+      {viewMode === 'grid' ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredMembers.map((member) => (
+            <Card key={member.id} className="hover:shadow-lg transition-shadow duration-200">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                      {member.firstName[0]}{member.lastName[0]}
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">{member.firstName} {member.lastName}</CardTitle>
+                      <p className="text-sm text-gray-600">{member.position}</p>
+                    </div>
                   </div>
-                  <div>
-                    <CardTitle className="text-lg">{member.firstName} {member.lastName}</CardTitle>
-                    <p className="text-sm text-gray-600">{member.position}</p>
-                  </div>
+                  <div className={`w-3 h-3 rounded-full ${getStatusColor(member.status)}`}></div>
                 </div>
-                <div className={`w-3 h-3 rounded-full ${getStatusColor(member.status)}`}></div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2 text-sm">
-                  <Mail className="h-4 w-4 text-gray-400" />
-                  <span className="text-gray-600">{member.email}</span>
-                </div>
-                <div className="flex items-center space-x-2 text-sm">
-                  <Phone className="h-4 w-4 text-gray-400" />
-                  <span className="text-gray-600">{member.phone}</span>
-                </div>
-                <div className="flex items-center space-x-2 text-sm">
-                  <MapPin className="h-4 w-4 text-gray-400" />
-                  <span className="text-gray-600">{member.department}</span>
-                </div>
-              </div>
-              
-              <div className="pt-3 border-t">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium">Efektivita</span>
-                  <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                    {member.performance.efficiency}%
-                  </Badge>
-                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Zmluvy:</span>
-                    <span className="font-medium">{member.performance.contractsSigned}</span>
+                  <div className="flex items-center space-x-2 text-sm">
+                    <Mail className="h-4 w-4 text-gray-400" />
+                    <span className="text-gray-600">{member.email}</span>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Tržby:</span>
-                    <span className="font-medium">€{member.performance.monthlyRevenue.toLocaleString()}</span>
+                  <div className="flex items-center space-x-2 text-sm">
+                    <Phone className="h-4 w-4 text-gray-400" />
+                    <span className="text-gray-600">{member.phone}</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm">
+                    <MapPin className="h-4 w-4 text-gray-400" />
+                    <span className="text-gray-600">{member.department}</span>
                   </div>
                 </div>
-              </div>
-              
-              <Button className="w-full" variant="outline">
-                Zobraziť detail
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+                
+                <div className="pt-3 border-t">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium">Efektivita</span>
+                    <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                      {member.performance.efficiency}%
+                    </Badge>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Zmluvy:</span>
+                      <span className="font-medium">{member.performance.contractsSigned}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Tržby:</span>
+                      <span className="font-medium">€{member.performance.monthlyRevenue.toLocaleString()}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <Link to={`/dashboard/team/${member.id}`}>
+                  <Button className="w-full" variant="outline">
+                    Zobraziť detail
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <Card>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Meno</TableHead>
+                  <TableHead>Pozícia</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Telefón</TableHead>
+                  <TableHead>Oddelenie</TableHead>
+                  <TableHead>Efektivita</TableHead>
+                  <TableHead>Tržby</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Akcie</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredMembers.map((member) => (
+                  <TableRow key={member.id}>
+                    <TableCell>
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                          {member.firstName[0]}{member.lastName[0]}
+                        </div>
+                        <span className="font-medium">{member.firstName} {member.lastName}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>{member.position}</TableCell>
+                    <TableCell>{member.email}</TableCell>
+                    <TableCell>{member.phone}</TableCell>
+                    <TableCell>{member.department}</TableCell>
+                    <TableCell>
+                      <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                        {member.performance.efficiency}%
+                      </Badge>
+                    </TableCell>
+                    <TableCell>€{member.performance.monthlyRevenue.toLocaleString()}</TableCell>
+                    <TableCell>
+                      <div className={`w-3 h-3 rounded-full ${getStatusColor(member.status)} inline-block`}></div>
+                    </TableCell>
+                    <TableCell>
+                      <Link to={`/dashboard/team/${member.id}`}>
+                        <Button size="sm" variant="outline">
+                          Detail
+                        </Button>
+                      </Link>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

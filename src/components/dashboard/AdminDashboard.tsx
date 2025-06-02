@@ -10,35 +10,40 @@ import {
   Award,
   Target,
   BarChart3,
-  UserPlus,
   Settings,
   FileText,
-  Calendar,
-  Activity
+  Activity,
+  DollarSign,
+  Download
 } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, ComposedChart } from 'recharts';
 import { AddEmployeeDialog } from './AddEmployeeDialog';
 
-// Mock data pre tímovú výkonnosť
+// Mock data pre tímovú výkonnosť s filtrovaním
 const teamPerformanceData = [
-  { month: 'Jan', peter: 85, ladislav: 78, richie: 92 },
-  { month: 'Feb', peter: 88, ladislav: 82, richie: 95 },
-  { month: 'Mar', peter: 92, ladislav: 85, richie: 88 },
-  { month: 'Apr', peter: 95, ladislav: 88, richie: 98 },
-  { month: 'Máj', peter: 90, ladislav: 92, richie: 96 },
-  { month: 'Jún', peter: 97, ladislav: 89, richie: 99 }
+  { month: 'Jan', peter: 85, ladislav: 78, richie: 92, maria: 75, jan: 68 },
+  { month: 'Feb', peter: 88, ladislav: 82, richie: 95, maria: 78, jan: 72 },
+  { month: 'Mar', peter: 92, ladislav: 85, richie: 88, maria: 82, jan: 76 },
+  { month: 'Apr', peter: 95, ladislav: 88, richie: 98, maria: 85, jan: 80 },
+  { month: 'Máj', peter: 90, ladislav: 92, richie: 96, maria: 87, jan: 84 },
+  { month: 'Jún', peter: 97, ladislav: 89, richie: 99, maria: 89, jan: 87 }
+];
+
+const revenueAndProfitData = [
+  { month: 'Jan', revenue: 59200, profit: 18760, expenses: 40440 },
+  { month: 'Feb', revenue: 63400, profit: 20288, expenses: 43112 },
+  { month: 'Mar', revenue: 68800, profit: 22016, expenses: 46784 },
+  { month: 'Apr', revenue: 72600, profit: 23232, expenses: 49368 },
+  { month: 'Máj', revenue: 69800, profit: 22336, expenses: 47464 },
+  { month: 'Jún', revenue: 76200, profit: 24384, expenses: 51816 }
 ];
 
 const monthlyRevenueData = [
   { name: 'Peter Fekiač', revenue: 23800, contracts: 12, efficiency: 95 },
   { name: 'Ladislav Mathis', revenue: 18800, contracts: 8, efficiency: 92 },
-  { name: 'Richie Plichta', revenue: 16600, contracts: 6, efficiency: 98 }
-];
-
-const departmentData = [
-  { name: 'Sales', value: 45, color: '#3b82f6' },
-  { name: 'Support', value: 30, color: '#10b981' },
-  { name: 'Management', value: 25, color: '#f59e0b' }
+  { name: 'Richie Plichta', revenue: 16600, contracts: 6, efficiency: 98 },
+  { name: 'Mária Novotná', revenue: 14200, contracts: 4, efficiency: 87 },
+  { name: 'Ján Kováč', revenue: 12800, contracts: 3, efficiency: 89 }
 ];
 
 export const AdminDashboard: React.FC = () => {
@@ -50,6 +55,49 @@ export const AdminDashboard: React.FC = () => {
     console.log('New employee added:', employee);
   };
 
+  // Funkcionalita filtra - filtrovanie dát na základe vybraných filtrov
+  const getFilteredPerformanceData = () => {
+    let data = [...teamPerformanceData];
+    
+    // Filter by period
+    if (periodFilter === '1month') {
+      data = data.slice(-1);
+    } else if (periodFilter === '3months') {
+      data = data.slice(-3);
+    } else if (periodFilter === '6months') {
+      data = data.slice(-6);
+    }
+    
+    // Filter by member
+    if (memberFilter !== 'all') {
+      data = data.map(item => ({
+        month: item.month,
+        [memberFilter]: item[memberFilter as keyof typeof item]
+      }));
+    }
+    
+    return data;
+  };
+
+  const getFilteredRevenueData = () => {
+    let data = [...revenueAndProfitData];
+    
+    if (periodFilter === '1month') {
+      data = data.slice(-1);
+    } else if (periodFilter === '3months') {
+      data = data.slice(-3);
+    } else if (periodFilter === '6months') {
+      data = data.slice(-6);
+    }
+    
+    return data;
+  };
+
+  const applyFilters = () => {
+    // Trigger re-render with new filtered data
+    console.log('Applying filters:', { periodFilter, memberFilter, roleFilter });
+  };
+
   return (
     <div className="space-y-6">
       {/* Action Panel */}
@@ -58,23 +106,23 @@ export const AdminDashboard: React.FC = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <div className="p-3 bg-white/20 rounded-lg">
-                <Users className="h-8 w-8" />
+                <BarChart3 className="h-8 w-8" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold mb-1">Správa tímu</h2>
+                <h2 className="text-2xl font-bold mb-1">Admin Dashboard</h2>
                 <p className="text-blue-100 text-sm">
-                  Analyzujte výkonnosť vašich zamestnancov a optimalizujte procesy
+                  Komplexný prehľad výkonnosti tímu a obchodných výsledkov
                 </p>
               </div>
             </div>
             <div className="flex items-center space-x-3">
               <Button variant="outline" className="bg-white/20 hover:bg-white/30 border-white/30 text-white">
-                <FileText className="h-4 w-4 mr-2" />
-                Výkonnostný report
+                <Download className="h-4 w-4 mr-2" />
+                Export reportu
               </Button>
               <Button variant="outline" className="bg-white/20 hover:bg-white/30 border-white/30 text-white">
                 <Settings className="h-4 w-4 mr-2" />
-                Nastavenia tímu
+                Nastavenia
               </Button>
               <AddEmployeeDialog onAddEmployee={handleAddEmployee} />
             </div>
@@ -82,7 +130,7 @@ export const AdminDashboard: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Filters */}
+      {/* Functional Filters */}
       <Card className="shadow-sm">
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -115,6 +163,8 @@ export const AdminDashboard: React.FC = () => {
                   <SelectItem value="peter">Peter Fekiač</SelectItem>
                   <SelectItem value="ladislav">Ladislav Mathis</SelectItem>
                   <SelectItem value="richie">Richie Plichta</SelectItem>
+                  <SelectItem value="maria">Mária Novotná</SelectItem>
+                  <SelectItem value="jan">Ján Kováč</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -135,7 +185,7 @@ export const AdminDashboard: React.FC = () => {
               </Select>
             </div>
             <div className="flex items-end">
-              <Button className="w-full bg-blue-600 hover:bg-blue-700">
+              <Button onClick={applyFilters} className="w-full bg-blue-600 hover:bg-blue-700">
                 <Activity className="h-4 w-4 mr-2" />
                 Aplikovať filter
               </Button>
@@ -151,7 +201,7 @@ export const AdminDashboard: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-blue-600 dark:text-blue-400">Aktívni členovia</p>
-                <p className="text-3xl font-bold text-blue-900 dark:text-blue-100">3</p>
+                <p className="text-3xl font-bold text-blue-900 dark:text-blue-100">5</p>
                 <div className="flex items-center mt-2">
                   <TrendingUp className="h-4 w-4 text-green-600 mr-1" />
                   <span className="text-sm text-green-600">100% aktívnych</span>
@@ -169,7 +219,7 @@ export const AdminDashboard: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-green-600 dark:text-green-400">Priemerná efektivita</p>
-                <p className="text-3xl font-bold text-green-900 dark:text-green-100">95%</p>
+                <p className="text-3xl font-bold text-green-900 dark:text-green-100">92%</p>
                 <div className="flex items-center mt-2">
                   <TrendingUp className="h-4 w-4 text-green-600 mr-1" />
                   <span className="text-sm text-green-600">+3% oproti minulému</span>
@@ -187,7 +237,7 @@ export const AdminDashboard: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-purple-600 dark:text-purple-400">Celkom zmluv</p>
-                <p className="text-3xl font-bold text-purple-900 dark:text-purple-100">26</p>
+                <p className="text-3xl font-bold text-purple-900 dark:text-purple-100">33</p>
                 <div className="flex items-center mt-2">
                   <TrendingUp className="h-4 w-4 text-green-600 mr-1" />
                   <span className="text-sm text-green-600">+8 tento mesiac</span>
@@ -204,11 +254,11 @@ export const AdminDashboard: React.FC = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-orange-600 dark:text-orange-400">Top performer</p>
-                <p className="text-lg font-bold text-orange-900 dark:text-orange-100">Richie Plichta</p>
+                <p className="text-sm font-medium text-orange-600 dark:text-orange-400">Mesačné tržby</p>
+                <p className="text-3xl font-bold text-orange-900 dark:text-orange-100">€86.2K</p>
                 <div className="flex items-center mt-2">
-                  <Award className="h-4 w-4 text-orange-600 mr-1" />
-                  <span className="text-sm text-orange-600">98% efektivita</span>
+                  <DollarSign className="h-4 w-4 text-orange-600 mr-1" />
+                  <span className="text-sm text-orange-600">+12% MoM</span>
                 </div>
               </div>
               <div className="p-3 bg-orange-600 rounded-full">
@@ -219,9 +269,9 @@ export const AdminDashboard: React.FC = () => {
         </Card>
       </div>
 
-      {/* Enhanced Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2">
+      {/* Charts Section - Vývoj efektivity tímu a Tržby & Zisky */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BarChart3 className="h-5 w-5 text-blue-600" />
@@ -231,7 +281,7 @@ export const AdminDashboard: React.FC = () => {
           <CardContent>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={teamPerformanceData}>
+                <LineChart data={getFilteredPerformanceData()}>
                   <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                   <XAxis dataKey="month" />
                   <YAxis />
@@ -243,30 +293,17 @@ export const AdminDashboard: React.FC = () => {
                       boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                     }}
                   />
-                  <Line 
-                    type="monotone" 
-                    dataKey="peter" 
-                    stroke="#3b82f6" 
-                    strokeWidth={3} 
-                    name="Peter Fekiač"
-                    dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="ladislav" 
-                    stroke="#10b981" 
-                    strokeWidth={3} 
-                    name="Ladislav Mathis"
-                    dot={{ fill: '#10b981', strokeWidth: 2, r: 4 }}
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="richie" 
-                    stroke="#f59e0b" 
-                    strokeWidth={3} 
-                    name="Richie Plichta"
-                    dot={{ fill: '#f59e0b', strokeWidth: 2, r: 4 }}
-                  />
+                  {memberFilter === 'all' ? (
+                    <>
+                      <Line type="monotone" dataKey="peter" stroke="#3b82f6" strokeWidth={3} name="Peter Fekiač" />
+                      <Line type="monotone" dataKey="ladislav" stroke="#10b981" strokeWidth={3} name="Ladislav Mathis" />
+                      <Line type="monotone" dataKey="richie" stroke="#f59e0b" strokeWidth={3} name="Richie Plichta" />
+                      <Line type="monotone" dataKey="maria" stroke="#ef4444" strokeWidth={3} name="Mária Novotná" />
+                      <Line type="monotone" dataKey="jan" stroke="#8b5cf6" strokeWidth={3} name="Ján Kováč" />
+                    </>
+                  ) : (
+                    <Line type="monotone" dataKey={memberFilter} stroke="#3b82f6" strokeWidth={3} />
+                  )}
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -276,73 +313,39 @@ export const AdminDashboard: React.FC = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-purple-600" />
-              Rozdelenie tímu
+              <DollarSign className="h-5 w-5 text-green-600" />
+              Tržby a zisky
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={departmentData}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    dataKey="value"
-                    label={({ name, value }) => `${name}: ${value}%`}
-                  >
-                    {departmentData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
+                <ComposedChart data={getFilteredRevenueData()}>
+                  <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip 
+                    contentStyle={{
+                      backgroundColor: 'white',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                    }}
+                    formatter={(value: any, name: string) => [
+                      `€${value.toLocaleString()}`,
+                      name === 'revenue' ? 'Tržby' : 
+                      name === 'profit' ? 'Zisk' : 'Náklady'
+                    ]}
+                  />
+                  <Bar dataKey="revenue" fill="#3b82f6" name="Tržby" />
+                  <Bar dataKey="profit" fill="#10b981" name="Zisk" />
+                  <Line type="monotone" dataKey="expenses" stroke="#ef4444" strokeWidth={2} name="Náklady" />
+                </ComposedChart>
               </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
       </div>
-
-      {/* Monthly Performance Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5 text-green-600" />
-            Mesačné výkony tímu
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={monthlyRevenueData}>
-                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip 
-                  contentStyle={{
-                    backgroundColor: 'white',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                  }}
-                />
-                <Bar 
-                  dataKey="revenue" 
-                  fill="url(#colorGradient)" 
-                  radius={[4, 4, 0, 0]}
-                />
-                <defs>
-                  <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                  </linearGradient>
-                </defs>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Enhanced Team Performance Details */}
       <Card>
@@ -368,7 +371,7 @@ export const AdminDashboard: React.FC = () => {
                         {member.contracts} zmluv
                       </span>
                       <span className="flex items-center">
-                        <Calendar className="h-4 w-4 mr-1" />
+                        <DollarSign className="h-4 w-4 mr-1" />
                         €{member.revenue.toLocaleString()} tržby
                       </span>
                     </div>

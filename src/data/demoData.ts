@@ -1,536 +1,541 @@
-import { Ticket } from '@/types/tickets';
-
-// Users data - updated to new 2-level structure
-export const demoUsers = [
-  {
-    id: 'usr-admin-1',
-    name: 'ISO Organizácia Admin',
-    email: 'admin@isoorg.sk',
-    role: 'admin' as const,
-    avatar: '/avatars/admin.jpg'
-  },
-  {
-    id: 'usr-client-1',
-    name: 'Jana Svobodová',
-    email: 'jana@restacia.sk',
-    role: 'client' as const,
-    organizationId: 'org-1',
-    avatar: '/avatars/jana.jpg'
-  },
-  {
-    id: 'usr-client-2',
-    name: 'Martin Tatra',
-    email: 'martin@hoteltatra.sk',
-    role: 'client' as const,
-    organizationId: 'org-1',
-    avatar: '/avatars/martin.jpg'
-  },
-  {
-    id: 'usr-client-3',
-    name: 'Eva Športová',
-    email: 'eva@sportshop.sk',
-    role: 'client' as const,
-    organizationId: 'org-1',
-    avatar: '/avatars/eva.jpg'
-  },
-  {
-    id: 'usr-client-4',
-    name: 'Tomáš Zdravý',
-    email: 'tomas@lekaren.sk',
-    role: 'client' as const,
-    organizationId: 'org-1',
-    avatar: '/avatars/tomas.jpg'
-  }
-];
-
-// Clients/Merchants data - updated structure
-export const demoClients = [
-  {
-    id: 'usr-client-1',
-    name: 'Reštaurácia U Jána',
-    businessName: 'Reštaurácia U Jána s.r.o.',
-    email: 'jana@restacia.sk',
-    phone: '+421 905 123 456',
-    address: 'Hlavná 15, 811 01 Bratislava',
-    organizationId: 'org-1',
-    status: 'active' as const,
-    joinedDate: '2023-06-15',
-    monthlyVolume: 25000,
-    monthlyRevenue: 2500,
-    devicesCount: 2,
-    industry: 'restaurant'
-  },
-  {
-    id: 'usr-client-2',
-    name: 'Hotel Tatra',
-    businessName: 'Hotel Tatra a.s.',
-    email: 'martin@hoteltatra.sk',
-    phone: '+421 905 234 567',
-    address: 'Námestie SNP 8, 811 06 Bratislava',
-    organizationId: 'org-1',
-    status: 'active' as const,
-    joinedDate: '2023-08-20',
-    monthlyVolume: 85000,
-    monthlyRevenue: 8500,
-    devicesCount: 5,
-    industry: 'hospitality'
-  },
-  {
-    id: 'usr-client-3',
-    name: 'Športový obchod',
-    businessName: 'Sport Pro s.r.o.',
-    email: 'eva@sportshop.sk',
-    phone: '+421 905 345 678',
-    address: 'Obchodná 22, 811 02 Bratislava',
-    organizationId: 'org-1',
-    status: 'active' as const,
-    joinedDate: '2023-07-10',
-    monthlyVolume: 45000,
-    monthlyRevenue: 4500,
-    devicesCount: 3,
-    industry: 'retail'
-  },
-  {
-    id: 'usr-client-4',
-    name: 'Lekáreň Zdravie',
-    businessName: 'Zdravie Pharmacy s.r.o.',
-    email: 'tomas@lekaren.sk',
-    phone: '+421 905 456 789',
-    address: 'Lekárska 5, 811 08 Bratislava',
-    organizationId: 'org-1',
-    status: 'active' as const,
-    joinedDate: '2023-09-05',
-    monthlyVolume: 32000,
-    monthlyRevenue: 3200,
-    devicesCount: 2,
-    industry: 'pharmacy'
-  }
-];
-
-// Locations data - updated with organizationId and missing properties
-export const demoLocations = [
-  {
-    id: 'loc-1',
-    name: 'Hlavná prevádzka',
-    address: 'Hlavná 15, 811 01 Bratislava',
-    clientId: 'usr-client-1',
-    organizationId: 'org-1',
-    devicesCount: 2,
-    status: 'active' as const,
-    type: 'retail' as const,
-    monthlyRevenue: 2500,
-    manager: 'Jana Svobodová',
-    createdAt: '2023-06-15T10:00:00Z'
-  },
-  {
-    id: 'loc-2',
-    name: 'Hotel - Recepcia',
-    address: 'Námestie SNP 8, 811 06 Bratislava',
-    clientId: 'usr-client-2',
-    organizationId: 'org-1',
-    devicesCount: 3,
-    status: 'active' as const,
-    type: 'hospitality' as const,
-    monthlyRevenue: 5000,
-    manager: 'Martin Tatra',
-    createdAt: '2023-08-20T10:00:00Z'
-  },
-  {
-    id: 'loc-3',
-    name: 'Hotel - Reštaurácia',
-    address: 'Námestie SNP 8, 811 06 Bratislava',
-    clientId: 'usr-client-2',
-    organizationId: 'org-1',
-    devicesCount: 2,
-    status: 'inactive' as const,
-    type: 'hospitality' as const,
-    monthlyRevenue: 3500,
-    manager: 'Martin Tatra',
-    createdAt: '2023-08-20T10:00:00Z'
-  },
-  {
-    id: 'loc-4',
-    name: 'Predajňa',
-    address: 'Obchodná 22, 811 02 Bratislava',
-    clientId: 'usr-client-3',
-    organizationId: 'org-1',
-    devicesCount: 3,
-    status: 'active' as const,
-    type: 'retail' as const,
-    monthlyRevenue: 4500,
-    manager: 'Eva Športová',
-    createdAt: '2023-07-10T10:00:00Z'
-  },
-  {
-    id: 'loc-5',
-    name: 'Lekáreň',
-    address: 'Lekárska 5, 811 08 Bratislava',
-    clientId: 'usr-client-4',
-    organizationId: 'org-1',
-    devicesCount: 2,
-    status: 'pending' as const,
-    type: 'retail' as const,
-    monthlyRevenue: 3200,
-    manager: 'Tomáš Zdravý',
-    createdAt: '2023-09-05T10:00:00Z'
-  }
-];
-
-// Devices data - updated with correct status values and missing properties
-export const demoDevices = [
-  {
-    id: 'dev-1',
-    name: 'Terminal 1',
-    type: 'terminal' as const,
-    brand: 'Ingenico',
-    model: 'iWL250',
-    tid: 'T1001',
-    status: 'active' as const,
-    locationId: 'loc-1',
-    clientId: 'usr-client-1',
-    organizationId: 'org-1',
-    lastTransaction: '2024-01-15T14:30:00Z',
-    lastActivity: '2024-01-15T14:30:00Z',
-    transactions: 1250,
-    revenue: 15600,
-    uptime: 98.5,
-    serialNumber: 'IGN-2023-001',
-    firmwareVersion: 'v2.1.4',
-    installDate: '2023-06-15',
-    lastMaintenance: '2024-01-01'
-  },
-  {
-    id: 'dev-2',
-    name: 'Terminal 2',
-    type: 'terminal' as const,
-    brand: 'Verifone',
-    model: 'V240m',
-    tid: 'T1002',
-    status: 'active' as const,
-    locationId: 'loc-1',
-    clientId: 'usr-client-1',
-    organizationId: 'org-1',
-    lastTransaction: '2024-01-15T16:45:00Z',
-    lastActivity: '2024-01-15T16:45:00Z',
-    transactions: 980,
-    revenue: 12400,
-    uptime: 97.2,
-    serialNumber: 'VRF-2023-002',
-    firmwareVersion: 'v3.0.1',
-    installDate: '2023-06-16'
-  },
-  {
-    id: 'dev-3',
-    name: 'Recepcia Terminal',
-    type: 'terminal' as const,
-    brand: 'PAX',
-    model: 'A920Pro',
-    tid: 'T2001',
-    status: 'maintenance' as const,
-    locationId: 'loc-2',
-    clientId: 'usr-client-2',
-    organizationId: 'org-1',
-    lastTransaction: '2024-01-15T18:20:00Z',
-    lastActivity: '2024-01-14T18:20:00Z',
-    transactions: 2150,
-    revenue: 28900,
-    uptime: 99.1,
-    serialNumber: 'PAX-2023-003',
-    firmwareVersion: 'v1.5.2',
-    installDate: '2023-08-20'
-  },
-  {
-    id: 'dev-4',
-    name: 'Terminal Offline',
-    type: 'terminal' as const,
-    brand: 'Ingenico',
-    model: 'iWL220',
-    tid: 'T2002',
-    status: 'inactive' as const,
-    locationId: 'loc-4',
-    clientId: 'usr-client-3',
-    organizationId: 'org-1',
-    lastTransaction: '2024-01-10T10:20:00Z',
-    lastActivity: '2024-01-10T10:20:00Z',
-    transactions: 450,
-    revenue: 8900,
-    uptime: 85.2,
-    serialNumber: 'IGN-2023-004',
-    firmwareVersion: 'v2.0.3',
-    installDate: '2023-07-10'
-  },
-  {
-    id: 'dev-5',
-    name: 'Terminal Error',
-    type: 'terminal' as const,
-    brand: 'Verifone',
-    model: 'V240m',
-    tid: 'T3001',
-    status: 'error' as const,
-    locationId: 'loc-5',
-    clientId: 'usr-client-4',
-    organizationId: 'org-1',
-    lastTransaction: '2024-01-12T15:30:00Z',
-    lastActivity: '2024-01-12T15:30:00Z',
-    transactions: 120,
-    revenue: 2400,
-    uptime: 45.8,
-    serialNumber: 'VRF-2023-005',
-    firmwareVersion: 'v2.8.1',
-    installDate: '2023-09-05'
-  }
-];
-
-// Contracts data
-export interface DemoContract {
+export interface TeamMemberData {
   id: string;
-  title: string;
-  contractNumber: string;
-  description: string;
-  type: 'hardware' | 'software' | 'service' | 'maintenance';
-  status: 'active' | 'pending' | 'expired' | 'terminated';
-  value: number;
-  monthlyFee?: number;
-  startDate: string;
-  endDate: string;
-  clientId: string;
-  clientName: string;
-  organizationId: string;
-  createdBy: string;
+  name: string;
+  role: string;
+  email: string;
+  performance: number;
 }
 
-export const demoContracts: DemoContract[] = [
+export interface BusinessPartnerData {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  contactPerson: string;
+  status: "active" | "inactive" | "pending";
+  createdAt: string;
+  clientsCount: number;
+  totalRevenue: number;
+  monthlyRevenue: number;
+  commission: number;
+  website: string;
+  industry: string;
+  notes: string;
+  teamMembers: TeamMemberData[];
+}
+
+export interface ContractData {
+  id: string;
+  clientId: string;
+  clientName: string;
+  contractNumber: string;
+  type: string;
+  status: "active" | "pending" | "expired";
+  startDate: string;
+  endDate: string;
+  value: number;
+  monthlyFee: number;
+  commissionRate: number;
+  devices: string[];
+  signedBy: string;
+  notes: string;
+}
+
+export interface TicketData {
+  id: string;
+  title: string;
+  description: string;
+  clientId: string;
+  clientName: string;
+  status: "open" | "in_progress" | "resolved" | "closed";
+  priority: "high" | "medium" | "low";
+  assignedTo: string;
+  createdAt: string;
+  updatedAt: string;
+  category: string;
+  estimatedResolution: string;
+}
+
+export interface ReportData {
+  id: string;
+  name: string;
+  type: string;
+  period: string;
+  createdAt: string;
+  createdBy: string;
+  status: "completed" | "pending" | "failed";
+  data: {
+    totalRevenue: number;
+    totalTransactions: number;
+    averageTicket: number;
+    topPerformer: string;
+    growth: number;
+    totalProfit?: number;
+    expenses?: number;
+    profitMargin?: number;
+  };
+}
+
+export interface TransactionData {
+  id: string;
+  merchantId: string;
+  merchantName: string;
+  amount: number;
+  currency: string;
+  status: "completed" | "pending" | "failed" | "refunded";
+  type: "card_payment" | "contactless" | "online" | "cash";
+  timestamp: string;
+  paymentMethod: string;
+  terminalId: string;
+  receiptNumber: string;
+  errorCode?: string;
+}
+
+export interface ClientData {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  businessPartnerId: string;
+  assignedTeamMemberId: string;
+  locationsCount: number;
+  devicesCount: number;
+  totalRevenue: number;
+  monthlyRevenue: number;
+  status: "active" | "inactive" | "pending";
+  createdAt: string;
+  industry: string;
+  address?: string;
+  website?: string;
+  contactPerson?: string;
+  notes?: string;
+}
+
+// Enhanced demo data with more comprehensive information
+export const demoBusinessPartners = [
+  {
+    id: 'bp-1',
+    name: 'ISO Organizácia Slovakia',
+    email: 'info@iso-org.sk',
+    phone: '+421 2 1234 5678',
+    address: 'Bratislava, Slovakia',
+    contactPerson: 'Marián Lapoš',
+    status: 'active' as const,
+    createdAt: '2023-01-01',
+    clientsCount: 156,
+    totalRevenue: 2850000,
+    monthlyRevenue: 285000,
+    commission: 12.5,
+    website: 'https://iso-org.sk',
+    industry: 'Payment Processing',
+    notes: 'Hlavný business partner pre Slovensko',
+    teamMembers: [
+      {
+        id: 'team-1',
+        name: 'Peter Fekiač',
+        role: 'Senior Account Manager',
+        email: 'peter.fekiac@iso-org.sk',
+        performance: 95
+      },
+      {
+        id: 'team-2',
+        name: 'Ladislav Mathis',
+        role: 'Account Manager',
+        email: 'ladislav.mathis@iso-org.sk',
+        performance: 92
+      },
+      {
+        id: 'team-3',
+        name: 'Richie Plichta',
+        role: 'Technical Support Manager',
+        email: 'richie.plichta@iso-org.sk',
+        performance: 98
+      }
+    ]
+  },
+  {
+    id: 'bp-2',
+    name: 'Central Europe Payments',
+    email: 'contact@cepayments.com',
+    phone: '+420 234 567 890',
+    address: 'Prague, Czech Republic',
+    contactPerson: 'Jan Novák',
+    status: 'active' as const,
+    createdAt: '2023-03-15',
+    clientsCount: 89,
+    totalRevenue: 1650000,
+    monthlyRevenue: 165000,
+    commission: 11.0,
+    website: 'https://cepayments.com',
+    industry: 'Payment Processing',
+    notes: 'Expanding partner for Czech market',
+    teamMembers: []
+  }
+];
+
+export const demoContracts = [
   {
     id: 'contract-1',
-    title: 'Dodávka POS terminálov',
-    contractNumber: 'CON-2023-001',
-    description: 'Dodávka a inštalácia 2 POS terminálov pre reštauráciu',
-    type: 'hardware',
-    status: 'active',
-    value: 598,
-    monthlyFee: 25,
-    startDate: '2023-06-15',
-    endDate: '2025-06-15',
-    clientId: 'usr-client-1',
+    clientId: 'client-1',
     clientName: 'Reštaurácia U Jána',
-    organizationId: 'org-1',
-    createdBy: 'usr-admin-1'
+    contractNumber: 'CON-2024-001',
+    type: 'Standard POS Agreement',
+    status: 'active' as const,
+    startDate: '2024-01-15',
+    endDate: '2025-01-14',
+    value: 12800,
+    monthlyFee: 45,
+    commissionRate: 2.5,
+    devices: ['Terminal PAX A920', 'Receipt Printer'],
+    signedBy: 'Peter Fekiač',
+    notes: 'Štandardná zmluva pre reštauračné zariadenie'
   },
   {
     id: 'contract-2',
-    title: 'Hotel POS systém',
-    contractNumber: 'CON-2023-002',
-    description: 'Kompletný POS systém pre hotel s 5 terminálmi',
-    type: 'hardware',
-    status: 'active',
-    value: 1495,
-    monthlyFee: 75,
-    startDate: '2023-08-20',
-    endDate: '2025-08-20',
-    clientId: 'usr-client-2',
-    clientName: 'Hotel Tatra',
-    organizationId: 'org-1',
-    createdBy: 'usr-admin-1'
-  }
-];
-
-// Transactions data
-export interface DemoTransaction {
-  id: string;
-  amount: number;
-  currency: string;
-  status: 'completed' | 'pending' | 'failed' | 'refunded';
-  type: 'payment' | 'refund';
-  timestamp: string;
-  merchantId: string;
-  merchantName: string;
-  deviceId: string;
-  locationId: string;
-  organizationId: string;
-  clientId: string;
-  reference: string;
-  paymentMethod: 'card' | 'contactless' | 'mobile' | 'cash';
-  fee: number;
-}
-
-export const demoTransactions: DemoTransaction[] = [
-  {
-    id: 'txn-1',
-    amount: 25.50,
-    currency: 'EUR',
-    status: 'completed',
-    type: 'payment',
-    timestamp: '2024-01-15T14:30:00Z',
-    merchantId: 'usr-client-1',
-    merchantName: 'Reštaurácia U Jána',
-    deviceId: 'dev-1',
-    locationId: 'loc-1',
-    organizationId: 'org-1',
-    clientId: 'usr-client-1',
-    reference: 'TXN-240115-001',
-    paymentMethod: 'card',
-    fee: 0.51
+    clientId: 'client-4',
+    clientName: 'Fitness Centrum Power',
+    contractNumber: 'CON-2024-002',
+    type: 'Premium Service Package',
+    status: 'active' as const,
+    startDate: '2024-02-20',
+    endDate: '2025-02-19',
+    value: 8600,
+    monthlyFee: 65,
+    commissionRate: 2.2,
+    devices: ['Terminal Ingenico Move 5000', 'Mobile Reader'],
+    signedBy: 'Ladislav Mathis',
+    notes: 'Premium balík s pokročilými funkciami'
   },
   {
-    id: 'txn-2',
-    amount: 120.00,
-    currency: 'EUR',
-    status: 'completed',
-    type: 'payment',
-    timestamp: '2024-01-15T16:45:00Z',
-    merchantId: 'usr-client-2',
-    merchantName: 'Hotel Tatra',
-    deviceId: 'dev-3',
-    locationId: 'loc-2',
-    organizationId: 'org-1',
-    clientId: 'usr-client-2',
-    reference: 'TXN-240115-002',
-    paymentMethod: 'contactless',
-    fee: 2.40
+    id: 'contract-3',
+    clientId: 'client-5',
+    clientName: 'Obchod s elektronikou Tech Store',
+    contractNumber: 'CON-2024-003',
+    type: 'E-commerce Integration',
+    status: 'pending' as const,
+    startDate: '2024-11-01',
+    endDate: '2025-10-31',
+    value: 15200,
+    monthlyFee: 85,
+    commissionRate: 2.8,
+    devices: ['Virtual Terminal', 'API Integration'],
+    signedBy: 'Richie Plichta',
+    notes: 'Integrácia pre online obchod'
   }
 ];
 
-// Helper functions
-export const getClientLocations = (clientId: string) => {
-  return demoLocations.filter(location => location.clientId === clientId);
-};
-
-export const getLocationDevices = (locationId: string) => {
-  return demoDevices.filter(device => device.locationId === locationId);
-};
-
-// Updated mockTickets with new structure
-export const mockTickets: Ticket[] = [
+export const demoTickets = [
   {
-    id: 'TKT-001',
-    title: 'Terminal nefunguje na pobočke Bratislava',
-    description: 'Zákazníci sa sťažujú, že terminál odmietne karty. Potrebujeme okamžitú pomoc.',
+    id: 'ticket-1',
+    title: 'Problém s platobným terminálom',
+    description: 'Terminál sa náhodne reštartuje počas transakcie',
+    clientId: 'client-1',
+    clientName: 'Reštaurácia U Jána',
     status: 'open' as const,
     priority: 'high' as const,
-    category: 'device' as const,
-    createdBy: 'usr-client-1',
-    assignedTo: 'usr-admin-1',
-    clientId: 'usr-client-1',
-    organizationId: 'org-1',
-    locationId: 'loc-1',
-    deviceId: 'dev-1',
-    createdAt: '2024-01-15T10:30:00Z',
-    updatedAt: '2024-01-15T10:30:00Z',
-    comments: []
+    assignedTo: 'Richie Plichta',
+    createdAt: '2024-11-25T10:30:00Z',
+    updatedAt: '2024-11-26T14:15:00Z',
+    category: 'Technical Issue',
+    estimatedResolution: '2024-11-27T16:00:00Z'
   },
   {
-    id: 'TKT-002',
-    title: 'Požiadavka na nový terminál',
-    description: 'Potrebujeme pridať druhý terminál do novej časti prevádzky.',
+    id: 'ticket-2',
+    title: 'Žiadosť o zvýšenie limitu',
+    description: 'Potrebujeme zvýšiť denný limit transakcií',
+    clientId: 'client-4',
+    clientName: 'Fitness Centrum Power',
     status: 'in_progress' as const,
     priority: 'medium' as const,
-    category: 'device' as const,
-    createdBy: 'usr-client-2',
-    assignedTo: 'usr-admin-1',
-    clientId: 'usr-client-2',
-    organizationId: 'org-1',
-    locationId: 'loc-2',
-    createdAt: '2024-01-14T14:20:00Z',
-    updatedAt: '2024-01-15T09:15:00Z',
-    comments: []
+    assignedTo: 'Peter Fekiač',
+    createdAt: '2024-11-24T08:45:00Z',
+    updatedAt: '2024-11-25T11:20:00Z',
+    category: 'Account Management',
+    estimatedResolution: '2024-11-28T12:00:00Z'
   },
   {
-    id: 'TKT-003',
-    title: 'Problém s účtovaním poplatkov',
-    description: 'Zistili sme rozdiel v účtovaných poplatkoch za minulý mesiac.',
+    id: 'ticket-3',
+    title: 'Inštalácia nového terminála',
+    description: 'Potrebujeme nainštalovať dodatočný terminál',
+    clientId: 'client-2',
+    clientName: 'Kaviarňa Central',
     status: 'resolved' as const,
-    priority: 'high' as const,
-    category: 'billing' as const,
-    createdBy: 'usr-client-3',
-    assignedTo: 'usr-admin-1',
-    clientId: 'usr-client-3',
-    organizationId: 'org-1',
-    createdAt: '2024-01-12T16:45:00Z',
-    updatedAt: '2024-01-13T11:30:00Z',
-    resolvedAt: '2024-01-13T11:30:00Z',
-    comments: []
-  },
-  {
-    id: 'TKT-004',
-    title: 'Aktualizácia softvéru',
-    description: 'Potrebujeme aktualizovať softvér na všetkých termináloch.',
-    status: 'open' as const,
-    priority: 'medium' as const,
-    category: 'technical' as const,
-    createdBy: 'usr-client-1',
-    assignedTo: 'usr-admin-1',
-    clientId: 'usr-client-1',
-    organizationId: 'org-1',
-    createdAt: '2024-01-13T08:00:00Z',
-    updatedAt: '2024-01-13T08:00:00Z',
-    comments: []
-  },
-  {
-    id: 'TKT-005',
-    title: 'Zmena podmienok zmluvy',
-    description: 'Chceme prediskutovať možnosť zníženia poplatkov.',
-    status: 'in_progress' as const,
-    priority: 'medium' as const,
-    category: 'contract' as const,
-    createdBy: 'usr-client-4',
-    assignedTo: 'usr-admin-1',
-    clientId: 'usr-client-4',
-    organizationId: 'org-1',
-    createdAt: '2024-01-11T13:15:00Z',
-    updatedAt: '2024-01-14T10:20:00Z',
-    comments: []
+    priority: 'low' as const,
+    assignedTo: 'Ladislav Mathis',
+    createdAt: '2024-11-20T14:20:00Z',
+    updatedAt: '2024-11-23T16:45:00Z',
+    category: 'Installation',
+    estimatedResolution: '2024-11-23T16:45:00Z'
   }
 ];
 
-// Helper function to get client name from tickets
-export const getClientName = (clientId: string): string => {
-  const client = demoClients.find(c => c.id === clientId);
-  return client ? client.name : 'Neznámy klient';
-};
-
-// Helper function to get assigned person name
-export const getAssignedToName = (assignedTo: string): string => {
-  const user = demoUsers.find(u => u.id === assignedTo);
-  return user ? user.name : 'Nepridelené';
-};
-
-// Enhanced team data with historical earnings
-export interface EarningsHistory {
-  date: string;
-  amount: number;
-  teamMemberId?: string;
-}
-
-export const demoEarningsHistory: EarningsHistory[] = [
-  // Peter Fekiač earnings
-  { date: '2024-01-01', amount: 22000, teamMemberId: 'team-1' },
-  { date: '2024-02-01', amount: 24500, teamMemberId: 'team-1' },
-  { date: '2024-03-01', amount: 23800, teamMemberId: 'team-1' },
-  { date: '2024-04-01', amount: 25200, teamMemberId: 'team-1' },
-  { date: '2024-05-01', amount: 23100, teamMemberId: 'team-1' },
-  { date: '2024-06-01', amount: 26800, teamMemberId: 'team-1' },
-  
-  // Ladislav Mathis earnings  
-  { date: '2024-01-01', amount: 16800, teamMemberId: 'team-2' },
-  { date: '2024-02-01', amount: 17900, teamMemberId: 'team-2' },
-  { date: '2024-03-01', amount: 18800, teamMemberId: 'team-2' },
-  { date: '2024-04-01', amount: 19200, teamMemberId: 'team-2' },
-  { date: '2024-05-01', amount: 18500, teamMemberId: 'team-2' },
-  { date: '2024-06-01', amount: 20100, teamMemberId: 'team-2' },
-  
-  // Richie Plichta earnings
-  { date: '2024-01-01', amount: 15200, teamMemberId: 'team-3' },
-  { date: '2024-02-01', amount: 16100, teamMemberId: 'team-3' },
-  { date: '2024-03-01', amount: 16600, teamMemberId: 'team-3' },
-  { date: '2024-04-01', amount: 17800, teamMemberId: 'team-3' },
-  { date: '2024-05-01', amount: 16900, teamMemberId: 'team-3' },
-  { date: '2024-06-01', amount: 18200, teamMemberId: 'team-3' },
+export const demoReports = [
+  {
+    id: 'report-1',
+    name: 'Mesačný prehľad výkonnosti',
+    type: 'Performance Report',
+    period: 'November 2024',
+    createdAt: '2024-11-01',
+    createdBy: 'Peter Fekiač',
+    status: 'completed' as const,
+    data: {
+      totalRevenue: 86200,
+      totalTransactions: 1247,
+      averageTicket: 69.12,
+      topPerformer: 'Richie Plichta',
+      growth: 12.5
+    }
+  },
+  {
+    id: 'report-2',
+    name: 'Kvartálne finančné výsledky',
+    type: 'Financial Report',
+    period: 'Q3 2024',
+    createdAt: '2024-10-01',
+    createdBy: 'Ladislav Mathis',
+    status: 'completed' as const,
+    data: {
+      totalRevenue: 245600,
+      totalProfit: 73680,
+      expenses: 171920,
+      profitMargin: 30.0
+    }
+  }
 ];
 
-// Helper function to get earnings data for charts
-export const getEarningsData = (period: 'day' | 'week' | 'month' | 'year', teamMemberId?: string) => {
-  // This would normally fetch from API based on period and team member
-  return demoEarningsHistory.filter(earning => 
-    !teamMemberId || teamMemberId === 'all' || earning.teamMemberId === teamMemberId
-  );
-};
+export const demoTransactions = [
+  {
+    id: 'trans-1',
+    merchantId: 'client-1',
+    merchantName: 'Reštaurácia U Jána',
+    amount: 89.50,
+    currency: 'EUR',
+    status: 'completed' as const,
+    type: 'card_payment' as const,
+    timestamp: '2024-11-26T12:34:56Z',
+    paymentMethod: 'Visa **** 1234',
+    terminalId: 'PAX-001',
+    receiptNumber: 'RCP-001234'
+  },
+  {
+    id: 'trans-2',
+    merchantId: 'client-4',
+    merchantName: 'Fitness Centrum Power',
+    amount: 35.00,
+    currency: 'EUR',
+    status: 'completed' as const,
+    type: 'contactless' as const,
+    timestamp: '2024-11-26T11:22:15Z',
+    paymentMethod: 'Mastercard Contactless',
+    terminalId: 'ING-002',
+    receiptNumber: 'RCP-001235'
+  },
+  {
+    id: 'trans-3',
+    merchantId: 'client-2',
+    merchantName: 'Kaviarňa Central',
+    amount: 12.80,
+    currency: 'EUR',
+    status: 'failed' as const,
+    type: 'card_payment' as const,
+    timestamp: '2024-11-26T10:15:30Z',
+    paymentMethod: 'Visa **** 5678',
+    terminalId: 'PAX-003',
+    receiptNumber: 'RCP-001236',
+    errorCode: 'insufficient_funds'
+  }
+];
+
+export const demoClients: ClientData[] = [
+  {
+    id: 'client-1',
+    name: 'Reštaurácia U Jána',
+    email: 'info@restauraciaujana.sk',
+    phone: '+421 903 123 456',
+    businessPartnerId: 'bp-1',
+    assignedTeamMemberId: 'team-1',
+    locationsCount: 1,
+    devicesCount: 3,
+    totalRevenue: 125000,
+    monthlyRevenue: 10500,
+    status: 'active',
+    createdAt: '2022-05-15',
+    industry: 'Reštaurácia',
+    address: 'Hlavná 123, 010 01 Žilina',
+    website: 'www.restauraciaujana.sk',
+    contactPerson: 'Ján Novák',
+    notes: 'Overený klient s pravidelnými platbami'
+  },
+  {
+    id: 'client-2',
+    name: 'Kaviarňa Central',
+    email: 'info@kaviarencentral.sk',
+    phone: '+421 905 789 123',
+    businessPartnerId: 'bp-1',
+    assignedTeamMemberId: 'team-2',
+    locationsCount: 1,
+    devicesCount: 2,
+    totalRevenue: 85000,
+    monthlyRevenue: 7000,
+    status: 'active',
+    createdAt: '2022-08-01',
+    industry: 'Kaviarňa',
+    address: 'Námestie Slobody 5, 811 01 Bratislava',
+    website: 'www.kaviarencentral.sk',
+    contactPerson: 'Eva Horváthová',
+    notes: 'Klient s potenciálom pre rast'
+  },
+  {
+    id: 'client-3',
+    name: 'Pizzeria Italia',
+    email: 'objednavky@pizzeriaitalia.sk',
+    phone: '+421 911 456 789',
+    businessPartnerId: 'bp-1',
+    assignedTeamMemberId: 'team-1',
+    locationsCount: 1,
+    devicesCount: 4,
+    totalRevenue: 150000,
+    monthlyRevenue: 12500,
+    status: 'active',
+    createdAt: '2022-10-10',
+    industry: 'Pizzeria',
+    address: 'Štúrova 25, 040 01 Košice',
+    website: 'www.pizzeriaitalia.sk',
+    contactPerson: 'Matej Kováč',
+    notes: 'Dobrý platca, občasné technické problémy'
+  },
+    {
+    id: 'client-4',
+    name: 'Fitness Centrum Power',
+    email: 'info@fitnesspower.sk',
+    phone: '+421 907 987 654',
+    businessPartnerId: 'bp-1',
+    assignedTeamMemberId: 'team-2',
+    locationsCount: 1,
+    devicesCount: 2,
+    totalRevenue: 95000,
+    monthlyRevenue: 8000,
+    status: 'active',
+    createdAt: '2023-01-20',
+    industry: 'Fitness',
+    address: 'Trenčianska 45, 821 09 Bratislava',
+    website: 'www.fitnesspower.sk',
+    contactPerson: 'Zuzana Králiková',
+    notes: 'Spoľahlivý klient, platby vždy načas'
+  },
+  {
+    id: 'client-5',
+    name: 'Obchod s elektronikou Tech Store',
+    email: 'eshop@techstore.sk',
+    phone: '+421 902 345 678',
+    businessPartnerId: 'bp-1',
+    assignedTeamMemberId: 'team-3',
+    locationsCount: 1,
+    devicesCount: 5,
+    totalRevenue: 220000,
+    monthlyRevenue: 18000,
+    status: 'pending',
+    createdAt: '2023-03-01',
+    industry: 'Elektronika',
+    address: 'Mlynská dolina 9, 841 04 Bratislava',
+    website: 'www.techstore.sk',
+    contactPerson: 'Tomáš Molnár',
+    notes: 'Nový klient, čaká sa na schválenie zmluvy'
+  },
+  {
+    id: 'client-6',
+    name: 'Kvetinárstvo Orchidea',
+    email: 'info@kvetinarstvoorchidea.sk',
+    phone: '+421 915 678 901',
+    businessPartnerId: 'bp-1',
+    assignedTeamMemberId: 'team-1',
+    locationsCount: 1,
+    devicesCount: 1,
+    totalRevenue: 60000,
+    monthlyRevenue: 5000,
+    status: 'active',
+    createdAt: '2023-05-10',
+    industry: 'Kvetinárstvo',
+    address: 'Poštová 11, 974 01 Banská Bystrica',
+    website: 'www.kvetinarstvoorchidea.sk',
+    contactPerson: 'Lucia Benková',
+    notes: 'Malý klient, stabilný príjem'
+  },
+  {
+    id: 'client-7',
+    name: 'Cukráreň Sladký Sen',
+    email: 'objednavky@sladkysen.sk',
+    phone: '+421 908 234 567',
+    businessPartnerId: 'bp-1',
+    assignedTeamMemberId: 'team-2',
+    locationsCount: 1,
+    devicesCount: 2,
+    totalRevenue: 90000,
+    monthlyRevenue: 7500,
+    status: 'active',
+    createdAt: '2023-07-01',
+    industry: 'Cukráreň',
+    address: 'SNP 15, 036 01 Martin',
+    website: 'www.sladkysen.sk',
+    contactPerson: 'Veronika Gajdošová',
+    notes: 'Klient s rastúcim obratom'
+  },
+  {
+    id: 'client-8',
+    name: 'Reštaurácia Zlatý Kľúčik',
+    email: 'rezervacie@zlatykucik.sk',
+    phone: '+421 917 567 890',
+    businessPartnerId: 'bp-1',
+    assignedTeamMemberId: 'team-3',
+    locationsCount: 1,
+    devicesCount: 3,
+    totalRevenue: 180000,
+    monthlyRevenue: 15000,
+    status: 'active',
+    createdAt: '2023-09-15',
+    industry: 'Reštaurácia',
+    address: 'Hviezdoslavovo námestie 7, 811 02 Bratislava',
+    website: 'www.zlatykucik.sk',
+    contactPerson: 'Peter Urban',
+    notes: 'VIP klient, vyžaduje promptnú podporu'
+  },
+  {
+    id: 'client-9',
+    name: 'Kaderníctvo Glamour',
+    email: 'objednavky@kadernictvoglamour.sk',
+    phone: '+421 904 890 123',
+    businessPartnerId: 'bp-1',
+    assignedTeamMemberId: 'team-1',
+    locationsCount: 1,
+    devicesCount: 1,
+    totalRevenue: 55000,
+    monthlyRevenue: 4500,
+    status: 'active',
+    createdAt: '2023-11-01',
+    industry: 'Kaderníctvo',
+    address: 'Kollárovo námestie 20, 811 07 Bratislava',
+    website: 'www.kadernictvoglamour.sk',
+    contactPerson: 'Martina Lukáčová',
+    notes: 'Malý klient, stabilné platby'
+  },
+  {
+    id: 'client-10',
+    name: 'Autoservis Rýchly Servis',
+    email: 'servis@rychlyservis.sk',
+    phone: '+421 918 123 456',
+    businessPartnerId: 'bp-1',
+    assignedTeamMemberId: 'team-2',
+    locationsCount: 1,
+    devicesCount: 2,
+    totalRevenue: 110000,
+    monthlyRevenue: 9000,
+    status: 'active',
+    createdAt: '2024-01-10',
+    industry: 'Autoservis',
+    address: 'Rožňavská 22, 821 01 Bratislava',
+    website: 'www.rychlyservis.sk',
+    contactPerson: 'Jozef Mráz',
+    notes: 'Klient s potenciálom pre rozšírenie služieb'
+  }
+];

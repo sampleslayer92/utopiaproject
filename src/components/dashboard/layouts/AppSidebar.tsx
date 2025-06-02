@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -110,31 +111,37 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
-      <SidebarHeader className="px-4 py-3">
+      <SidebarHeader className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center space-x-3">
           <img 
             src="https://cdn.prod.website-files.com/65bb58bd9feeda1fd2e1b551/65bb58bd9feeda1fd2e1b5ad_logo-header.svg" 
             alt="Onepos Logo" 
-            className="h-6 w-auto flex-shrink-0"
+            className="h-8 w-auto flex-shrink-0"
           />
           <div className="min-w-0">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white truncate">Onepos</h2>
-            <p className="text-xs text-gray-600 dark:text-gray-400 truncate">ISO Organizácia</p>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white truncate">onepos</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 truncate">ISO Organizácia</p>
           </div>
         </div>
       </SidebarHeader>
       
-      <SidebarContent>
+      <SidebarContent className="px-4 py-2">
         <SidebarGroup>
-          <SidebarGroupLabel>Menu</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+            Menu
+          </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="space-y-1">
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={location.pathname === item.url}>
-                    <Link to={item.url}>
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
+                  <SidebarMenuButton 
+                    asChild 
+                    isActive={location.pathname === item.url}
+                    className="w-full justify-start px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 data-[active=true]:bg-blue-50 data-[active=true]:text-blue-700 dark:data-[active=true]:bg-blue-900/20 dark:data-[active=true]:text-blue-400"
+                  >
+                    <Link to={item.url} className="flex items-center space-x-3">
+                      <item.icon className="h-5 w-5 flex-shrink-0" />
+                      <span className="truncate">{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -144,22 +151,20 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       
-      <SidebarFooter className="p-4">
-        <div className="space-y-3">
-          <div className="border-t pt-3">
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <p className="text-xs text-gray-500 mb-1">Téma</p>
-                <ThemeToggle />
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 mb-1">Jazyk</p>
-                <LanguageSwitcher />
-              </div>
+      <SidebarFooter className="p-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <p className="text-xs text-gray-500 mb-2 font-medium">Téma</p>
+              <ThemeToggle />
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 mb-2 font-medium">Jazyk</p>
+              <LanguageSwitcher />
             </div>
           </div>
           
-          <div className="text-xs text-gray-500 text-center">
+          <div className="text-xs text-gray-500 text-center pt-2 border-t border-gray-200 dark:border-gray-700">
             © 2025 Onepos Platform
           </div>
         </div>
