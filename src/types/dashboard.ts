@@ -54,4 +54,13 @@ export interface BusinessPartner {
   totalSales: number;
   commission: number;
   clients: number;
+  clientsCount: number;
+  devicesCount: number;
+  totalRevenue: number;
+  monthlyRevenue: number;
+  expectedRevenue: number;
+  commissionRate: number;
+  calculatedCommission: number;
+  contractViolation: boolean;
+  createdAt: string;
 }
