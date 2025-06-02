@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Users } from 'lucide-react';
+import { Users, Filter } from 'lucide-react';
 
 interface TeamEfficiencyData {
   name: string;
@@ -41,7 +42,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
-      <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
+      <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
         <p className="font-semibold">{label}</p>
         <p className="text-blue-600">
           Odoslané zmluvy: <span className="font-bold">{data.contractsSent}</span>
@@ -62,13 +63,46 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export const TeamEfficiencyChart: React.FC = () => {
+  const [selectedPeriod, setSelectedPeriod] = useState('quarter');
+  const [selectedMember, setSelectedMember] = useState('all');
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Users className="h-5 w-5" />
-          Efektivita tímu
+        <CardTitle className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            Efektivita tímu
+          </div>
+          <Filter className="h-4 w-4 text-gray-400" />
         </CardTitle>
+        <div className="flex gap-3 mt-4">
+          <div className="flex-1">
+            <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+              <SelectTrigger className="h-8 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="month">Posledný mesiac</SelectItem>
+                <SelectItem value="quarter">Posledný kvartál</SelectItem>
+                <SelectItem value="year">Posledný rok</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex-1">
+            <Select value={selectedMember} onValueChange={setSelectedMember}>
+              <SelectTrigger className="h-8 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Celý tím</SelectItem>
+                <SelectItem value="peter">Peter Fekiač</SelectItem>
+                <SelectItem value="ladislav">Ladislav Mathis</SelectItem>
+                <SelectItem value="richie">Richie Plichta</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="h-80">

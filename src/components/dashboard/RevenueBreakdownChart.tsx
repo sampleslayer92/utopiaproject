@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { DollarSign, Download } from 'lucide-react';
+import { DollarSign, Download, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface RevenueData {
@@ -72,7 +72,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     const total = payload.reduce((sum: number, item: any) => sum + item.value, 0);
     
     return (
-      <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
+      <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
         <p className="font-semibold">{label}</p>
         {payload.map((item: any, index: number) => (
           <p key={index} style={{ color: item.color }}>
@@ -91,6 +91,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 export const RevenueBreakdownChart: React.FC = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('6months');
   const [selectedPartner, setSelectedPartner] = useState('all');
+  const [selectedMetric, setSelectedMetric] = useState('all');
 
   const handleExport = (format: string) => {
     console.log(`Exportujem revenue data vo formáte: ${format}`);
@@ -106,41 +107,45 @@ export const RevenueBreakdownChart: React.FC = () => {
             Tržby a zisky
           </div>
           <div className="flex items-center gap-2">
+            <Filter className="h-4 w-4 text-gray-400" />
             <Button variant="outline" size="sm" onClick={() => handleExport('pdf')}>
               <Download className="h-4 w-4 mr-1" />
               PDF
             </Button>
-            <Button variant="outline" size="sm" onClick={() => handleExport('excel')}>
-              <Download className="h-4 w-4 mr-1" />
-              Excel
-            </Button>
           </div>
         </CardTitle>
-        <div className="flex gap-4 mt-4">
-          <div className="flex-1">
-            <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="3months">Posledné 3 mesiace</SelectItem>
-                <SelectItem value="6months">Posledných 6 mesiacov</SelectItem>
-                <SelectItem value="1year">Posledný rok</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex-1">
-            <Select value={selectedPartner} onValueChange={setSelectedPartner}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Všetci partneri</SelectItem>
-                <SelectItem value="partner1">Partner A</SelectItem>
-                <SelectItem value="partner2">Partner B</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        <div className="grid grid-cols-3 gap-3 mt-4">
+          <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+            <SelectTrigger className="h-8 text-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="3months">Posledné 3 mesiace</SelectItem>
+              <SelectItem value="6months">Posledných 6 mesiacov</SelectItem>
+              <SelectItem value="1year">Posledný rok</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={selectedPartner} onValueChange={setSelectedPartner}>
+            <SelectTrigger className="h-8 text-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Všetci partneri</SelectItem>
+              <SelectItem value="partner1">Partner A</SelectItem>
+              <SelectItem value="partner2">Partner B</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={selectedMetric} onValueChange={setSelectedMetric}>
+            <SelectTrigger className="h-8 text-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Všetky metriky</SelectItem>
+              <SelectItem value="services">Len služby</SelectItem>
+              <SelectItem value="devices">Len zariadenia</SelectItem>
+              <SelectItem value="commissions">Len provízie</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </CardHeader>
       <CardContent>

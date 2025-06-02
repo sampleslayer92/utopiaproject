@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useForm } from 'react-hook-form';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, FileText, Save, Download, X } from 'lucide-react';
+import { Calendar, FileText, Save, Download, X, Building, MapPin, Users, CreditCard, FileSignature } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface ContractFormData {
@@ -42,6 +42,42 @@ interface ContractFormData {
   
   // Obchodník
   assignedSalesperson: string;
+
+  // Rozšírené firemné údaje
+  companyName: string;
+  ico: string;
+  dic: string;
+  companyAddress: string;
+  
+  // Prevádzky
+  locations: Array<{
+    name: string;
+    address: string;
+    type: string;
+    contactPerson: string;
+  }>;
+  
+  // Osoby
+  persons: Array<{
+    name: string;
+    position: string;
+    email: string;
+    phone: string;
+    role: string;
+  }>;
+  
+  // Fakturácia
+  billingAddress: string;
+  billingEmail: string;
+  paymentMethod: string;
+  bankAccount: string;
+  
+  // Digitálny podpis (read-only)
+  signatureData?: {
+    signedBy: string;
+    signedAt: string;
+    ipAddress: string;
+  };
 }
 
 interface ContractFormProps {
@@ -76,12 +112,24 @@ export const ContractForm: React.FC<ContractFormProps> = ({
       endDate: '',
       services: [],
       products: [],
-      assignedSalesperson: ''
+      assignedSalesperson: '',
+      companyName: '',
+      ico: '',
+      dic: '',
+      companyAddress: '',
+      locations: [],
+      persons: [],
+      billingAddress: '',
+      billingEmail: '',
+      paymentMethod: 'bank_transfer',
+      bankAccount: ''
     }
   });
 
   const [selectedServices, setSelectedServices] = useState<string[]>(contract?.services || []);
   const [selectedProducts, setSelectedProducts] = useState<string[]>(contract?.products || []);
+  const [locations, setLocations] = useState(contract?.locations || [{ name: '', address: '', type: 'main', contactPerson: '' }]);
+  const [persons, setPersons] = useState(contract?.persons || [{ name: '', position: '', email: '', phone: '', role: 'contact' }]);
 
   const availableServices = [
     'POS Systém',
@@ -112,7 +160,9 @@ export const ContractForm: React.FC<ContractFormProps> = ({
     const contractData = {
       ...data,
       services: selectedServices,
-      products: selectedProducts
+      products: selectedProducts,
+      locations,
+      persons
     };
     
     onSave(contractData);
@@ -140,6 +190,22 @@ export const ContractForm: React.FC<ContractFormProps> = ({
     );
   };
 
+  const addLocation = () => {
+    setLocations([...locations, { name: '', address: '', type: 'branch', contactPerson: '' }]);
+  };
+
+  const removeLocation = (index: number) => {
+    setLocations(locations.filter((_, i) => i !== index));
+  };
+
+  const addPerson = () => {
+    setPersons([...persons, { name: '', position: '', email: '', phone: '', role: 'authorized' }]);
+  };
+
+  const removePerson = (index: number) => {
+    setPersons(persons.filter((_, i) => i !== index));
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -147,7 +213,7 @@ export const ContractForm: React.FC<ContractFormProps> = ({
           <h2 className="text-2xl font-bold">
             {isEdit ? 'Upraviť zmluvu' : 'Nová zmluva'}
           </h2>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-600">
             {isEdit ? 'Aktualizujte údaje zmluvy' : 'Vytvorte novú zmluvu pre merchanta'}
           </p>
         </div>
@@ -167,92 +233,92 @@ export const ContractForm: React.FC<ContractFormProps> = ({
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Základné informácie */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <FileText className="h-5 w-5" />
-                  <span>Základné informácie</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Názov zmluvy</FormLabel>
+          {/* Základné informácie */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <FileText className="h-5 w-5" />
+                <span>Základné informácie</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Názov zmluvy</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Názov zmluvy..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="contractNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Číslo zmluvy</FormLabel>
+                    <FormControl>
+                      <Input placeholder="CT-2024-001" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Typ zmluvy</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <Input placeholder="Názov zmluvy..." {...field} />
+                        <SelectTrigger>
+                          <SelectValue placeholder="Vyberte typ" />
+                        </SelectTrigger>
                       </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                      <SelectContent>
+                        <SelectItem value="hardware">Hardware</SelectItem>
+                        <SelectItem value="software">Software</SelectItem>
+                        <SelectItem value="service">Služby</SelectItem>
+                        <SelectItem value="maintenance">Údržba</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                <FormField
-                  control={form.control}
-                  name="contractNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Číslo zmluvy</FormLabel>
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <Input placeholder="CT-2024-001" {...field} />
+                        <SelectTrigger>
+                          <SelectValue placeholder="Vyberte status" />
+                        </SelectTrigger>
                       </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                      <SelectContent>
+                        <SelectItem value="pending">Čakajúca</SelectItem>
+                        <SelectItem value="active">Aktívna</SelectItem>
+                        <SelectItem value="expired">Expirovaná</SelectItem>
+                        <SelectItem value="terminated">Ukončená</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                <FormField
-                  control={form.control}
-                  name="type"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Typ zmluvy</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Vyberte typ" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="hardware">Hardware</SelectItem>
-                          <SelectItem value="software">Software</SelectItem>
-                          <SelectItem value="service">Služby</SelectItem>
-                          <SelectItem value="maintenance">Údržba</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="status"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Status</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Vyberte status" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="pending">Čakajúca</SelectItem>
-                          <SelectItem value="active">Aktívna</SelectItem>
-                          <SelectItem value="expired">Expirovaná</SelectItem>
-                          <SelectItem value="terminated">Ukončená</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
+              <div className="md:col-span-2">
                 <FormField
                   control={form.control}
                   name="description"
@@ -266,88 +332,406 @@ export const ContractForm: React.FC<ContractFormProps> = ({
                     </FormItem>
                   )}
                 />
-              </CardContent>
-            </Card>
+              </div>
+            </CardContent>
+          </Card>
 
-            {/* Klient informácie */}
+          {/* Firemné údaje */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Building className="h-5 w-5" />
+                <span>Firemné údaje</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="companyName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Názov spoločnosti</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Názov spoločnosti..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="ico"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>IČO</FormLabel>
+                    <FormControl>
+                      <Input placeholder="12345678" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="dic"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>DIČ</FormLabel>
+                    <FormControl>
+                      <Input placeholder="SK1234567890" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="clientEmail"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="email@example.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="md:col-span-2">
+                <FormField
+                  control={form.control}
+                  name="companyAddress"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Adresa spoločnosti</FormLabel>
+                      <FormControl>
+                        <Textarea placeholder="Adresa spoločnosti..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Prevádzky */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <MapPin className="h-5 w-5" />
+                  <span>Prevádzky</span>
+                </div>
+                <Button type="button" variant="outline" size="sm" onClick={addLocation}>
+                  Pridať prevádzku
+                </Button>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {locations.map((location, index) => (
+                <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border rounded-lg">
+                  <Input
+                    placeholder="Názov prevádzky"
+                    value={location.name}
+                    onChange={(e) => {
+                      const newLocations = [...locations];
+                      newLocations[index].name = e.target.value;
+                      setLocations(newLocations);
+                    }}
+                  />
+                  <Input
+                    placeholder="Adresa"
+                    value={location.address}
+                    onChange={(e) => {
+                      const newLocations = [...locations];
+                      newLocations[index].address = e.target.value;
+                      setLocations(newLocations);
+                    }}
+                  />
+                  <Select
+                    value={location.type}
+                    onValueChange={(value) => {
+                      const newLocations = [...locations];
+                      newLocations[index].type = value;
+                      setLocations(newLocations);
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="main">Hlavná</SelectItem>
+                      <SelectItem value="branch">Pobočka</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Kontaktná osoba"
+                      value={location.contactPerson}
+                      onChange={(e) => {
+                        const newLocations = [...locations];
+                        newLocations[index].contactPerson = e.target.value;
+                        setLocations(newLocations);
+                      }}
+                    />
+                    {locations.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => removeLocation(index)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* Osoby */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Users className="h-5 w-5" />
+                  <span>Osoby</span>
+                </div>
+                <Button type="button" variant="outline" size="sm" onClick={addPerson}>
+                  Pridať osobu
+                </Button>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {persons.map((person, index) => (
+                <div key={index} className="grid grid-cols-1 md:grid-cols-5 gap-4 p-4 border rounded-lg">
+                  <Input
+                    placeholder="Meno a priezvisko"
+                    value={person.name}
+                    onChange={(e) => {
+                      const newPersons = [...persons];
+                      newPersons[index].name = e.target.value;
+                      setPersons(newPersons);
+                    }}
+                  />
+                  <Input
+                    placeholder="Pozícia"
+                    value={person.position}
+                    onChange={(e) => {
+                      const newPersons = [...persons];
+                      newPersons[index].position = e.target.value;
+                      setPersons(newPersons);
+                    }}
+                  />
+                  <Input
+                    placeholder="Email"
+                    value={person.email}
+                    onChange={(e) => {
+                      const newPersons = [...persons];
+                      newPersons[index].email = e.target.value;
+                      setPersons(newPersons);
+                    }}
+                  />
+                  <Input
+                    placeholder="Telefón"
+                    value={person.phone}
+                    onChange={(e) => {
+                      const newPersons = [...persons];
+                      newPersons[index].phone = e.target.value;
+                      setPersons(newPersons);
+                    }}
+                  />
+                  <div className="flex gap-2">
+                    <Select
+                      value={person.role}
+                      onValueChange={(value) => {
+                        const newPersons = [...persons];
+                        newPersons[index].role = value;
+                        setPersons(newPersons);
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="contact">Kontakt</SelectItem>
+                        <SelectItem value="authorized">Oprávnená osoba</SelectItem>
+                        <SelectItem value="technical">Technický kontakt</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {persons.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => removePerson(index)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* Služby a produkty */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
-                <CardTitle>Informácie o klientovi</CardTitle>
+                <CardTitle>Služby</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="clientName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Názov klienta</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Názov firmy..." {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="clientEmail"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input type="email" placeholder="email@example.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="clientPhone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Telefón</FormLabel>
-                      <FormControl>
-                        <Input placeholder="+421 xxx xxx xxx" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="clientAddress"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Adresa</FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="Adresa klienta..." {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="contactPerson"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Kontaktná osoba</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Meno kontaktnej osoby..." {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <CardContent>
+                <div className="space-y-2">
+                  {availableServices.map((service) => (
+                    <div
+                      key={service}
+                      onClick={() => toggleService(service)}
+                      className="cursor-pointer"
+                    >
+                      <Badge
+                        variant={selectedServices.includes(service) ? "default" : "outline"}
+                        className="mr-2 mb-2"
+                      >
+                        {service}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
 
-            {/* Finančné údaje */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Produkty</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {availableProducts.map((product) => (
+                    <div
+                      key={product}
+                      onClick={() => toggleProduct(product)}
+                      className="cursor-pointer"
+                    >
+                      <Badge
+                        variant={selectedProducts.includes(product) ? "default" : "outline"}
+                        className="mr-2 mb-2"
+                      >
+                        {product}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Fakturácia */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <CreditCard className="h-5 w-5" />
+                <span>Fakturácia</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="billingAddress"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Fakturačná adresa</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder="Fakturačná adresa..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="billingEmail"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email pre faktúry</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="billing@example.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="paymentMethod"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Spôsob platby</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Vyberte spôsob platby" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="bank_transfer">Bankový prevod</SelectItem>
+                        <SelectItem value="card">Platobná karta</SelectItem>
+                        <SelectItem value="cash">Hotovosť</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="bankAccount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Číslo účtu</FormLabel>
+                    <FormControl>
+                      <Input placeholder="SK89 1200 0000 1987 4263 7541" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
+
+          {/* Digitálny podpis (read-only pre editáciu) */}
+          {isEdit && contract?.signatureData && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <FileSignature className="h-5 w-5" />
+                  <span>Digitálny podpis</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                  <p><strong>Podpísal:</strong> {contract.signatureData.signedBy}</p>
+                  <p><strong>Dátum:</strong> {new Date(contract.signatureData.signedAt).toLocaleString('sk-SK')}</p>
+                  <p><strong>IP adresa:</strong> {contract.signatureData.ipAddress}</p>
+                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                    Platne podpísané
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Finančné údaje a ostatné */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
                 <CardTitle>Finančné údaje</CardTitle>
@@ -421,7 +805,6 @@ export const ContractForm: React.FC<ContractFormProps> = ({
               </CardContent>
             </Card>
 
-            {/* Dátumy */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
@@ -482,57 +865,6 @@ export const ContractForm: React.FC<ContractFormProps> = ({
                     </FormItem>
                   )}
                 />
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Služby a produkty */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Služby</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {availableServices.map((service) => (
-                    <div
-                      key={service}
-                      onClick={() => toggleService(service)}
-                      className="cursor-pointer"
-                    >
-                      <Badge
-                        variant={selectedServices.includes(service) ? "default" : "outline"}
-                        className="mr-2 mb-2"
-                      >
-                        {service}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Produkty</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {availableProducts.map((product) => (
-                    <div
-                      key={product}
-                      onClick={() => toggleProduct(product)}
-                      className="cursor-pointer"
-                    >
-                      <Badge
-                        variant={selectedProducts.includes(product) ? "default" : "outline"}
-                        className="mr-2 mb-2"
-                      >
-                        {product}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
               </CardContent>
             </Card>
           </div>

@@ -12,44 +12,15 @@ import {
   DollarSign,
   Download
 } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, ComposedChart } from 'recharts';
 import { AddEmployeeDialog } from './AddEmployeeDialog';
-import { DashboardFiltersComponent } from './DashboardFilters';
 import { RecentTeamActivity } from './RecentTeamActivity';
 import { TeamEfficiencyChart } from './TeamEfficiencyChart';
 import { RevenueBreakdownChart } from './RevenueBreakdownChart';
 import { DashboardFilters } from '@/types/activity';
-import { getTeamActivities, getTeamPerformanceData, getRevenueData } from '@/services/dashboardDataService';
-
-// Mock data pre tímovú výkonnosť s filtrovaním
-const teamPerformanceData = [
-  { month: 'Jan', peter: 85, ladislav: 78, richie: 92, maria: 75, jan: 68 },
-  { month: 'Feb', peter: 88, ladislav: 82, richie: 95, maria: 78, jan: 72 },
-  { month: 'Mar', peter: 92, ladislav: 85, richie: 88, maria: 82, jan: 76 },
-  { month: 'Apr', peter: 95, ladislav: 88, richie: 98, maria: 85, jan: 80 },
-  { month: 'Máj', peter: 90, ladislav: 92, richie: 96, maria: 87, jan: 84 },
-  { month: 'Jún', peter: 97, ladislav: 89, richie: 99, maria: 89, jan: 87 }
-];
-
-const revenueAndProfitData = [
-  { month: 'Jan', revenue: 59200, profit: 18760, expenses: 40440 },
-  { month: 'Feb', revenue: 63400, profit: 20288, expenses: 43112 },
-  { month: 'Mar', revenue: 68800, profit: 22016, expenses: 46784 },
-  { month: 'Apr', revenue: 72600, profit: 23232, expenses: 49368 },
-  { month: 'Máj', revenue: 69800, profit: 22336, expenses: 47464 },
-  { month: 'Jún', revenue: 76200, profit: 24384, expenses: 51816 }
-];
-
-const monthlyRevenueData = [
-  { name: 'Peter Fekiač', revenue: 23800, contracts: 12, efficiency: 95 },
-  { name: 'Ladislav Mathis', revenue: 18800, contracts: 8, efficiency: 92 },
-  { name: 'Richie Plichta', revenue: 16600, contracts: 6, efficiency: 98 },
-  { name: 'Mária Novotná', revenue: 14200, contracts: 4, efficiency: 87 },
-  { name: 'Ján Kováč', revenue: 12800, contracts: 3, efficiency: 89 }
-];
+import { getTeamActivities } from '@/services/dashboardDataService';
 
 export const AdminDashboard: React.FC = () => {
-  const [filters, setFilters] = useState<DashboardFilters>({
+  const [filters] = useState<DashboardFilters>({
     period: 'quarter',
     teamMember: 'all',
     actionType: 'all'
@@ -59,62 +30,8 @@ export const AdminDashboard: React.FC = () => {
     console.log('New employee added:', employee);
   };
 
-  // Get filtered data using the centralized service
+  // Get activities using the centralized service
   const activities = getTeamActivities(filters);
-  const teamData = getTeamPerformanceData(filters);
-  const revenueData = getRevenueData(filters);
-
-  // Funkcionalita filtra - filtrovanie dát na základe vybraných filtrov
-  const getFilteredPerformanceData = () => {
-    let data = [...teamPerformanceData];
-    
-    // Filter by period using correct values
-    if (filters.period === 'month') {
-      data = data.slice(-1);
-    } else if (filters.period === 'quarter') {
-      data = data.slice(-3);
-    }
-    // For 'custom' we show all data by default
-    
-    return data;
-  };
-
-  const getFilteredRevenueData = () => {
-    let data = [...revenueAndProfitData];
-    
-    // Filter by period using correct values
-    if (filters.period === 'month') {
-      data = data.slice(-1);
-    } else if (filters.period === 'quarter') {
-      data = data.slice(-3);
-    }
-    // For 'custom' we show all data by default
-    
-    return data;
-  };
-
-  const applyFilters = () => {
-    // Trigger re-render with new filtered data
-    console.log('Applying filters:', { filters });
-  };
-
-  // Get lines to display based on member filter
-  const getPerformanceLines = () => {
-    const memberFilter = filters.teamMember;
-    if (memberFilter === 'all') {
-      return (
-        <>
-          <Line type="monotone" dataKey="peter" stroke="#3b82f6" strokeWidth={3} name="Peter Fekiač" />
-          <Line type="monotone" dataKey="ladislav" stroke="#10b981" strokeWidth={3} name="Ladislav Mathis" />
-          <Line type="monotone" dataKey="richie" stroke="#f59e0b" strokeWidth={3} name="Richie Plichta" />
-          <Line type="monotone" dataKey="maria" stroke="#ef4444" strokeWidth={3} name="Mária Novotná" />
-          <Line type="monotone" dataKey="jan" stroke="#8b5cf6" strokeWidth={3} name="Ján Kováč" />
-        </>
-      );
-    } else {
-      return <Line type="monotone" dataKey={memberFilter} stroke="#3b82f6" strokeWidth={3} />;
-    }
-  };
 
   return (
     <div className="space-y-6">
@@ -148,17 +65,14 @@ export const AdminDashboard: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Dashboard Filters */}
-      <DashboardFiltersComponent filters={filters} onFiltersChange={setFilters} />
-
       {/* Enhanced Team Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200">
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-blue-600 dark:text-blue-400">Aktívni členovia</p>
-                <p className="text-3xl font-bold text-blue-900 dark:text-blue-100">5</p>
+                <p className="text-sm font-medium text-blue-600">Aktívni členovia</p>
+                <p className="text-3xl font-bold text-blue-900">5</p>
                 <div className="flex items-center mt-2">
                   <TrendingUp className="h-4 w-4 text-green-600 mr-1" />
                   <span className="text-sm text-green-600">100% aktívnych</span>
@@ -171,12 +85,12 @@ export const AdminDashboard: React.FC = () => {
           </CardContent>
         </Card>
         
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-green-200">
+        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-green-600 dark:text-green-400">Priemerná efektivita</p>
-                <p className="text-3xl font-bold text-green-900 dark:text-green-100">92%</p>
+                <p className="text-sm font-medium text-green-600">Priemerná efektivita</p>
+                <p className="text-3xl font-bold text-green-900">92%</p>
                 <div className="flex items-center mt-2">
                   <TrendingUp className="h-4 w-4 text-green-600 mr-1" />
                   <span className="text-sm text-green-600">+3% oproti minulému</span>
@@ -189,12 +103,12 @@ export const AdminDashboard: React.FC = () => {
           </CardContent>
         </Card>
         
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200">
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-purple-600 dark:text-purple-400">Celkom zmluv</p>
-                <p className="text-3xl font-bold text-purple-900 dark:text-purple-100">33</p>
+                <p className="text-sm font-medium text-purple-600">Celkom zmluv</p>
+                <p className="text-3xl font-bold text-purple-900">33</p>
                 <div className="flex items-center mt-2">
                   <TrendingUp className="h-4 w-4 text-green-600 mr-1" />
                   <span className="text-sm text-green-600">+8 tento mesiac</span>
@@ -207,12 +121,12 @@ export const AdminDashboard: React.FC = () => {
           </CardContent>
         </Card>
         
-        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950 dark:to-orange-900 border-orange-200">
+        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-orange-600 dark:text-orange-400">Mesačné tržby</p>
-                <p className="text-3xl font-bold text-orange-900 dark:text-orange-100">€86.2K</p>
+                <p className="text-sm font-medium text-orange-600">Mesačné tržby</p>
+                <p className="text-3xl font-bold text-orange-900">€86.2K</p>
                 <div className="flex items-center mt-2">
                   <DollarSign className="h-4 w-4 text-orange-600 mr-1" />
                   <span className="text-sm text-orange-600">+12% MoM</span>
@@ -226,13 +140,13 @@ export const AdminDashboard: React.FC = () => {
         </Card>
       </div>
 
-      {/* Charts Section - Team Efficiency and Revenue Breakdown */}
+      {/* Charts Section - Team Efficiency and Revenue Breakdown with Local Filters */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <TeamEfficiencyChart />
         <RevenueBreakdownChart />
       </div>
 
-      {/* Recent Team Activity - Replaces Team Performance Details */}
+      {/* Recent Team Activity */}
       <RecentTeamActivity activities={activities} />
     </div>
   );
