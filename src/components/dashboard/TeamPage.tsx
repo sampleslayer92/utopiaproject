@@ -27,6 +27,7 @@ import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog';
 import { TeamMember } from '@/types/team';
 import { PageHeader } from '@/components/ui/page-header';
 import { EntityActions } from '@/components/ui/entity-actions';
+import { SectionHeader } from '@/components/ui/section-header';
 
 // Mock data pre tím s reálnejšími údajmi
 const mockTeamMembers: TeamMember[] = [
@@ -197,30 +198,28 @@ export const TeamPage: React.FC = () => {
     return member.performance.monthlyRevenue * (member.commissionRate || 0) / 100;
   };
 
+  const activeMembers = teamMembers.filter(m => m.status === 'active').length;
+  const avgEfficiency = Math.round(teamMembers.reduce((acc, m) => acc + m.performance.efficiency, 0) / teamMembers.length);
+  const totalRevenue = teamMembers.reduce((acc, m) => acc + m.performance.monthlyRevenue, 0);
+
   const stats = [
     {
-      label: 'Celkom členov',
-      value: teamMembers.length,
+      label: 'Aktívni členovia',
+      value: activeMembers,
       icon: Users,
-      color: 'text-blue-500'
-    },
-    {
-      label: 'Aktívni',
-      value: teamMembers.filter(m => m.status === 'active').length,
-      icon: Target,
-      color: 'text-green-500'
+      color: 'bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
     },
     {
       label: 'Priemerná efektivita',
-      value: `${Math.round(teamMembers.reduce((acc, m) => acc + m.performance.efficiency, 0) / teamMembers.length)}%`,
+      value: `${avgEfficiency}%`,
       icon: TrendingUp,
-      color: 'text-purple-500'
+      color: 'bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400'
     },
     {
-      label: 'Celkom provízie',
-      value: `€${teamMembers.reduce((acc, m) => acc + calculateCommission(m), 0).toLocaleString()}`,
+      label: 'Celkový obrat',
+      value: `€${totalRevenue.toLocaleString()}`,
       icon: Euro,
-      color: 'text-orange-500'
+      color: 'bg-purple-100 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400'
     }
   ];
 
@@ -239,12 +238,15 @@ export const TeamPage: React.FC = () => {
   );
 
   return (
-    <PageHeader
-      title="Správa tímu"
-      description="Spravujte členov vášho tímu, sledujte výkonnosť a koordinujte prácu"
-      stats={stats}
-      actions={actions}
-    >
+    <div className="space-y-6">
+      <SectionHeader
+        icon={Users}
+        title="Správa tímu"
+        description="Spravujte členov vášho tímu, sledujte výkonnosť a koordinujte prácu"
+        stats={stats}
+        actions={actions}
+      />
+
       {/* Search and View Toggle */}
       <Card>
         <CardContent className="p-6">
@@ -461,6 +463,6 @@ export const TeamPage: React.FC = () => {
         description="Ste si istí, že chcete vymazať tohoto člena tímu? Táto akcia sa nedá vrátiť späť."
         itemName={deletingMember ? `${deletingMember.firstName} ${deletingMember.lastName}` : undefined}
       />
-    </PageHeader>
+    </div>
   );
 };

@@ -1,13 +1,15 @@
+
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Search, Filter, Clock, AlertCircle, CheckCircle, User, FileText, BarChart3 } from 'lucide-react';
+import { Plus, Search, AlertCircle, CheckCircle, Clock, User, FileText, BarChart3 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { demoTickets, getClientName, getAssignedToName, TicketData } from '@/data/demoData';
 import { getFilteredData } from '@/utils/roleUtils';
+import { SectionHeader } from '@/components/ui/section-header';
 
 export const TicketsPage: React.FC = () => {
   const { user } = useAuth();
@@ -58,118 +60,60 @@ export const TicketsPage: React.FC = () => {
     }
   };
 
-  const getTicketStats = () => {
-    const stats = {
-      total: finalFilteredTickets.length,
-      open: finalFilteredTickets.filter(t => t.status === 'open').length,
-      inProgress: finalFilteredTickets.filter(t => t.status === 'in_progress').length,
-      resolved: finalFilteredTickets.filter(t => t.status === 'resolved').length
-    };
-    return stats;
-  };
+  const openTickets = finalFilteredTickets.filter(t => t.status === 'open').length;
+  const inProgressTickets = finalFilteredTickets.filter(t => t.status === 'in_progress').length;
+  const resolvedToday = finalFilteredTickets.filter(t => {
+    const today = new Date().toDateString();
+    return t.status === 'resolved' && new Date(t.updatedAt || t.createdAt).toDateString() === today;
+  }).length;
 
-  const stats = getTicketStats();
+  const stats = [
+    {
+      label: 'Otvorené tikety',
+      value: openTickets,
+      icon: AlertCircle,
+      color: 'bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400'
+    },
+    {
+      label: 'V riešení',
+      value: inProgressTickets,
+      icon: Clock,
+      color: 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400'
+    },
+    {
+      label: 'Vyriešené dnes',
+      value: resolvedToday,
+      icon: CheckCircle,
+      color: 'bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400'
+    }
+  ];
+
+  const actions = (
+    <>
+      <Button variant="outline" className="flex items-center space-x-2">
+        <FileText className="h-4 w-4" />
+        <span>Export</span>
+      </Button>
+      <Button variant="outline" className="flex items-center space-x-2">
+        <BarChart3 className="h-4 w-4" />
+        <span>Analýza</span>
+      </Button>
+      <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-200">
+        <Plus className="h-4 w-4 mr-2" />
+        Nový tiket
+      </Button>
+    </>
+  );
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Tikety</h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            {user?.role === 'admin' && 'Spravujte všetky tikety v systéme'}
-            {user?.role === 'client' && 'Vaše tikety a požiadavky'}
-          </p>
-        </div>
-      </div>
-
-      {/* Action Panel */}
-      <Card className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 border-0 shadow-sm">
-        <CardContent className="p-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                Správa tiketov
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Vytvárajte, spravujte a analyzujte tikety
-              </p>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Button variant="outline" className="flex items-center space-x-2">
-                <FileText className="h-4 w-4" />
-                <span>Export</span>
-              </Button>
-              <Button variant="outline" className="flex items-center space-x-2">
-                <BarChart3 className="h-4 w-4" />
-                <span>Analýza</span>
-              </Button>
-              <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-200">
-                <Plus className="h-4 w-4 mr-2" />
-                Nový tiket
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Celkom</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
-              </div>
-              <div className="p-3 rounded-lg bg-blue-100 dark:bg-blue-900/20">
-                <Filter className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Otvorené</p>
-                <p className="text-2xl font-bold text-red-600 dark:text-red-400">{stats.open}</p>
-              </div>
-              <div className="p-3 rounded-lg bg-red-100 dark:bg-red-900/20">
-                <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">V riešení</p>
-                <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{stats.inProgress}</p>
-              </div>
-              <div className="p-3 rounded-lg bg-yellow-100 dark:bg-yellow-900/20">
-                <Clock className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Vyriešené</p>
-                <p className="text-2xl font-bold text-green-600 dark:text-green-400">{stats.resolved}</p>
-              </div>
-              <div className="p-3 rounded-lg bg-green-100 dark:bg-green-900/20">
-                <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <SectionHeader
+        icon={AlertCircle}
+        title="Tikety"
+        description={user?.role === 'admin' ? 'Spravujte všetky tikety v systéme' : 'Vaše tikety a požiadavky'}
+        stats={stats}
+        actions={actions}
+      />
 
       {/* Filters */}
       <Card>
