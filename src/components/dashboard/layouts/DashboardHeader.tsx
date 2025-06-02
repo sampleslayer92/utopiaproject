@@ -18,11 +18,11 @@ export const DashboardHeader: React.FC = () => {
           
           {/* Minimalistic Profile Widget Card */}
           <Card className="bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700">
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-4">
+            <CardContent className="p-3">
+              <div className="flex items-center space-x-3">
                 {/* User Info */}
                 <div className="flex items-center space-x-3">
-                  <Avatar className="h-10 w-10">
+                  <Avatar className="h-8 w-8">
                     <AvatarImage 
                       src="https://cdn.prod.website-files.com/65bb58bd9feeda1fd2e1b551/668549d26dee517c49833a53_Lapos-p-500.webp" 
                       alt="Marián Lapoš" 
@@ -49,17 +49,6 @@ export const DashboardHeader: React.FC = () => {
                     <span className="text-xs text-gray-500 dark:text-gray-400">
                       marian.lapos@onepos.eu
                     </span>
-                    
-                    {/* Organization and Role */}
-                    <div className="flex items-center space-x-2">
-                      <span className="text-xs text-gray-600 dark:text-gray-300">
-                        Onepos
-                      </span>
-                      <span className="text-xs text-gray-400">•</span>
-                      <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-0.5 rounded-full">
-                        ISO Organizácia
-                      </span>
-                    </div>
                   </div>
                 </div>
                 

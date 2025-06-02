@@ -22,7 +22,10 @@ import {
   Settings,
   BarChart3,
   UserCheck,
-  CreditCard
+  CreditCard,
+  Building2,
+  MapPin,
+  Phone
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
@@ -121,6 +124,38 @@ export function AppSidebar() {
                 alt="Onepos Logo" 
                 className="h-8 w-auto"
               />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Organization Info Card */}
+        <Card className="bg-blue-50 dark:bg-blue-900/20 shadow-sm border border-blue-200 dark:border-blue-800/50 mt-4">
+          <CardContent className="p-4">
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <Building2 className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <span className="text-sm font-semibold text-blue-800 dark:text-blue-300">
+                  Onepos
+                </span>
+              </div>
+              
+              <div className="space-y-2 text-xs text-blue-700 dark:text-blue-300">
+                <div className="flex items-center space-x-2">
+                  <span className="bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 px-2 py-1 rounded-full font-medium">
+                    ISO Organizácia
+                  </span>
+                </div>
+                
+                <div className="flex items-center space-x-1">
+                  <MapPin className="h-3 w-3" />
+                  <span>Bratislava, SK</span>
+                </div>
+                
+                <div className="flex items-center space-x-1">
+                  <Phone className="h-3 w-3" />
+                  <span>+421 XXX XXX XXX</span>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
