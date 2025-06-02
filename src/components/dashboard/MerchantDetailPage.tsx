@@ -150,8 +150,8 @@ export const MerchantDetailPage: React.FC = () => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('overview');
   
-  // Contract management state
-  const [contracts, setContracts] = useState(mockMerchantData.contracts);
+  // Contract management state - explicitly type as Contract[]
+  const [contracts, setContracts] = useState<Contract[]>(mockMerchantData.contracts);
   const [editingContract, setEditingContract] = useState<Contract | null>(null);
   const [showEditContractDialog, setShowEditContractDialog] = useState(false);
   const [showAddContractDialog, setShowAddContractDialog] = useState(false);
