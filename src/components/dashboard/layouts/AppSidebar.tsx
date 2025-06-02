@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { LayoutDashboard, CreditCard, Monitor, Users, MapPin, FileText, Ticket, Settings, Building2, BarChart3 } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, Ticket, Settings, BarChart3, UserCheck } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarHeader, SidebarFooter } from '@/components/ui/sidebar';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
@@ -22,33 +22,25 @@ export const AppSidebar: React.FC = () => {
 
     if (user?.role === 'admin') {
       return [...baseItems, {
-        title: 'Transakcie',
-        url: '/dashboard/transactions',
-        icon: CreditCard
+        title: 'Team',
+        url: '/dashboard/team',
+        icon: UserCheck
       }, {
-        title: 'Zariadenia',
-        url: '/dashboard/devices',
-        icon: Monitor
-      }, {
-        title: 'Klienti',
+        title: 'Merchanti',
         url: '/dashboard/clients',
         icon: Users
-      }, {
-        title: 'Prevádzky',
-        url: '/dashboard/locations',
-        icon: MapPin
       }, {
         title: 'Zmluvy',
         url: '/dashboard/contracts',
         icon: FileText
       }, {
-        title: 'Reporty',
-        url: '/dashboard/reports',
-        icon: BarChart3
-      }, {
         title: 'Tikety',
         url: '/dashboard/tickets',
         icon: Ticket
+      }, {
+        title: 'Reporty',
+        url: '/dashboard/reports',
+        icon: BarChart3
       }, {
         title: 'Nastavenia',
         url: '/dashboard/settings',
@@ -60,15 +52,15 @@ export const AppSidebar: React.FC = () => {
       return [...baseItems, {
         title: 'Transakcie',
         url: '/dashboard/transactions',
-        icon: CreditCard
+        icon: BarChart3
       }, {
         title: 'Zariadenia',
         url: '/dashboard/devices',
-        icon: Monitor
+        icon: UserCheck
       }, {
         title: 'Prevádzky',
         url: '/dashboard/locations',
-        icon: MapPin
+        icon: Users
       }, {
         title: 'Zmluvy',
         url: '/dashboard/contracts',
@@ -163,7 +155,7 @@ export const AppSidebar: React.FC = () => {
       
       <SidebarFooter className={`p-4 ${designSystem.gradients.background} border-t border-gray-200 dark:border-gray-600`}>
         <div className="space-y-4">
-          <div className="flex justify-center space-x-2">
+          <div className="grid grid-cols-2 gap-2 justify-items-center">
             <ThemeToggle />
             <LanguageSwitcher />
           </div>

@@ -1,4 +1,3 @@
-
 import { Ticket } from '@/types/tickets';
 
 // Users data - updated to new 2-level structure
@@ -493,4 +492,45 @@ export const getClientName = (clientId: string): string => {
 export const getAssignedToName = (assignedTo: string): string => {
   const user = demoUsers.find(u => u.id === assignedTo);
   return user ? user.name : 'Nepridelené';
+};
+
+// Enhanced team data with historical earnings
+export interface EarningsHistory {
+  date: string;
+  amount: number;
+  teamMemberId?: string;
+}
+
+export const demoEarningsHistory: EarningsHistory[] = [
+  // Peter Fekiač earnings
+  { date: '2024-01-01', amount: 22000, teamMemberId: 'team-1' },
+  { date: '2024-02-01', amount: 24500, teamMemberId: 'team-1' },
+  { date: '2024-03-01', amount: 23800, teamMemberId: 'team-1' },
+  { date: '2024-04-01', amount: 25200, teamMemberId: 'team-1' },
+  { date: '2024-05-01', amount: 23100, teamMemberId: 'team-1' },
+  { date: '2024-06-01', amount: 26800, teamMemberId: 'team-1' },
+  
+  // Ladislav Mathis earnings  
+  { date: '2024-01-01', amount: 16800, teamMemberId: 'team-2' },
+  { date: '2024-02-01', amount: 17900, teamMemberId: 'team-2' },
+  { date: '2024-03-01', amount: 18800, teamMemberId: 'team-2' },
+  { date: '2024-04-01', amount: 19200, teamMemberId: 'team-2' },
+  { date: '2024-05-01', amount: 18500, teamMemberId: 'team-2' },
+  { date: '2024-06-01', amount: 20100, teamMemberId: 'team-2' },
+  
+  // Richie Plichta earnings
+  { date: '2024-01-01', amount: 15200, teamMemberId: 'team-3' },
+  { date: '2024-02-01', amount: 16100, teamMemberId: 'team-3' },
+  { date: '2024-03-01', amount: 16600, teamMemberId: 'team-3' },
+  { date: '2024-04-01', amount: 17800, teamMemberId: 'team-3' },
+  { date: '2024-05-01', amount: 16900, teamMemberId: 'team-3' },
+  { date: '2024-06-01', amount: 18200, teamMemberId: 'team-3' },
+];
+
+// Helper function to get earnings data for charts
+export const getEarningsData = (period: 'day' | 'week' | 'month' | 'year', teamMemberId?: string) => {
+  // This would normally fetch from API based on period and team member
+  return demoEarningsHistory.filter(earning => 
+    !teamMemberId || teamMemberId === 'all' || earning.teamMemberId === teamMemberId
+  );
 };
