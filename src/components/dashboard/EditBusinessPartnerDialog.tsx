@@ -28,8 +28,8 @@ export const EditBusinessPartnerDialog: React.FC<EditBusinessPartnerDialogProps>
     phone: '',
     address: '',
     region: '',
-    tier: 'bronze' as 'gold' | 'silver' | 'bronze',
-    status: 'active' as 'active' | 'inactive'
+    tier: 'bronze' as 'gold' | 'silver' | 'bronze' | 'platinum',
+    status: 'active' as 'active' | 'inactive' | 'suspended'
   });
 
   useEffect(() => {
@@ -141,7 +141,7 @@ export const EditBusinessPartnerDialog: React.FC<EditBusinessPartnerDialogProps>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="tier">Tier</Label>
-              <Select value={formData.tier} onValueChange={(value: 'gold' | 'silver' | 'bronze') => setFormData({ ...formData, tier: value })}>
+              <Select value={formData.tier} onValueChange={(value: 'gold' | 'silver' | 'bronze' | 'platinum') => setFormData({ ...formData, tier: value })}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -149,18 +149,20 @@ export const EditBusinessPartnerDialog: React.FC<EditBusinessPartnerDialogProps>
                   <SelectItem value="bronze">Bronze</SelectItem>
                   <SelectItem value="silver">Silver</SelectItem>
                   <SelectItem value="gold">Gold</SelectItem>
+                  <SelectItem value="platinum">Platinum</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
               <Label htmlFor="status">Status</Label>
-              <Select value={formData.status} onValueChange={(value: 'active' | 'inactive') => setFormData({ ...formData, status: value })}>
+              <Select value={formData.status} onValueChange={(value: 'active' | 'inactive' | 'suspended') => setFormData({ ...formData, status: value })}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="active">Aktívny</SelectItem>
                   <SelectItem value="inactive">Neaktívny</SelectItem>
+                  <SelectItem value="suspended">Pozastavený</SelectItem>
                 </SelectContent>
               </Select>
             </div>

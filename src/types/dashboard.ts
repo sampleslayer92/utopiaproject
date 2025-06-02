@@ -1,39 +1,19 @@
+import { LucideIcon } from 'lucide-react';
 
-export interface BusinessPartner {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  address: string;
-  clientsCount: number;
-  devicesCount: number;
-  totalRevenue: number;
-  monthlyRevenue: number;
-  expectedRevenue: number; // New: Expected revenue declared in contract
-  commissionRate: number; // New: Commission percentage (default 0.5%)
-  calculatedCommission: number; // New: Calculated commission
-  contractViolation: boolean; // New: Flag for contract violation
-  status: 'active' | 'inactive';
-  createdAt: string;
-  tier: 'gold' | 'silver' | 'bronze';
-  region: string;
+export interface DashboardCard {
+  title: string;
+  value: string | number;
+  change?: string;
+  trend?: 'up' | 'down' | 'neutral';
+  icon?: LucideIcon;
 }
 
-export interface Location {
-  id: string;
-  name: string;
-  address: string;
-  city: string;
-  country: string;
-  businessPartnerId: string;
-  managerId?: string;
-  devicesCount: number;
-  monthlyRevenue: number;
-  status: 'active' | 'inactive' | 'pending';
-  createdAt: string;
-  type: 'main' | 'branch';
-  contactPerson?: string;
-  phone?: string;
+export interface NavigationItem {
+  label: string;
+  href: string;
+  icon: LucideIcon;
+  roles: string[];
+  badge?: number;
 }
 
 export interface Client {
@@ -41,82 +21,105 @@ export interface Client {
   name: string;
   email: string;
   phone?: string;
-  address: string;
   businessPartnerId: string;
-  assignedTeamMemberId?: string;
   locationsCount: number;
   devicesCount: number;
   totalRevenue: number;
   monthlyRevenue: number;
-  status: 'active' | 'inactive' | 'pending';
+  status: 'active' | 'inactive' | 'suspended';
   createdAt: string;
-  lastActivity: string; // Added missing property
-  industry: string;
+  lastActivity?: string;
+  contracts: Contract[];
+  industry?: string;
+  address?: string;
   website?: string;
   contactPerson?: string;
-  notes?: string;
+  assignedTeamMemberId?: string;
+}
+
+export interface Location {
+  id: string;
+  name: string;
+  address: string;
+  clientId: string;
+  businessPartnerId: string;
+  devicesCount: number;
+  activeDevices: number;
+  status: 'active' | 'inactive' | 'maintenance';
+  createdAt: string;
+  lastReportDate?: string;
+  revenue: {
+    monthly: number;
+    total: number;
+  };
 }
 
 export interface Device {
   id: string;
-  model: string;
-  serialNumber: string;
-  status: 'active' | 'inactive' | 'maintenance' | 'error';
+  name: string;
+  type: string;
+  model?: string;
+  serialNumber?: string;
   locationId: string;
-  businessPartnerId: string;
   clientId: string;
-  lastActivity: string;
+  businessPartnerId: string;
+  status: 'online' | 'offline' | 'maintenance' | 'error';
+  lastSeen: string;
   installDate: string;
-  type: 'pos' | 'payment_terminal' | 'tablet' | 'printer';
-  version: string;
-  batteryLevel?: number;
-  networkStatus: 'online' | 'offline';
+  warrantyExpiry?: string;
+  revenue: {
+    daily: number;
+    monthly: number;
+    total: number;
+  };
+  metrics: {
+    uptime: number;
+    transactions: number;
+    errors: number;
+  };
 }
 
 export interface Contract {
   id: string;
-  number: string;
-  title: string;
   clientId: string;
-  clientName: string;
-  type: 'hardware' | 'software' | 'service' | 'maintenance';
-  status: 'draft' | 'pending' | 'active' | 'expired' | 'terminated';
+  businessPartnerId: string;
+  type: 'subscription' | 'lease' | 'purchase' | 'maintenance';
+  title: string;
   value: number;
+  monthlyValue?: number;
+  status: 'active' | 'pending' | 'expired' | 'cancelled';
   startDate: string;
   endDate: string;
-  signedDate?: string;
-  businessPartnerId: string;
-  assignedTeamMemberId?: string;
-  description?: string;
+  renewalDate?: string;
+  autoRenewal: boolean;
+  terms: string;
+  devices?: string[]; // Device IDs covered by this contract
 }
 
-export interface Ticket {
+export interface BusinessPartner {
   id: string;
-  title: string;
-  description: string;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  status: 'open' | 'in_progress' | 'resolved' | 'closed';
-  category: 'technical' | 'billing' | 'general' | 'hardware';
-  clientId: string;
-  clientName: string;
-  businessPartnerId: string;
-  assignedTeamMemberId?: string;
+  name: string;
+  email: string;
+  phone?: string;
+  address?: string;
+  clientsCount: number;
+  devicesCount: number;
+  totalRevenue: number;
+  monthlyRevenue: number;
+  status: 'active' | 'inactive' | 'suspended';
   createdAt: string;
-  updatedAt: string;
-  resolvedAt?: string;
+  lastActivity?: string;
+  region?: string;
+  tier: 'bronze' | 'silver' | 'gold' | 'platinum';
 }
 
-export interface Transaction {
-  id: string;
-  amount: number;
-  currency: 'EUR' | 'USD' | 'CZK';
-  type: 'payment' | 'refund' | 'fee' | 'commission';
-  status: 'pending' | 'completed' | 'failed' | 'cancelled';
-  clientId: string;
-  clientName: string;
-  merchantId: string;
-  deviceId: string;
-  timestamp: string;
-  description?: string;
-  reference?: string;
+export interface RevenueReport {
+  period: string;
+  totalRevenue: number;
+  deviceRevenue: number;
+  subscriptionRevenue: number;
+  transactionCount: number;
+  activeDevices: number;
+  newClients: number;
+  churnRate: number;
 }

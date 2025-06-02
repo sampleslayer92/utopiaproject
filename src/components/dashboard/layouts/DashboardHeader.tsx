@@ -1,62 +1,69 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Bell, Search, User } from 'lucide-react';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Card, CardContent } from '@/components/ui/card';
+import { LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Input } from '@/components/ui/input';
-import { 
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { NotificationCenter } from '@/components/notifications/NotificationCenter';
 
 export const DashboardHeader: React.FC = () => {
   const { user, logout } = useAuth();
 
   return (
-    <header className="h-16 border-b border-gray-200 bg-white">
-      <div className="flex h-full items-center justify-between px-6">
-        {/* Search */}
+    <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-3">
+      <div className="flex items-center justify-end">
         <div className="flex items-center space-x-4">
-          <div className="relative w-96">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-            <Input
-              placeholder="Hľadať..."
-              className="pl-10 bg-gray-50 border-gray-200 focus:bg-white"
-            />
-          </div>
-        </div>
-
-        {/* Right side */}
-        <div className="flex items-center space-x-4">
-          {/* Notifications */}
-          <Button variant="ghost" size="sm" className="relative">
-            <Bell className="h-5 w-5" />
-            <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full text-xs"></span>
-          </Button>
-
-          {/* User menu */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="flex items-center space-x-2">
-                <User className="h-5 w-5" />
-                <span className="hidden md:block">{user?.fullName}</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 bg-white">
-              <DropdownMenuLabel>Môj účet</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Profil</DropdownMenuItem>
-              <DropdownMenuItem>Nastavenia</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={logout}>
-                Odhlásiť sa
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <NotificationCenter />
+          
+          {/* Minimalistic Profile Widget Card */}
+          <Card className="bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700">
+            <CardContent className="p-3">
+              <div className="flex items-center space-x-3">
+                {/* User Info */}
+                <div className="flex items-center space-x-3">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage 
+                      src="https://cdn.prod.website-files.com/65bb58bd9feeda1fd2e1b551/668549d26dee517c49833a53_Lapos-p-500.webp" 
+                      alt="Marián Lapoš" 
+                    />
+                    <AvatarFallback>ML</AvatarFallback>
+                  </Avatar>
+                  
+                  <div className="flex flex-col space-y-0.5">
+                    {/* Name */}
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                        Marián Lapoš
+                      </span>
+                      {/* Online Status Indicator */}
+                      <div className="flex items-center space-x-1">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span className="text-xs text-green-600 dark:text-green-400 font-medium">
+                          Online
+                        </span>
+                      </div>
+                    </div>
+                    
+                    {/* Email */}
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      marian.lapos@onepos.eu
+                    </span>
+                  </div>
+                </div>
+                
+                {/* Logout Button */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={logout}
+                  className="ml-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </header>
