@@ -4,13 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Search, Edit, Eye, MapPin, Users, Smartphone, DollarSign, Plus } from 'lucide-react';
+import { Search, Edit, Eye, MapPin, Users, Smartphone, DollarSign, Plus, UserPlus } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Client } from '@/types/dashboard';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
+import { OnboardingClientCard } from './OnboardingClientCard';
 
 const mockClients: Client[] = [
   {
@@ -120,25 +121,13 @@ export const ClientsPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [activeTab, setActiveTab] = useState('list');
 
-  // Filter clients based on user role
-  const getFilteredClients = () => {
-    let clients = mockClients;
-    
-    // If business partner, show only their assigned clients
-    if (user?.role === 'business_partner') {
-      clients = clients.filter(client => client.businessPartnerId === user.organizationId);
-    }
-    
-    // Apply search filter
-    return clients.filter(client =>
-      client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (client.industry && client.industry.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
-  };
-
-  const filteredClients = getFilteredClients();
+  const filteredClients = mockClients.filter(client =>
+    client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (client.industry && client.industry.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -168,19 +157,8 @@ export const ClientsPage: React.FC = () => {
     navigate(`/dashboard/merchants/${clientId}`);
   };
 
-  const handleAddClient = () => {
-    // Set merchant onboarding context
-    localStorage.setItem('onboarding_context', JSON.stringify({ 
-      type: 'merchant',
-      initiatedBy: user?.role,
-      organizationId: user?.organizationId 
-    }));
-    toast.success('Spúšťa sa onboarding nového merchanta...');
-    navigate('/onboarding/company');
-  };
-
-  // Only admins and business partners can see this page
-  if (!user || (user.role !== 'admin' && user.role !== 'business_partner')) {
+  // Only admins can see this page
+  if (!user || user.role !== 'admin') {
     return (
       <div className="text-center py-8">
         <p className="text-gray-600 dark:text-gray-400">
@@ -198,19 +176,9 @@ export const ClientsPage: React.FC = () => {
             Merchanti
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            {user.role === 'admin' 
-              ? 'Správa všetkých merchantov v systéme'
-              : 'Správa vašich pridelených merchantov'
-            }
+            Správa všetkých merchantov v systéme
           </p>
         </div>
-        <Button 
-          onClick={handleAddClient}
-          className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Pridať merchanta
-        </Button>
       </div>
 
       {/* Summary Cards */}
@@ -261,128 +229,147 @@ export const ClientsPage: React.FC = () => {
         </Card>
       </div>
 
-      {/* Search and Table */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center space-x-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                placeholder="Hľadať merchantov..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {filteredClients.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-gray-500 dark:text-gray-400">
-                {searchTerm ? 'Žiadni merchanti nevyhovujú hľadaniu.' : 'Žiadni merchanti neboli nájdení.'}
-              </p>
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Merchant</TableHead>
-                  <TableHead>Odvetvie</TableHead>
-                  <TableHead>Lokácie</TableHead>
-                  <TableHead>Zariadenia</TableHead>
-                  <TableHead>Mesačné tržby</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Akcie</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredClients.map((client) => (
-                  <TableRow 
-                    key={client.id}
-                    className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-                    onClick={() => handleClientClick(client.id)}
-                  >
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{client.name}</div>
-                        <div className="text-sm text-gray-500">{client.email}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">
-                        {getIndustryLabel(client.industry || '')}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{client.locationsCount}</TableCell>
-                    <TableCell>{client.devicesCount}</TableCell>
-                    <TableCell>€{client.monthlyRevenue.toLocaleString()}</TableCell>
-                    <TableCell>
-                      <Badge className={getStatusColor(client.status)}>
-                        {client.status === 'active' ? 'Aktívny' : 
-                         client.status === 'inactive' ? 'Neaktívny' : 'Pozastavený'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-2" onClick={(e) => e.stopPropagation()}>
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setSelectedClient(client)}
-                            >
-                              <Eye className="h-4 w-4" />
+      {/* Tabs for List and Add New */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2 max-w-md">
+          <TabsTrigger value="list">Zoznam merchantov</TabsTrigger>
+          <TabsTrigger value="add" className="flex items-center space-x-2">
+            <UserPlus className="h-4 w-4" />
+            <span>Pridať nového</span>
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="list" className="space-y-6">
+          {/* Search and Table */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center space-x-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Input
+                    placeholder="Hľadať merchantov..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {filteredClients.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-500 dark:text-gray-400">
+                    {searchTerm ? 'Žiadni merchanti nevyhovujú hľadaniu.' : 'Žiadni merchanti neboli nájdení.'}
+                  </p>
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Merchant</TableHead>
+                      <TableHead>Odvetvie</TableHead>
+                      <TableHead>Lokácie</TableHead>
+                      <TableHead>Zariadenia</TableHead>
+                      <TableHead>Mesačné tržby</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Akcie</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredClients.map((client) => (
+                      <TableRow 
+                        key={client.id}
+                        className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                        onClick={() => handleClientClick(client.id)}
+                      >
+                        <TableCell>
+                          <div>
+                            <div className="font-medium">{client.name}</div>
+                            <div className="text-sm text-gray-500">{client.email}</div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline">
+                            {getIndustryLabel(client.industry || '')}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{client.locationsCount}</TableCell>
+                        <TableCell>{client.devicesCount}</TableCell>
+                        <TableCell>€{client.monthlyRevenue.toLocaleString()}</TableCell>
+                        <TableCell>
+                          <Badge className={getStatusColor(client.status)}>
+                            {client.status === 'active' ? 'Aktívny' : 
+                             client.status === 'inactive' ? 'Neaktívny' : 'Pozastavený'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center space-x-2" onClick={(e) => e.stopPropagation()}>
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setSelectedClient(client)}
+                                >
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="max-w-2xl">
+                                <DialogHeader>
+                                  <DialogTitle>Detail merchanta</DialogTitle>
+                                </DialogHeader>
+                                {selectedClient && (
+                                  <div className="space-y-4">
+                                    <div className="grid grid-cols-2 gap-4">
+                                      <div>
+                                        <p className="text-sm font-medium text-gray-500">Názov</p>
+                                        <p>{selectedClient.name}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-sm font-medium text-gray-500">Email</p>
+                                        <p>{selectedClient.email}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-sm font-medium text-gray-500">Telefón</p>
+                                        <p>{selectedClient.phone}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-sm font-medium text-gray-500">Adresa</p>
+                                        <p>{selectedClient.address}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-sm font-medium text-gray-500">Celkové tržby</p>
+                                        <p>€{selectedClient.totalRevenue.toLocaleString()}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-sm font-medium text-gray-500">Vytvorený</p>
+                                        <p>{new Date(selectedClient.createdAt).toLocaleDateString('sk-SK')}</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                              </DialogContent>
+                            </Dialog>
+                            <Button variant="outline" size="sm">
+                              <Edit className="h-4 w-4" />
                             </Button>
-                          </DialogTrigger>
-                          <DialogContent className="max-w-2xl">
-                            <DialogHeader>
-                              <DialogTitle>Detail merchanta</DialogTitle>
-                            </DialogHeader>
-                            {selectedClient && (
-                              <div className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                  <div>
-                                    <p className="text-sm font-medium text-gray-500">Názov</p>
-                                    <p>{selectedClient.name}</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-sm font-medium text-gray-500">Email</p>
-                                    <p>{selectedClient.email}</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-sm font-medium text-gray-500">Telefón</p>
-                                    <p>{selectedClient.phone}</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-sm font-medium text-gray-500">Adresa</p>
-                                    <p>{selectedClient.address}</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-sm font-medium text-gray-500">Celkové tržby</p>
-                                    <p>€{selectedClient.totalRevenue.toLocaleString()}</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-sm font-medium text-gray-500">Vytvorený</p>
-                                    <p>{new Date(selectedClient.createdAt).toLocaleDateString('sk-SK')}</p>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-                          </DialogContent>
-                        </Dialog>
-                        <Button variant="outline" size="sm">
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="add" className="space-y-6">
+          <div className="max-w-2xl">
+            <OnboardingClientCard />
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

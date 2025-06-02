@@ -16,15 +16,12 @@ import {
 import {
   Home,
   Users,
-  Building2,
-  Smartphone,
-  MapPin,
-  CreditCard,
   FileText,
   Ticket,
   Settings,
   BarChart3,
-  UserCheck
+  UserCheck,
+  CreditCard
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
@@ -50,65 +47,62 @@ export function AppSidebar() {
         title: "Merchanti",
         url: "/dashboard/merchants",
         icon: Users,
-        roles: ['admin', 'business_partner']
-      },
-      {
-        title: "Business Partneri",
-        url: "/dashboard/business-partners",
-        icon: Building2,
         roles: ['admin']
-      },
-      {
-        title: "Zariadenia",
-        url: "/dashboard/devices",
-        icon: Smartphone,
-        roles: ['admin', 'business_partner']
-      },
-      {
-        title: "Lokácie",
-        url: "/dashboard/locations",
-        icon: MapPin,
-        roles: ['admin', 'business_partner', 'client']
-      },
-      {
-        title: "Transakcie",
-        url: "/dashboard/transactions",
-        icon: CreditCard,
-        roles: ['admin', 'business_partner', 'client']
       },
       {
         title: "Kontrakty",
         url: "/dashboard/contracts",
         icon: FileText,
-        roles: ['admin', 'business_partner']
+        roles: ['admin']
       },
       {
         title: "Tickety",
         url: "/dashboard/tickets",
         icon: Ticket,
-        roles: ['admin', 'business_partner', 'client']
+        roles: ['admin', 'client']
       },
       {
         title: "Tím",
         url: "/dashboard/team",
         icon: UserCheck,
-        roles: ['admin', 'business_partner']
+        roles: ['admin']
       },
       {
         title: "Reporty",
         url: "/dashboard/reports",
         icon: BarChart3,
-        roles: ['admin', 'business_partner']
+        roles: ['admin']
       },
       {
         title: "Nastavenia",
         url: "/dashboard/settings",
         icon: Settings,
-        roles: ['admin', 'business_partner', 'client']
+        roles: ['admin', 'client']
       }
     ];
 
-    return [...baseItems, ...adminItems].filter(item => 
+    const clientItems = [
+      {
+        title: "Transakcie",
+        url: "/dashboard/transactions",
+        icon: CreditCard,
+        roles: ['client']
+      },
+      {
+        title: "Tickety",
+        url: "/dashboard/tickets",
+        icon: Ticket,
+        roles: ['client']
+      },
+      {
+        title: "Nastavenia",
+        url: "/dashboard/settings",
+        icon: Settings,
+        roles: ['client']
+      }
+    ];
+
+    return [...baseItems, ...adminItems, ...clientItems].filter(item => 
       item.roles.includes(user?.role || '')
     );
   };
@@ -123,9 +117,7 @@ export function AppSidebar() {
           <div>
             <h2 className="text-lg font-semibold">Utopia</h2>
             <p className="text-xs text-gray-500">
-              {user?.role === 'admin' ? 'ISO Platform' : 
-               user?.role === 'business_partner' ? 'Partner Portal' : 
-               'Client Portal'}
+              {user?.role === 'admin' ? 'ISO Platform' : 'Client Portal'}
             </p>
           </div>
         </div>

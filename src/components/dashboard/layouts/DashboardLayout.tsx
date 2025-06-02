@@ -6,20 +6,15 @@ import { AppSidebar } from './AppSidebar';
 import { DashboardHeader } from './DashboardHeader';
 import { AdminDashboard } from '../AdminDashboard';
 import { ClientDashboard } from '../ClientDashboard';
-import { BusinessPartnerDashboard } from '../BusinessPartnerDashboard';
-import { LocationDashboard } from '../LocationDashboard';
 import { ClientsPage } from '../ClientsPage';
-import { BusinessPartnersPage } from '../BusinessPartnersPage';
-import { DevicesPage } from '../DevicesPage';
-import { LocationsPage } from '../LocationsPage';
-import { TransactionsPage } from '../TransactionsPage';
-import { ReportsPage } from '../ReportsPage';
 import { ContractsPage } from '../ContractsPage';
 import { TicketsPage } from '../TicketsPage';
 import { TeamPage } from '../TeamPage';
 import { TeamMemberDetail } from '../TeamMemberDetail';
 import { SettingsPage } from '../SettingsPage';
 import { MerchantDetailPage } from '../MerchantDetailPage';
+import { TransactionsPage } from '../TransactionsPage';
+import { ReportsPage } from '../ReportsPage';
 import { GlobalChatbot } from '../../chat/GlobalChatbot';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -31,8 +26,6 @@ export const DashboardLayout: React.FC = () => {
     switch (user?.role) {
       case 'admin':
         return <AdminDashboard />;
-      case 'business_partner':
-        return <BusinessPartnerDashboard />;
       case 'client':
         return <ClientDashboard />;
       default:
@@ -51,22 +44,6 @@ export const DashboardLayout: React.FC = () => {
     
     if (location.pathname.startsWith('/dashboard/merchants/')) {
       return <MerchantDetailPage />;
-    }
-    
-    if (location.pathname === '/dashboard/business-partners') {
-      return <BusinessPartnersPage />;
-    }
-    
-    if (location.pathname === '/dashboard/devices') {
-      return <DevicesPage />;
-    }
-    
-    if (location.pathname === '/dashboard/locations') {
-      return <LocationsPage />;
-    }
-    
-    if (location.pathname.startsWith('/dashboard/location/')) {
-      return <LocationDashboard />;
     }
     
     if (location.pathname === '/dashboard/transactions') {

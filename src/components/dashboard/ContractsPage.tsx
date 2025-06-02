@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,21 +9,114 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Plus, Search, Filter, Calendar, FileText, User, MapPin, DollarSign, Clock, Eye, Edit } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/contexts/AuthContext';
-import { demoContracts, demoClients, type DemoContract } from '@/data/demoData';
+
+// Updated contract interface with creator info
+interface ContractWithCreator {
+  id: string;
+  title: string;
+  contractNumber: string;
+  clientName: string;
+  type: 'hardware' | 'software' | 'service' | 'maintenance';
+  status: 'active' | 'pending' | 'expired' | 'terminated';
+  value: number;
+  startDate: string;
+  endDate: string;
+  description: string;
+  createdBy: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  createdAt: string;
+}
+
+const mockContracts: ContractWithCreator[] = [
+  {
+    id: 'contract-1',
+    title: 'POS Systém - Reštaurácia U Jána',
+    contractNumber: 'CT-2024-001',
+    clientName: 'Reštaurácia U Jána',
+    type: 'hardware',
+    status: 'active',
+    value: 12800,
+    startDate: '2024-01-15',
+    endDate: '2025-01-15',
+    description: 'Kompletný POS systém s platobným terminálom a online správou.',
+    createdBy: {
+      id: 'team-1',
+      name: 'Peter Manažér',
+      email: 'peter@utopia.sk'
+    },
+    createdAt: '2024-01-10'
+  },
+  {
+    id: 'contract-2',
+    title: 'Software licencia - Tech Store',
+    contractNumber: 'CT-2024-002',
+    clientName: 'Tech Store Slovakia',
+    type: 'software',
+    status: 'active',
+    value: 8640,
+    startDate: '2024-02-20',
+    endDate: '2025-02-20',
+    description: 'Ročná licencia pre inventúrny a predajný systém.',
+    createdBy: {
+      id: 'team-2',
+      name: 'Mária Obchodná',
+      email: 'maria@utopia.sk'
+    },
+    createdAt: '2024-02-15'
+  },
+  {
+    id: 'contract-3',
+    title: 'Údržba zariadení - Hotel Grandeur',
+    contractNumber: 'CT-2024-003',
+    clientName: 'Hotel Grandeur',
+    type: 'maintenance',
+    status: 'active',
+    value: 3600,
+    startDate: '2024-03-10',
+    endDate: '2025-03-10',
+    description: 'Pravidelná údržba a podpora pre všetky POS zariadenia.',
+    createdBy: {
+      id: 'team-3',
+      name: 'Tomáš Technik',
+      email: 'tomas@utopia.sk'
+    },
+    createdAt: '2024-03-05'
+  },
+  {
+    id: 'contract-4',
+    title: 'Služby - Fitness Centrum Power',
+    contractNumber: 'CT-2024-004',
+    clientName: 'Fitness Centrum Power',
+    type: 'service',
+    status: 'pending',
+    value: 4800,
+    startDate: '2024-12-01',
+    endDate: '2025-12-01',
+    description: 'Kompletné služby pre správu členstva a platieb.',
+    createdBy: {
+      id: 'team-1',
+      name: 'Peter Manažér',
+      email: 'peter@utopia.sk'
+    },
+    createdAt: '2024-11-25'
+  }
+];
 
 export const ContractsPage: React.FC = () => {
   const { user } = useAuth();
-  const [selectedContract, setSelectedContract] = useState<DemoContract | null>(null);
-
-  const [contracts] = useState<DemoContract[]>(demoContracts);
+  const [selectedContract, setSelectedContract] = useState<ContractWithCreator | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
 
-  const filteredContracts = contracts.filter(contract => {
+  const filteredContracts = mockContracts.filter(contract => {
     const matchesSearch = contract.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          contract.contractNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         contract.clientName.toLowerCase().includes(searchTerm.toLowerCase());
+                         contract.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         contract.createdBy.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || contract.status === statusFilter;
     const matchesType = typeFilter === 'all' || contract.type === typeFilter;
     
@@ -49,18 +143,49 @@ export const ContractsPage: React.FC = () => {
     }
   };
 
-  const activeContracts = contracts.filter(c => c.status === 'active').length;
-  const totalValue = contracts.reduce((sum, c) => sum + c.value, 0);
-  const expiringContracts = contracts.filter(c => {
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'active': return 'Aktívna';
+      case 'pending': return 'Čakajúca';
+      case 'expired': return 'Expirovaná';
+      case 'terminated': return 'Ukončená';
+      default: return status;
+    }
+  };
+
+  const getTypeLabel = (type: string) => {
+    switch (type) {
+      case 'hardware': return 'Hardware';
+      case 'software': return 'Software';
+      case 'service': return 'Služby';
+      case 'maintenance': return 'Údržba';
+      default: return type;
+    }
+  };
+
+  const activeContracts = mockContracts.filter(c => c.status === 'active').length;
+  const totalValue = mockContracts.reduce((sum, c) => sum + c.value, 0);
+  const expiringContracts = mockContracts.filter(c => {
     const endDate = new Date(c.endDate);
     const threeMonthsFromNow = new Date();
     threeMonthsFromNow.setMonth(threeMonthsFromNow.getMonth() + 3);
     return endDate <= threeMonthsFromNow && c.status === 'active';
   }).length;
 
-  const handleRowClick = (contract: DemoContract) => {
+  const handleRowClick = (contract: ContractWithCreator) => {
     setSelectedContract(contract);
   };
+
+  // Only admins can see this page
+  if (!user || user.role !== 'admin') {
+    return (
+      <div className="text-center py-8">
+        <p className="text-gray-600 dark:text-gray-400">
+          Nemáte oprávnenie na zobrazenie tejto stránky.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 p-6">
@@ -200,6 +325,7 @@ export const ContractsPage: React.FC = () => {
                 <TableHead>Názov</TableHead>
                 <TableHead>Číslo zmluvy</TableHead>
                 <TableHead>Klient</TableHead>
+                <TableHead>Vytvoril</TableHead>
                 <TableHead>Typ</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Hodnota</TableHead>
@@ -218,13 +344,19 @@ export const ContractsPage: React.FC = () => {
                   <TableCell>{contract.contractNumber}</TableCell>
                   <TableCell>{contract.clientName}</TableCell>
                   <TableCell>
+                    <div>
+                      <div className="font-medium">{contract.createdBy.name}</div>
+                      <div className="text-sm text-gray-500">{contract.createdBy.email}</div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
                     <Badge className={getTypeColor(contract.type)}>
-                      {contract.type}
+                      {getTypeLabel(contract.type)}
                     </Badge>
                   </TableCell>
                   <TableCell>
                     <Badge className={getStatusColor(contract.status)}>
-                      {contract.status}
+                      {getStatusLabel(contract.status)}
                     </Badge>
                   </TableCell>
                   <TableCell>€{contract.value.toLocaleString()}</TableCell>
@@ -272,13 +404,13 @@ export const ContractsPage: React.FC = () => {
                     <div>
                       <p className="text-sm font-medium text-gray-500">Typ</p>
                       <Badge className={getTypeColor(selectedContract.type)}>
-                        {selectedContract.type}
+                        {getTypeLabel(selectedContract.type)}
                       </Badge>
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-500">Status</p>
                       <Badge className={getStatusColor(selectedContract.status)}>
-                        {selectedContract.status}
+                        {getStatusLabel(selectedContract.status)}
                       </Badge>
                     </div>
                   </div>
@@ -287,12 +419,21 @@ export const ContractsPage: React.FC = () => {
                 <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
                   <h3 className="font-semibold mb-3 flex items-center gap-2">
                     <User className="h-4 w-4" />
-                    Klient
+                    Klient a tvoriteľ
                   </h3>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <div>
-                      <p className="text-sm font-medium text-gray-500">Názov</p>
+                      <p className="text-sm font-medium text-gray-500">Klient</p>
                       <p className="font-medium">{selectedContract.clientName}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Vytvoril</p>
+                      <p className="font-medium">{selectedContract.createdBy.name}</p>
+                      <p className="text-sm text-gray-500">{selectedContract.createdBy.email}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Dátum vytvorenia</p>
+                      <p className="font-medium">{new Date(selectedContract.createdAt).toLocaleDateString('sk')}</p>
                     </div>
                   </div>
                 </div>
