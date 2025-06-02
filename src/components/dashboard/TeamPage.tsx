@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -142,6 +143,11 @@ export const TeamPage: React.FC = () => {
 
   const handleDeleteMember = (member: TeamMember) => {
     setMemberToDelete(member);
+  };
+
+  const handleAddEmployee = (employee: TeamMember) => {
+    console.log('Pridáva sa nový zamestnanec:', employee);
+    // TODO: Implement actual employee addition logic
   };
 
   const confirmDeleteMember = () => {
