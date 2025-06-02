@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Users } from 'lucide-react';
+import { Users, Filter } from 'lucide-react';
 
 interface TeamEfficiencyData {
   name: string;
@@ -41,7 +42,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
-      <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
+      <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
         <p className="font-semibold">{label}</p>
         <p className="text-blue-600">
           Odoslané zmluvy: <span className="font-bold">{data.contractsSent}</span>
@@ -62,13 +63,54 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export const TeamEfficiencyChart: React.FC = () => {
+  const [selectedPeriod, setSelectedPeriod] = useState('month');
+  const [selectedMember, setSelectedMember] = useState('all');
+  const [selectedMetric, setSelectedMetric] = useState('contracts');
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Users className="h-5 w-5" />
-          Efektivita tímu
+        <CardTitle className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            Efektivita tímu
+          </div>
+          <Filter className="h-4 w-4 text-gray-400" />
         </CardTitle>
+        <div className="grid grid-cols-3 gap-2 mt-4">
+          <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+            <SelectTrigger className="h-8">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="week">Týždeň</SelectItem>
+              <SelectItem value="month">Mesiac</SelectItem>
+              <SelectItem value="quarter">Štvrťrok</SelectItem>
+              <SelectItem value="year">Rok</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={selectedMember} onValueChange={setSelectedMember}>
+            <SelectTrigger className="h-8">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Všetci</SelectItem>
+              <SelectItem value="peter">Peter Fekiač</SelectItem>
+              <SelectItem value="ladislav">Ladislav Mathis</SelectItem>
+              <SelectItem value="richie">Richie Plichta</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={selectedMetric} onValueChange={setSelectedMetric}>
+            <SelectTrigger className="h-8">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="contracts">Zmluvy</SelectItem>
+              <SelectItem value="revenue">Tržby</SelectItem>
+              <SelectItem value="efficiency">Efektivita</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="h-80">
@@ -88,3 +130,4 @@ export const TeamEfficiencyChart: React.FC = () => {
     </Card>
   );
 };
+

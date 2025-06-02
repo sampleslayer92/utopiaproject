@@ -26,7 +26,6 @@ const mockClients: Client[] = [
     status: 'active',
     createdAt: '2024-01-15',
     lastActivity: '2024-11-28T14:30:00Z',
-    contracts: [],
     industry: 'restaurant',
     address: 'Hlavná 15, Bratislava',
     website: 'www.restaurant-jana.sk',
@@ -46,7 +45,6 @@ const mockClients: Client[] = [
     status: 'active',
     createdAt: '2024-02-20',
     lastActivity: '2024-11-28T16:45:00Z',
-    contracts: [],
     industry: 'retail',
     address: 'Obchodná 32, Košice',
     website: 'www.techstore.sk',
@@ -66,7 +64,6 @@ const mockClients: Client[] = [
     status: 'active',
     createdAt: '2024-03-10',
     lastActivity: '2024-11-28T12:20:00Z',
-    contracts: [],
     industry: 'hospitality',
     address: 'Hviezdoslavovo nám. 5, Bratislava',
     website: 'www.grandeur.sk',
@@ -86,7 +83,6 @@ const mockClients: Client[] = [
     status: 'active',
     createdAt: '2024-04-05',
     lastActivity: '2024-11-28T10:15:00Z',
-    contracts: [],
     industry: 'fitness',
     address: 'Športová 28, Žilina',
     website: 'www.fitnesspower.sk',
@@ -106,7 +102,6 @@ const mockClients: Client[] = [
     status: 'active',
     createdAt: '2024-05-12',
     lastActivity: '2024-11-28T15:20:00Z',
-    contracts: [],
     industry: 'beauty',
     address: 'Krásna 12, Trenčín',
     website: 'www.bellasalon.sk',
@@ -120,7 +115,7 @@ export const ClientsPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
-  const [activeTab, setActiveTab] = useState('list');
+  const [activeTab, setActiveTab] = useState('list'); // Default to table view
 
   const filteredClients = mockClients.filter(client =>
     client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -131,13 +126,13 @@ export const ClientsPage: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+        return 'bg-green-100 text-green-800';
       case 'inactive':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+        return 'bg-red-100 text-red-800';
       case 'suspended':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
+        return 'bg-yellow-100 text-yellow-800';
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -164,7 +159,7 @@ export const ClientsPage: React.FC = () => {
   if (!user || user.role !== 'admin') {
     return (
       <div className="text-center py-8">
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="text-gray-600">
           Nemáte oprávnenie na zobrazenie tejto stránky.
         </p>
       </div>
@@ -182,7 +177,7 @@ export const ClientsPage: React.FC = () => {
   return (
     <div className="space-y-8 p-6">
       {/* Header Section */}
-      <div className="bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 rounded-3xl p-8 border border-blue-100 dark:border-gray-700 shadow-lg">
+      <div className="bg-gradient-to-br from-blue-50 via-white to-purple-50 rounded-3xl p-8 border border-blue-100 shadow-lg">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
           <div>
             <div className="flex items-center gap-3 mb-4">
@@ -193,7 +188,7 @@ export const ClientsPage: React.FC = () => {
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                   Merchanti
                 </h1>
-                <p className="text-gray-600 dark:text-gray-300 text-lg">
+                <p className="text-gray-600 text-lg">
                   Vítajte späť, {user?.fullName}! Správa všetkých merchantov v systéme.
                 </p>
               </div>
@@ -260,11 +255,11 @@ export const ClientsPage: React.FC = () => {
               <UserPlus className="h-4 w-4 mr-2" />
               Pridať nového merchanta
             </Button>
-            <Button variant="outline" className="border-gray-200 dark:border-gray-700">
+            <Button variant="outline" className="border-gray-200">
               <Calendar className="h-4 w-4 mr-2" />
               Kalender
             </Button>
-            <Button variant="outline" className="border-gray-200 dark:border-gray-700">
+            <Button variant="outline" className="border-gray-200">
               <Filter className="h-4 w-4 mr-2" />
               Reporty
             </Button>
@@ -301,7 +296,7 @@ export const ClientsPage: React.FC = () => {
             <CardContent>
               {filteredClients.length === 0 ? (
                 <div className="text-center py-8">
-                  <p className="text-gray-500 dark:text-gray-400">
+                  <p className="text-gray-500">
                     {searchTerm ? 'Žiadni merchanti nevyhovujú hľadaniu.' : 'Žiadni merchanti neboli nájdení.'}
                   </p>
                 </div>

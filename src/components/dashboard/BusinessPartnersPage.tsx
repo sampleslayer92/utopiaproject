@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -5,13 +6,14 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Search, Edit, Eye, MapPin, Users, Smartphone, DollarSign, Trash2 } from 'lucide-react';
+import { Search, Edit, Eye, MapPin, Users, Smartphone, DollarSign, Trash2, AlertTriangle, Filter } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { BusinessPartner } from '@/types/dashboard';
 import { AddBusinessPartnerDialog } from './AddBusinessPartnerDialog';
 import { EditBusinessPartnerDialog } from './EditBusinessPartnerDialog';
 import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const mockBusinessPartners: BusinessPartner[] = [
   {
@@ -24,6 +26,10 @@ const mockBusinessPartners: BusinessPartner[] = [
     devicesCount: 456,
     totalRevenue: 125000,
     monthlyRevenue: 8500,
+    expectedRevenue: 10000,
+    commissionRate: 0.5,
+    calculatedCommission: 42.5,
+    contractViolation: true,
     status: 'active',
     createdAt: '2024-01-15',
     tier: 'gold',
@@ -39,6 +45,10 @@ const mockBusinessPartners: BusinessPartner[] = [
     devicesCount: 324,
     totalRevenue: 98000,
     monthlyRevenue: 6200,
+    expectedRevenue: 6000,
+    commissionRate: 0.5,
+    calculatedCommission: 31.0,
+    contractViolation: false,
     status: 'active',
     createdAt: '2024-02-20',
     tier: 'silver',
@@ -54,6 +64,10 @@ const mockBusinessPartners: BusinessPartner[] = [
     devicesCount: 189,
     totalRevenue: 67000,
     monthlyRevenue: 4100,
+    expectedRevenue: 5000,
+    commissionRate: 0.5,
+    calculatedCommission: 20.5,
+    contractViolation: true,
     status: 'active',
     createdAt: '2024-03-10',
     tier: 'bronze',
@@ -71,40 +85,48 @@ export const BusinessPartnersPage: React.FC = () => {
   const [deletingPartner, setDeletingPartner] = useState<BusinessPartner | null>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showViolationsOnly, setShowViolationsOnly] = useState(false);
 
-  const filteredPartners = partners.filter(partner =>
-    partner.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    partner.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    partner.region.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredPartners = partners.filter(partner => {
+    const matchesSearch = partner.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      partner.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      partner.region.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesViolationFilter = !showViolationsOnly || partner.contractViolation;
+    
+    return matchesSearch && matchesViolationFilter;
+  });
 
   const getTierColor = (tier: string) => {
     switch (tier) {
       case 'gold':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
+        return 'bg-yellow-100 text-yellow-800';
       case 'silver':
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+        return 'bg-gray-100 text-gray-800';
       case 'bronze':
-        return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300';
+        return 'bg-orange-100 text-orange-800';
+      case 'platinum':
+        return 'bg-purple-100 text-purple-800';
       default:
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+        return 'bg-blue-100 text-blue-800';
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+        return 'bg-green-100 text-green-800';
       case 'inactive':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+        return 'bg-red-100 text-red-800';
+      case 'suspended':
+        return 'bg-yellow-100 text-yellow-800';
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
   const handlePartnerAdded = () => {
     console.log('Business partner added successfully');
-    // Refresh data if needed
   };
 
   const handleEditPartner = (partner: BusinessPartner) => {
@@ -137,25 +159,37 @@ export const BusinessPartnersPage: React.FC = () => {
   if (user?.role !== 'admin') {
     return (
       <div className="text-center py-8">
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="text-gray-600">
           Nemáte oprávnenie na zobrazenie tejto stránky.
         </p>
       </div>
     );
   }
 
+  const violationCount = partners.filter(p => p.contractViolation).length;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-gray-900">
             Obchodní partneri
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-600">
             Správa obchodných partnerov a ich výkonnosti
           </p>
         </div>
-        <AddBusinessPartnerDialog onPartnerAdded={handlePartnerAdded} />
+        <div className="flex items-center space-x-3">
+          <Button
+            variant={showViolationsOnly ? "default" : "outline"}
+            onClick={() => setShowViolationsOnly(!showViolationsOnly)}
+            className="flex items-center space-x-2"
+          >
+            <AlertTriangle className="h-4 w-4" />
+            <span>Porušenia ({violationCount})</span>
+          </Button>
+          <AddBusinessPartnerDialog onPartnerAdded={handlePartnerAdded} />
+        </div>
       </div>
 
       {/* Summary Cards */}
@@ -165,7 +199,7 @@ export const BusinessPartnersPage: React.FC = () => {
             <div className="flex items-center">
               <Users className="h-8 w-8 text-blue-500" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Celkom partnerov</p>
+                <p className="text-sm font-medium text-gray-600">Celkom partnerov</p>
                 <p className="text-2xl font-bold">{partners.length}</p>
               </div>
             </div>
@@ -176,7 +210,7 @@ export const BusinessPartnersPage: React.FC = () => {
             <div className="flex items-center">
               <Smartphone className="h-8 w-8 text-green-500" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Celkom zariadení</p>
+                <p className="text-sm font-medium text-gray-600">Celkom zariadení</p>
                 <p className="text-2xl font-bold">{partners.reduce((sum, p) => sum + p.devicesCount, 0)}</p>
               </div>
             </div>
@@ -187,8 +221,8 @@ export const BusinessPartnersPage: React.FC = () => {
             <div className="flex items-center">
               <DollarSign className="h-8 w-8 text-purple-500" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Mesačné tržby</p>
-                <p className="text-2xl font-bold">€{partners.reduce((sum, p) => sum + p.monthlyRevenue, 0).toLocaleString()}</p>
+                <p className="text-sm font-medium text-gray-600">Mesačné provízie</p>
+                <p className="text-2xl font-bold">€{partners.reduce((sum, p) => sum + p.calculatedCommission, 0).toFixed(2)}</p>
               </div>
             </div>
           </CardContent>
@@ -196,10 +230,10 @@ export const BusinessPartnersPage: React.FC = () => {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center">
-              <MapPin className="h-8 w-8 text-orange-500" />
+              <AlertTriangle className="h-8 w-8 text-red-500" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Aktívni partneri</p>
-                <p className="text-2xl font-bold">{partners.filter(p => p.status === 'active').length}</p>
+                <p className="text-sm font-medium text-gray-600">Porušenia zmluvy</p>
+                <p className="text-2xl font-bold text-red-600">{violationCount}</p>
               </div>
             </div>
           </CardContent>
@@ -230,7 +264,8 @@ export const BusinessPartnersPage: React.FC = () => {
                 <TableHead>Tier</TableHead>
                 <TableHead>Klienti</TableHead>
                 <TableHead>Zariadenia</TableHead>
-                <TableHead>Mesačné tržby</TableHead>
+                <TableHead>Mesačný obrat</TableHead>
+                <TableHead>Moja provízia</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Akcie</TableHead>
               </TableRow>
@@ -239,9 +274,23 @@ export const BusinessPartnersPage: React.FC = () => {
               {filteredPartners.map((partner) => (
                 <TableRow key={partner.id}>
                   <TableCell>
-                    <div>
-                      <div className="font-medium">{partner.name}</div>
-                      <div className="text-sm text-gray-500">{partner.email}</div>
+                    <div className="flex items-center space-x-2">
+                      {partner.contractViolation && (
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <AlertTriangle className="h-4 w-4 text-red-500" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Obrat klienta je pod úrovňou deklarovanej zmluvy.</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      )}
+                      <div>
+                        <div className="font-medium">{partner.name}</div>
+                        <div className="text-sm text-gray-500">{partner.email}</div>
+                      </div>
                     </div>
                   </TableCell>
                   <TableCell>{partner.region}</TableCell>
@@ -252,10 +301,26 @@ export const BusinessPartnersPage: React.FC = () => {
                   </TableCell>
                   <TableCell>{partner.clientsCount}</TableCell>
                   <TableCell>{partner.devicesCount}</TableCell>
-                  <TableCell>€{partner.monthlyRevenue.toLocaleString()}</TableCell>
+                  <TableCell>
+                    <div>
+                      <div className="font-medium">€{partner.monthlyRevenue.toLocaleString()}</div>
+                      {partner.contractViolation && (
+                        <div className="text-xs text-red-500">
+                          Očakávané: €{partner.expectedRevenue.toLocaleString()}
+                        </div>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div>
+                      <div className="font-medium">€{partner.calculatedCommission.toFixed(2)}</div>
+                      <div className="text-xs text-gray-500">{partner.commissionRate}%</div>
+                    </div>
+                  </TableCell>
                   <TableCell>
                     <Badge className={getStatusColor(partner.status)}>
-                      {partner.status === 'active' ? 'Aktívny' : 'Neaktívny'}
+                      {partner.status === 'active' ? 'Aktívny' : 
+                       partner.status === 'inactive' ? 'Neaktívny' : 'Pozastavený'}
                     </Badge>
                   </TableCell>
                   <TableCell>
@@ -350,3 +415,4 @@ export const BusinessPartnersPage: React.FC = () => {
     </div>
   );
 };
+

@@ -1,3 +1,4 @@
+
 import { LucideIcon } from 'lucide-react';
 
 export interface DashboardCard {
@@ -29,7 +30,6 @@ export interface Client {
   status: 'active' | 'inactive' | 'suspended';
   createdAt: string;
   lastActivity?: string;
-  contracts: Contract[];
   industry?: string;
   address?: string;
   website?: string;
@@ -93,7 +93,40 @@ export interface Contract {
   renewalDate?: string;
   autoRenewal: boolean;
   terms: string;
-  devices?: string[]; // Device IDs covered by this contract
+  devices?: string[];
+  // Extended contract data for editing
+  companyInfo?: {
+    name: string;
+    ico: string;
+    dic: string;
+    address: string;
+    email: string;
+    phone: string;
+  };
+  locations?: {
+    id: string;
+    name: string;
+    address: string;
+    contact: string;
+  }[];
+  products?: string[];
+  services?: string[];
+  persons?: {
+    name: string;
+    position: string;
+    email: string;
+    phone: string;
+  }[];
+  billing?: {
+    invoiceAddress: string;
+    paymentMethod: string;
+    paymentTerms: string;
+  };
+  digitalSignature?: {
+    signedAt: string;
+    signedBy: string;
+    documentHash: string;
+  };
 }
 
 export interface BusinessPartner {
@@ -106,6 +139,10 @@ export interface BusinessPartner {
   devicesCount: number;
   totalRevenue: number;
   monthlyRevenue: number;
+  expectedRevenue: number; // New: Deklarovaný očakávaný obrat
+  commissionRate: number; // New: Percento provízie (default 0.5)
+  calculatedCommission: number; // New: Vypočítaná provízia
+  contractViolation: boolean; // New: Flag pre porušenie zmluvy
   status: 'active' | 'inactive' | 'suspended';
   createdAt: string;
   lastActivity?: string;
@@ -123,3 +160,4 @@ export interface RevenueReport {
   newClients: number;
   churnRate: number;
 }
+
