@@ -43,7 +43,7 @@ export const DashboardHeader: React.FC = () => {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="flex items-center space-x-2">
                 <User className="h-5 w-5" />
-                <span className="hidden md:block">{user?.firstName} {user?.lastName}</span>
+                <span className="hidden md:block">{user?.fullName}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 bg-white">

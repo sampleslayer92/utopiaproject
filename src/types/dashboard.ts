@@ -50,6 +50,7 @@ export interface Client {
   monthlyRevenue: number;
   status: 'active' | 'inactive' | 'pending';
   createdAt: string;
+  lastActivity: string; // Added missing property
   industry: string;
   website?: string;
   contactPerson?: string;
