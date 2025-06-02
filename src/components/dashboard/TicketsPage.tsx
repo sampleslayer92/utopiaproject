@@ -1,26 +1,10 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { 
-  Plus, 
-  Search, 
-  Filter, 
-  Clock, 
-  AlertCircle, 
-  CheckCircle, 
-  User, 
-  FileText, 
-  BarChart3,
-  Grid3X3,
-  List,
-  ArrowUpDown,
-  MoreHorizontal
-} from 'lucide-react';
+import { Plus, Search, Filter, Clock, AlertCircle, CheckCircle, User, FileText, BarChart3 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { demoTickets, getClientName, getAssignedToName, TicketData } from '@/data/demoData';
 import { getFilteredData } from '@/utils/roleUtils';
@@ -30,14 +14,10 @@ export const TicketsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
-  const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
-  const [sortField, setSortField] = useState<string>('');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   // Filter tickets based on user role - properly typed
   const filteredTickets: TicketData[] = getFilteredData(demoTickets, user!) as TicketData[];
-  
-  let finalFilteredTickets = filteredTickets.filter(ticket => {
+  const finalFilteredTickets = filteredTickets.filter(ticket => {
     const clientName = getClientName(ticket.clientId);
     const matchesSearch = ticket.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          ticket.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -47,57 +27,6 @@ export const TicketsPage: React.FC = () => {
     
     return matchesSearch && matchesStatus && matchesPriority;
   });
-
-  // Apply sorting
-  if (sortField) {
-    finalFilteredTickets.sort((a, b) => {
-      let aValue: any;
-      let bValue: any;
-
-      switch (sortField) {
-        case 'title':
-          aValue = a.title;
-          bValue = b.title;
-          break;
-        case 'client':
-          aValue = getClientName(a.clientId);
-          bValue = getClientName(b.clientId);
-          break;
-        case 'status':
-          aValue = a.status;
-          bValue = b.status;
-          break;
-        case 'priority':
-          aValue = a.priority;
-          bValue = b.priority;
-          break;
-        case 'createdAt':
-          aValue = new Date(a.createdAt);
-          bValue = new Date(b.createdAt);
-          break;
-        default:
-          return 0;
-      }
-
-      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
-      return 0;
-    });
-  }
-
-  const handleSort = (field: string) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortDirection('asc');
-    }
-  };
-
-  const getSortIcon = (field: string) => {
-    if (sortField !== field) return <ArrowUpDown className="h-4 w-4" />;
-    return sortDirection === 'asc' ? '↑' : '↓';
-  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -242,7 +171,7 @@ export const TicketsPage: React.FC = () => {
         </Card>
       </div>
 
-      {/* Filters and View Toggle */}
+      {/* Filters */}
       <Card>
         <CardContent className="p-6">
           <div className="flex flex-col md:flex-row gap-4">
@@ -281,178 +210,59 @@ export const TicketsPage: React.FC = () => {
                 <SelectItem value="urgent">Urgentná</SelectItem>
               </SelectContent>
             </Select>
-
-            <div className="flex border rounded-lg overflow-hidden">
-              <Button
-                variant={viewMode === 'table' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setViewMode('table')}
-                className="rounded-none"
-              >
-                <List className="h-4 w-4" />
-              </Button>
-              <Button
-                variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setViewMode('grid')}
-                className="rounded-none"
-              >
-                <Grid3X3 className="h-4 w-4" />
-              </Button>
-            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Content based on view mode */}
-      {viewMode === 'table' ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>Tikety</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead 
-                    className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-                    onClick={() => handleSort('title')}
-                  >
-                    <div className="flex items-center space-x-1">
-                      <span>Názov</span>
-                      {getSortIcon('title')}
-                    </div>
-                  </TableHead>
-                  <TableHead 
-                    className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-                    onClick={() => handleSort('client')}
-                  >
-                    <div className="flex items-center space-x-1">
-                      <span>Klient</span>
-                      {getSortIcon('client')}
-                    </div>
-                  </TableHead>
-                  <TableHead 
-                    className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-                    onClick={() => handleSort('status')}
-                  >
-                    <div className="flex items-center space-x-1">
-                      <span>Stav</span>
-                      {getSortIcon('status')}
-                    </div>
-                  </TableHead>
-                  <TableHead 
-                    className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-                    onClick={() => handleSort('priority')}
-                  >
-                    <div className="flex items-center space-x-1">
-                      <span>Priorita</span>
-                      {getSortIcon('priority')}
-                    </div>
-                  </TableHead>
-                  <TableHead 
-                    className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-                    onClick={() => handleSort('createdAt')}
-                  >
-                    <div className="flex items-center space-x-1">
-                      <span>Vytvorené</span>
-                      {getSortIcon('createdAt')}
-                    </div>
-                  </TableHead>
-                  <TableHead>Pridelené</TableHead>
-                  <TableHead>Akcie</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {finalFilteredTickets.map((ticket) => (
-                  <TableRow key={ticket.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
-                    <TableCell className="font-medium">{ticket.title}</TableCell>
-                    <TableCell>{getClientName(ticket.clientId)}</TableCell>
-                    <TableCell>
-                      <Badge className={getStatusColor(ticket.status)}>
-                        {getStatusIcon(ticket.status)}
-                        <span className="ml-1">
-                          {ticket.status === 'open' && 'Otvorené'}
-                          {ticket.status === 'in_progress' && 'V riešení'}
-                          {ticket.status === 'resolved' && 'Vyriešené'}
-                          {ticket.status === 'closed' && 'Zatvorené'}
-                        </span>
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={getPriorityColor(ticket.priority)}>
-                        {ticket.priority === 'low' && 'Nízka'}
-                        {ticket.priority === 'medium' && 'Stredná'}
-                        {ticket.priority === 'high' && 'Vysoká'}
-                        {ticket.priority === 'urgent' && 'Urgentná'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{new Date(ticket.createdAt).toLocaleDateString('sk-SK')}</TableCell>
-                    <TableCell>
-                      {ticket.assignedTo && getAssignedToName(ticket.assignedTo)}
-                    </TableCell>
-                    <TableCell>
-                      <Button variant="ghost" size="sm">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      ) : (
-        /* Grid View */
-        <div className="space-y-4">
-          {finalFilteredTickets.map((ticket) => (
-            <Card key={ticket.id} className="hover:shadow-md transition-shadow cursor-pointer">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                        {ticket.title}
-                      </h3>
-                      <Badge className={getStatusColor(ticket.status)}>
-                        {getStatusIcon(ticket.status)}
-                        <span className="ml-1">
-                          {ticket.status === 'open' && 'Otvorené'}
-                          {ticket.status === 'in_progress' && 'V riešení'}
-                          {ticket.status === 'resolved' && 'Vyriešené'}
-                          {ticket.status === 'closed' && 'Zatvorené'}
-                        </span>
-                      </Badge>
-                      <Badge className={getPriorityColor(ticket.priority)}>
-                        {ticket.priority === 'low' && 'Nízka'}
-                        {ticket.priority === 'medium' && 'Stredná'}
-                        {ticket.priority === 'high' && 'Vysoká'}
-                        {ticket.priority === 'urgent' && 'Urgentná'}
-                      </Badge>
-                    </div>
-                    
-                    <p className="text-gray-600 dark:text-gray-400 mb-3">
-                      {ticket.description}
-                    </p>
-                    
-                    <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-                      <span className="flex items-center gap-1">
-                        <User className="h-4 w-4" />
-                        {getClientName(ticket.clientId)}
+      {/* Tickets List */}
+      <div className="space-y-4">
+        {finalFilteredTickets.map((ticket) => (
+          <Card key={ticket.id} className="hover:shadow-md transition-shadow cursor-pointer">
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {ticket.title}
+                    </h3>
+                    <Badge className={getStatusColor(ticket.status)}>
+                      {getStatusIcon(ticket.status)}
+                      <span className="ml-1">
+                        {ticket.status === 'open' && 'Otvorené'}
+                        {ticket.status === 'in_progress' && 'V riešení'}
+                        {ticket.status === 'resolved' && 'Vyriešené'}
+                        {ticket.status === 'closed' && 'Zatvorené'}
                       </span>
-                      <span>#{ticket.id}</span>
-                      <span>Vytvorené: {new Date(ticket.createdAt).toLocaleDateString('sk-SK')}</span>
-                      {ticket.assignedTo && (
-                        <span>Pridelené: {getAssignedToName(ticket.assignedTo)}</span>
-                      )}
-                    </div>
+                    </Badge>
+                    <Badge className={getPriorityColor(ticket.priority)}>
+                      {ticket.priority === 'low' && 'Nízka'}
+                      {ticket.priority === 'medium' && 'Stredná'}
+                      {ticket.priority === 'high' && 'Vysoká'}
+                      {ticket.priority === 'urgent' && 'Urgentná'}
+                    </Badge>
+                  </div>
+                  
+                  <p className="text-gray-600 dark:text-gray-400 mb-3">
+                    {ticket.description}
+                  </p>
+                  
+                  <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                    <span className="flex items-center gap-1">
+                      <User className="h-4 w-4" />
+                      {getClientName(ticket.clientId)}
+                    </span>
+                    <span>#{ticket.id}</span>
+                    <span>Vytvorené: {new Date(ticket.createdAt).toLocaleDateString('sk-SK')}</span>
+                    {ticket.assignedTo && (
+                      <span>Pridelené: {getAssignedToName(ticket.assignedTo)}</span>
+                    )}
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
       {finalFilteredTickets.length === 0 && (
         <Card>

@@ -8,10 +8,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
-import { Client } from '@/types/dashboard';
 
 interface AddClientDialogProps {
-  onClientAdded: (newClient: Client) => void;
+  onClientAdded?: () => void;
 }
 
 export const AddClientDialog: React.FC<AddClientDialogProps> = ({ onClientAdded }) => {
@@ -41,33 +40,9 @@ export const AddClientDialog: React.FC<AddClientDialogProps> = ({ onClientAdded 
       return;
     }
 
-    // Create new client object
-    const newClient: Client = {
-      id: `client-${Date.now()}`,
-      name: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-      businessPartnerId: 'bp-1',
-      locationsCount: 0,
-      devicesCount: 0,
-      totalRevenue: 0,
-      monthlyRevenue: 0,
-      expectedRevenue: 0,
-      commissionRate: 2.5,
-      calculatedCommission: 0,
-      contractViolation: false,
-      status: 'active',
-      createdAt: new Date().toISOString().split('T')[0],
-      industry: formData.businessType,
-      address: formData.address,
-      contactPerson: formData.contactPerson,
-      services: []
-    };
-
-    console.log('Creating client:', newClient);
+    // Create client logic here
+    console.log('Creating client:', formData);
     toast.success('Klient bol úspešne pridaný');
-    
-    onClientAdded(newClient);
     
     setFormData({
       name: '',
@@ -80,6 +55,7 @@ export const AddClientDialog: React.FC<AddClientDialogProps> = ({ onClientAdded 
     });
     
     setOpen(false);
+    onClientAdded?.();
   };
 
   // Only show dialog for ISO Organizácia
