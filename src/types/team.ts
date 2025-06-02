@@ -26,6 +26,32 @@ export interface TeamMember {
   notes?: string;
 }
 
+export interface ContractsByStatus {
+  draft: number;
+  signed: number;
+  rejected: number;
+  expired: number;
+}
+
+export interface RevenueBreakdown {
+  services: number;
+  devices: number;
+  commissions: number;
+  licenses: number;
+}
+
+export interface TeamMemberPerformance extends TeamMember {
+  contractsByStatus: ContractsByStatus;
+  revenueBreakdown: RevenueBreakdown;
+  conversionRate: number;
+  averageContractValue: number;
+  monthlyGoals: {
+    contracts: number;
+    revenue: number;
+  };
+  contractsSent: number;
+}
+
 export interface TeamStats {
   totalMembers: number;
   activeMembers: number;

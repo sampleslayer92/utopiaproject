@@ -72,12 +72,6 @@ export function AppSidebar() {
         roles: ['admin']
       },
       {
-        title: "Pobočky",
-        url: "/dashboard/locations",
-        icon: MapPin,
-        roles: ['admin', 'client']
-      },
-      {
         title: "Reporty",
         url: "/dashboard/reports",
         icon: BarChart3,

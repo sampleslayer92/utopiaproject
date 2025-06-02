@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,9 +18,11 @@ import {
   Activity,
   TrendingUp,
   Award,
-  MapPin
+  MapPin,
+  PieChart
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 
 // Enhanced mock data for team member detail
 const mockTeamMemberData = {
@@ -55,6 +56,52 @@ const mockTeamMemberData = {
     emergencyContactName: 'Anna Manažérová (manželka)',
     birthDate: '1985-03-15',
     nationalId: 'SK1234567890'
+  },
+  contractsByStatus: {
+    draft: 3,
+    signed: 12,
+    rejected: 5,
+    expired: 0
+  },
+  revenueBreakdown: {
+    services: 8500,
+    devices: 15000,
+    commissions: 3200,
+    licenses: 1800
+  },
+  contractsData: [
+    {
+      id: 'c1',
+      clientName: 'Reštaurácia U Jána',
+      type: 'Zariadenia',
+      value: 12800,
+      status: 'signed',
+      date: '2024-01-15',
+      commission: 448
+    },
+    {
+      id: 'c2',
+      clientName: 'Fitness Centrum Power',
+      type: 'Služby',
+      value: 4800,
+      status: 'signed',
+      date: '2024-02-20',
+      commission: 168
+    },
+    {
+      id: 'c3',
+      clientName: 'Kavička s.r.o.',
+      type: 'Licencie',
+      value: 2400,
+      status: 'draft',
+      date: '2024-03-10',
+      commission: 0
+    }
+  ],
+  kpiData: {
+    conversionRate: 60,
+    averageContractValue: 6667,
+    monthlyGrowth: 12
   },
   workHistory: [
     {
@@ -110,6 +157,21 @@ export const TeamMemberDetail: React.FC = () => {
 
   const teamMember = mockTeamMemberData; // In real app, fetch by id
 
+  // Prepare data for charts
+  const revenueBreakdownData = [
+    { name: 'Služby', value: teamMember.revenueBreakdown.services, color: '#3b82f6' },
+    { name: 'Zariadenia', value: teamMember.revenueBreakdown.devices, color: '#10b981' },
+    { name: 'Provízie', value: teamMember.revenueBreakdown.commissions, color: '#8b5cf6' },
+    { name: 'Licencie', value: teamMember.revenueBreakdown.licenses, color: '#f59e0b' }
+  ];
+
+  const contractsStatusData = [
+    { name: 'Návrhy', count: teamMember.contractsByStatus.draft },
+    { name: 'Podpísané', count: teamMember.contractsByStatus.signed },
+    { name: 'Zamietnuté', count: teamMember.contractsByStatus.rejected },
+    { name: 'Expirované', count: teamMember.contractsByStatus.expired }
+  ];
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
@@ -118,6 +180,21 @@ export const TeamMemberDetail: React.FC = () => {
         return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
       case 'on_leave':
         return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
+      default:
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+    }
+  };
+
+  const getContractStatusColor = (status: string) => {
+    switch (status) {
+      case 'signed':
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+      case 'draft':
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+      case 'rejected':
+        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+      case 'expired':
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
       default:
         return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
     }
@@ -164,7 +241,7 @@ export const TeamMemberDetail: React.FC = () => {
         </div>
       </div>
 
-      {/* Performance Overview Cards */}
+      {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card>
           <CardContent className="p-6">
@@ -180,10 +257,10 @@ export const TeamMemberDetail: React.FC = () => {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center">
-              <Users className="h-8 w-8 text-blue-500" />
+              <TrendingUp className="h-8 w-8 text-blue-500" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Spravuje merchantov</p>
-                <p className="text-2xl font-bold">{teamMember.performance.merchantsManaged}</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Konverzný pomer</p>
+                <p className="text-2xl font-bold">{teamMember.kpiData.conversionRate}%</p>
               </div>
             </div>
           </CardContent>
@@ -193,8 +270,8 @@ export const TeamMemberDetail: React.FC = () => {
             <div className="flex items-center">
               <FileText className="h-8 w-8 text-purple-500" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Podpísané zmluvy</p>
-                <p className="text-2xl font-bold">{teamMember.performance.contractsSigned}</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Priemerná zmluva</p>
+                <p className="text-2xl font-bold">€{teamMember.kpiData.averageContractValue.toLocaleString()}</p>
               </div>
             </div>
           </CardContent>
@@ -202,10 +279,10 @@ export const TeamMemberDetail: React.FC = () => {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center">
-              <TrendingUp className="h-8 w-8 text-orange-500" />
+              <Award className="h-8 w-8 text-orange-500" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Efektívnosť</p>
-                <p className="text-2xl font-bold">{teamMember.performance.efficiency}%</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Mesačný rast</p>
+                <p className="text-2xl font-bold">+{teamMember.kpiData.monthlyGrowth}%</p>
               </div>
             </div>
           </CardContent>
@@ -213,14 +290,146 @@ export const TeamMemberDetail: React.FC = () => {
       </div>
 
       {/* Tabs */}
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
+      <Tabs defaultValue="contracts" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-6">
+          <TabsTrigger value="contracts">Zmluvy</TabsTrigger>
+          <TabsTrigger value="revenue">Breakdown odmien</TabsTrigger>
           <TabsTrigger value="overview">Prehľad</TabsTrigger>
           <TabsTrigger value="merchants">Merchanti</TabsTrigger>
-          <TabsTrigger value="performance">Výkonnosť</TabsTrigger>
           <TabsTrigger value="personal">Osobné údaje</TabsTrigger>
           <TabsTrigger value="activity">Aktivita</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="contracts" className="space-y-6">
+          {/* Contract Status Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Card>
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-blue-600">{teamMember.contractsByStatus.draft}</div>
+                <div className="text-sm text-gray-600">Návrhy</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-green-600">{teamMember.contractsByStatus.signed}</div>
+                <div className="text-sm text-gray-600">Podpísané</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-red-600">{teamMember.contractsByStatus.rejected}</div>
+                <div className="text-sm text-gray-600">Zamietnuté</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-gray-600">{teamMember.contractsByStatus.expired}</div>
+                <div className="text-sm text-gray-600">Expirované</div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Contracts Table */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Všetky zmluvy</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Klient</TableHead>
+                    <TableHead>Typ</TableHead>
+                    <TableHead>Hodnota</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Dátum</TableHead>
+                    <TableHead>Provízia</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {teamMember.contractsData.map((contract) => (
+                    <TableRow key={contract.id}>
+                      <TableCell className="font-medium">{contract.clientName}</TableCell>
+                      <TableCell>{contract.type}</TableCell>
+                      <TableCell>€{contract.value.toLocaleString()}</TableCell>
+                      <TableCell>
+                        <Badge className={getContractStatusColor(contract.status)}>
+                          {contract.status === 'signed' ? 'Podpísaná' : 
+                           contract.status === 'draft' ? 'Návrh' :
+                           contract.status === 'rejected' ? 'Zamietnutá' : 'Expirovaná'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{new Date(contract.date).toLocaleDateString('sk-SK')}</TableCell>
+                      <TableCell>€{contract.commission.toLocaleString()}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="revenue" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <PieChart className="h-5 w-5" />
+                  Breakdown odmien podľa typu
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RechartsPieChart>
+                      <Pie
+                        data={revenueBreakdownData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {revenueBreakdownData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(value) => `€${value.toLocaleString()}`} />
+                    </RechartsPieChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Detailný breakdown odmien</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {revenueBreakdownData.map((item, index) => (
+                  <div key={index} className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div 
+                        className="w-4 h-4 rounded-full" 
+                        style={{ backgroundColor: item.color }}
+                      ></div>
+                      <span className="font-medium">{item.name}</span>
+                    </div>
+                    <span className="font-bold">€{item.value.toLocaleString()}</span>
+                  </div>
+                ))}
+                <div className="border-t pt-3">
+                  <div className="flex justify-between items-center font-bold text-lg">
+                    <span>Celkom:</span>
+                    <span>€{Object.values(teamMember.revenueBreakdown).reduce((a, b) => a + b, 0).toLocaleString()}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
 
         <TabsContent value="overview" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -332,45 +541,6 @@ export const TeamMemberDetail: React.FC = () => {
               </Table>
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="performance" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Celková výkonnosť</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Celkové tržby</p>
-                    <p className="text-2xl font-bold text-green-600">€{teamMember.performance.totalRevenue.toLocaleString()}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Mesačné tržby</p>
-                    <p className="text-2xl font-bold">€{teamMember.performance.monthlyRevenue.toLocaleString()}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Plat</p>
-                    <p className="text-xl font-bold">€{teamMember.salary}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Provízia</p>
-                    <p className="text-xl font-bold">{teamMember.commissionRate}%</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Poznámky</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600 dark:text-gray-300">{teamMember.notes}</p>
-              </CardContent>
-            </Card>
-          </div>
         </TabsContent>
 
         <TabsContent value="personal" className="space-y-6">

@@ -3,13 +3,14 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { BarChart3, TrendingUp, Users, DollarSign, FileText, Download, Filter, Calendar, Clock, Settings } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
+import { TeamEfficiencyChart } from './TeamEfficiencyChart';
+import { RevenueBreakdownChart } from './RevenueBreakdownChart';
+import { TeamPerformanceTable } from './TeamPerformanceTable';
 
-// Mock data for reports
+// Mock data for existing reports
 const performanceData = [
   { month: 'Jan', revenue: 42000, contracts: 15, merchants: 8 },
   { month: 'Feb', revenue: 45000, contracts: 18, merchants: 12 },
@@ -34,11 +35,12 @@ const teamPerformanceData = [
 ];
 
 export const ReportsPage: React.FC = () => {
-  const [selectedReport, setSelectedReport] = useState('performance');
+  const [selectedReport, setSelectedReport] = useState('management');
   const [dateRange, setDateRange] = useState('6months');
   const [teamMemberFilter, setTeamMemberFilter] = useState('all');
 
   const reportTypes = [
+    { id: 'management', name: 'Manažérsky prehľad', icon: TrendingUp },
     { id: 'performance', name: 'Výkonnostný report', icon: TrendingUp },
     { id: 'financial', name: 'Finančný report', icon: DollarSign },
     { id: 'team', name: 'Report tímu', icon: Users },
@@ -104,7 +106,6 @@ export const ReportsPage: React.FC = () => {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <Label htmlFor="reportType">Typ reportu</Label>
               <Select value={selectedReport} onValueChange={setSelectedReport}>
                 <SelectTrigger>
                   <SelectValue />
@@ -119,7 +120,6 @@ export const ReportsPage: React.FC = () => {
               </Select>
             </div>
             <div>
-              <Label htmlFor="dateRange">Časové obdobie</Label>
               <Select value={dateRange} onValueChange={setDateRange}>
                 <SelectTrigger>
                   <SelectValue />
@@ -133,7 +133,6 @@ export const ReportsPage: React.FC = () => {
               </Select>
             </div>
             <div>
-              <Label htmlFor="teamFilter">Člen tímu</Label>
               <Select value={teamMemberFilter} onValueChange={setTeamMemberFilter}>
                 <SelectTrigger>
                   <SelectValue />
@@ -161,6 +160,20 @@ export const ReportsPage: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Management Overview - New Default View */}
+      {selectedReport === 'management' && (
+        <div className="space-y-6">
+          {/* Team Efficiency and Revenue Breakdown */}
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <TeamEfficiencyChart />
+            <RevenueBreakdownChart />
+          </div>
+          
+          {/* Team Performance Table */}
+          <TeamPerformanceTable />
+        </div>
+      )}
 
       {/* Performance Report */}
       {selectedReport === 'performance' && (
