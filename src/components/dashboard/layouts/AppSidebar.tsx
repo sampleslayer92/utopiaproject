@@ -13,6 +13,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Home,
   Users,
@@ -112,17 +113,17 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-        <div className="flex items-center space-x-3">
-          <img 
-            src="https://cdn.prod.website-files.com/65bb58bd9feeda1fd2e1b551/65bb58bd9feeda1fd2e1b5ad_logo-header.svg" 
-            alt="Onepos Logo" 
-            className="h-8 w-auto flex-shrink-0"
-          />
-          <div className="min-w-0">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white truncate">onepos</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400 truncate">ISO Organizácia</p>
-          </div>
-        </div>
+        <Card className="bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700">
+          <CardContent className="p-3">
+            <div className="flex items-center justify-center">
+              <img 
+                src="https://cdn.prod.website-files.com/65bb58bd9feeda1fd2e1b551/65bb58bd9feeda1fd2e1b5ad_logo-header.svg" 
+                alt="Onepos Logo" 
+                className="h-8 w-auto"
+              />
+            </div>
+          </CardContent>
+        </Card>
       </SidebarHeader>
       
       <SidebarContent className="px-4 py-2">

@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
-import { LogOut, Building2 } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { NotificationCenter } from '@/components/notifications/NotificationCenter';
 
@@ -20,11 +20,6 @@ export const DashboardHeader: React.FC = () => {
           <Card className="bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700">
             <CardContent className="p-4">
               <div className="flex items-center space-x-4">
-                {/* Onepos Logo */}
-                <div className="flex items-center justify-center w-10 h-10 bg-blue-600 rounded-lg">
-                  <Building2 className="h-6 w-6 text-white" />
-                </div>
-                
                 {/* User Info */}
                 <div className="flex items-center space-x-3">
                   <Avatar className="h-10 w-10">
