@@ -1,64 +1,66 @@
 
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from './AppSidebar';
-import { NotificationCenter } from '@/components/notifications/NotificationCenter';
-import { GlobalChatbot } from '@/components/chat/GlobalChatbot';
-import { LocationSelector } from '../LocationSelector';
-import { AppBreadcrumb } from '@/components/ui/app-breadcrumb';
+import { AdminDashboard } from '../AdminDashboard';
+import { ClientDashboard } from '../ClientDashboard';
+import { BusinessPartnerDashboard } from '../BusinessPartnerDashboard';
+import { LocationDashboard } from '../LocationDashboard';
+import { ClientsPage } from '../ClientsPage';
+import { BusinessPartnersPage } from '../BusinessPartnersPage';
+import { DevicesPage } from '../DevicesPage';
+import { LocationsPage } from '../LocationsPage';
+import { TransactionsPage } from '../TransactionsPage';
+import { ReportsPage } from '../ReportsPage';
+import { ContractsPage } from '../ContractsPage';
+import { TicketsPage } from '../TicketsPage';
+import { TeamPage } from '../TeamPage';
+import { TeamMemberDetail } from '../TeamMemberDetail';
+import { SettingsPage } from '../SettingsPage';
+import { MerchantDetailPage } from '../MerchantDetailPage';
 import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import { LogOut, User } from 'lucide-react';
 
 export const DashboardLayout: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
+
+  const getDashboardComponent = () => {
+    switch (user?.role) {
+      case 'admin':
+        return <AdminDashboard />;
+      case 'business_partner':
+        return <BusinessPartnerDashboard />;
+      case 'client':
+        return <ClientDashboard />;
+      default:
+        return <div>Neznáma rola používateľa</div>;
+    }
+  };
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="min-h-screen flex w-full">
         <AppSidebar />
-        <div className="flex-1 flex flex-col">
-          {/* Header */}
-          <header className="h-16 bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 border-b border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between px-6 shadow-sm">
-            <div className="flex items-center gap-4">
-              {user?.role === 'client' && <LocationSelector />}
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <NotificationCenter />
-              
-              <div className="flex items-center gap-2 ml-4 pl-4 border-l border-gray-200 dark:border-gray-700">
-                <div className="flex items-center gap-2 px-3 py-1 bg-gray-50 dark:bg-gray-700 rounded-full">
-                  <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                    <User className="h-3 w-3 text-white" />
-                  </div>
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {user?.fullName}
-                  </span>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={logout}
-                  className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20"
-                >
-                  <LogOut className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </header>
-          
-          {/* Main Content */}
-          <main className="flex-1 overflow-auto">
-            <div className="p-6">
-              <AppBreadcrumb />
-              <Outlet />
-            </div>
-          </main>
-        </div>
-        
-        <GlobalChatbot />
+        <main className="flex-1 overflow-auto">
+          <div className="p-6">
+            <Routes>
+              <Route path="/" element={getDashboardComponent()} />
+              <Route path="/merchants" element={<ClientsPage />} />
+              <Route path="/merchants/:id" element={<MerchantDetailPage />} />
+              <Route path="/business-partners" element={<BusinessPartnersPage />} />
+              <Route path="/devices" element={<DevicesPage />} />
+              <Route path="/locations" element={<LocationsPage />} />
+              <Route path="/location/:id" element={<LocationDashboard />} />
+              <Route path="/transactions" element={<TransactionsPage />} />
+              <Route path="/reports" element={<ReportsPage />} />
+              <Route path="/contracts" element={<ContractsPage />} />
+              <Route path="/tickets" element={<TicketsPage />} />
+              <Route path="/team" element={<TeamPage />} />
+              <Route path="/team/:id" element={<TeamMemberDetail />} />
+              <Route path="/settings" element={<SettingsPage />} />
+            </Routes>
+          </div>
+        </main>
       </div>
     </SidebarProvider>
   );

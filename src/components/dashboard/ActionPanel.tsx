@@ -5,19 +5,21 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Plus, Users, Building, UserPlus, Building2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { designSystem, roleColors } from '@/styles/design-system';
 
 export const ActionPanel: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const handleAddTeamMember = () => {
-    console.log('Adding team member...');
-    // TODO: Implement add team member functionality
+    // Redirect to onboarding for new merchant
+    navigate('/onboarding');
   };
 
   const handleAddMerchant = () => {
-    console.log('Adding merchant...');
-    // TODO: Implement add merchant functionality
+    // Redirect to onboarding for new merchant
+    navigate('/onboarding');
   };
 
   const getRoleGradient = () => {

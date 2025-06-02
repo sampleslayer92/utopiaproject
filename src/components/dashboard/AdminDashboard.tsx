@@ -5,12 +5,11 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Users, Building2, TrendingUp, DollarSign, Plus, Settings, BarChart3, Shield, Search, Target, Award, Eye } from 'lucide-react';
+import { Users, Building2, TrendingUp, DollarSign, Plus, BarChart3, Shield, Search, Target, Award, Eye } from 'lucide-react';
 import { DashboardCard } from '@/types/dashboard';
 import { TeamMember } from '@/types/team';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { useNavigate } from 'react-router-dom';
-import { AddMerchantDialog } from './AddMerchantDialog';
 import { AddEmployeeDialog } from './AddEmployeeDialog';
 
 const dashboardData: DashboardCard[] = [
@@ -163,9 +162,9 @@ export const AdminDashboard: React.FC = () => {
     navigate(`/dashboard/team/${memberId}`);
   };
 
-  const handleAddMerchant = (merchant: any) => {
-    console.log('Pridaný nový merchant:', merchant);
-    // TODO: Add to state management
+  const handleAddMerchant = () => {
+    // Redirect to onboarding for new merchant
+    navigate('/onboarding');
   };
 
   const handleAddEmployee = (employee: TeamMember) => {
@@ -202,24 +201,15 @@ export const AdminDashboard: React.FC = () => {
             </div>
             
             <div className="flex flex-wrap gap-3">
-              <AddMerchantDialog onAddMerchant={handleAddMerchant} />
-              <AddEmployeeDialog onAddEmployee={handleAddEmployee} />
               <Button 
                 size="lg" 
                 className="bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105"
+                onClick={handleAddMerchant}
               >
                 <Plus className="h-5 w-5 mr-2" />
-                Nový člen tímu
+                Nový merchant
               </Button>
-              <Button 
-                size="lg"
-                variant="outline"
-                className="bg-transparent hover:bg-white/10 border-white/30 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105"
-                onClick={() => navigate('/dashboard/settings')}
-              >
-                <Settings className="h-5 w-5 mr-2" />
-                Systémové nastavenia
-              </Button>
+              <AddEmployeeDialog onAddEmployee={handleAddEmployee} />
               <Button 
                 size="lg"
                 variant="outline"
