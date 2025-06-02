@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -29,7 +28,7 @@ import { EditTeamMemberDialog } from './EditTeamMemberDialog';
 import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog';
 import { TeamMember } from '@/types/team';
 
-// Mock data pre tím
+// Mock data pre tím s reálnejšími údajmi
 const mockTeamMembers: TeamMember[] = [
   {
     id: 'team-1',
@@ -43,8 +42,8 @@ const mockTeamMembers: TeamMember[] = [
     status: 'active',
     hireDate: '2023-01-15',
     performance: {
-      monthlyRevenue: 23800,
-      totalRevenue: 285600,
+      monthlyRevenue: 4800,
+      totalRevenue: 57600,
       merchantsManaged: 15,
       contractsSigned: 12,
       efficiency: 95
@@ -52,7 +51,7 @@ const mockTeamMembers: TeamMember[] = [
     assignedMerchants: ['merchant-1', 'merchant-2'],
     permissions: ['view_merchants', 'edit_contracts', 'create_reports'],
     salary: 3200,
-    commissionRate: 6.5
+    commissionRate: 2.0
   },
   {
     id: 'team-2',
@@ -66,8 +65,8 @@ const mockTeamMembers: TeamMember[] = [
     status: 'active',
     hireDate: '2023-03-20',
     performance: {
-      monthlyRevenue: 18800,
-      totalRevenue: 188000,
+      monthlyRevenue: 3200,
+      totalRevenue: 32000,
       merchantsManaged: 12,
       contractsSigned: 8,
       efficiency: 92
@@ -75,7 +74,7 @@ const mockTeamMembers: TeamMember[] = [
     assignedMerchants: ['merchant-3', 'merchant-4'],
     permissions: ['view_merchants', 'edit_contracts'],
     salary: 2800,
-    commissionRate: 5.5
+    commissionRate: 1.8
   },
   {
     id: 'team-3',
@@ -89,8 +88,8 @@ const mockTeamMembers: TeamMember[] = [
     status: 'active',
     hireDate: '2022-11-10',
     performance: {
-      monthlyRevenue: 16600,
-      totalRevenue: 199200,
+      monthlyRevenue: 2800,
+      totalRevenue: 33600,
       merchantsManaged: 8,
       contractsSigned: 6,
       efficiency: 98
@@ -98,7 +97,7 @@ const mockTeamMembers: TeamMember[] = [
     assignedMerchants: ['merchant-5'],
     permissions: ['technical_support', 'maintenance_contracts'],
     salary: 3000,
-    commissionRate: 4.0
+    commissionRate: 1.5
   },
   {
     id: 'team-4',
@@ -112,8 +111,8 @@ const mockTeamMembers: TeamMember[] = [
     status: 'active',
     hireDate: '2023-06-01',
     performance: {
-      monthlyRevenue: 14200,
-      totalRevenue: 85200,
+      monthlyRevenue: 2100,
+      totalRevenue: 12600,
       merchantsManaged: 6,
       contractsSigned: 4,
       efficiency: 87
@@ -121,7 +120,7 @@ const mockTeamMembers: TeamMember[] = [
     assignedMerchants: ['merchant-6'],
     permissions: ['view_merchants'],
     salary: 2400,
-    commissionRate: 4.5
+    commissionRate: 1.2
   },
   {
     id: 'team-5',
@@ -135,8 +134,8 @@ const mockTeamMembers: TeamMember[] = [
     status: 'active',
     hireDate: '2023-09-15',
     performance: {
-      monthlyRevenue: 12800,
-      totalRevenue: 38400,
+      monthlyRevenue: 1600,
+      totalRevenue: 4800,
       merchantsManaged: 5,
       contractsSigned: 3,
       efficiency: 89
@@ -144,7 +143,7 @@ const mockTeamMembers: TeamMember[] = [
     assignedMerchants: ['merchant-7'],
     permissions: ['technical_support', 'view_merchants'],
     salary: 2600,
-    commissionRate: 3.5
+    commissionRate: 1.0
   }
 ];
 

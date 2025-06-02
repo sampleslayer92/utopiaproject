@@ -1,18 +1,19 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Search, Edit, Eye, MapPin, Users, Smartphone, DollarSign, Plus, UserPlus, Calendar, Filter, TrendingUp, AlertTriangle } from 'lucide-react';
+import { Search, Edit, Eye, MapPin, Users, Smartphone, DollarSign, Trash2, AlertTriangle, Filter, ArrowUpDown } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 import { Client } from '@/types/dashboard';
-import { useNavigate } from 'react-router-dom';
-import { OnboardingClientCard } from './OnboardingClientCard';
+import { AddClientDialog } from './AddClientDialog';
+import { EditClientDialog } from './EditClientDialog';
+import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const mockClients: Client[] = [
   {
@@ -22,168 +23,217 @@ const mockClients: Client[] = [
     phone: '+421 900 123 456',
     businessPartnerId: 'bp-1',
     locationsCount: 2,
-    devicesCount: 8,
-    totalRevenue: 45000,
-    monthlyRevenue: 3800,
-    expectedRevenue: 5000,
-    commissionRate: 0.5,
-    calculatedCommission: 19,
+    devicesCount: 5,
+    totalRevenue: 12000,
+    monthlyRevenue: 2400,
+    expectedRevenue: 3000,
+    commissionRate: 2.5,
+    calculatedCommission: 60,
     contractViolation: true,
     status: 'active',
     createdAt: '2024-01-15',
-    lastActivity: '2024-11-28T14:30:00Z',
     industry: 'restaurant',
     address: 'Hlavná 15, Bratislava',
     website: 'www.restaurant-jana.sk',
     contactPerson: 'Ján Novák',
-    assignedTeamMemberId: 'team-1'
+    assignedTeamMemberId: 'team-1',
+    services: [
+      { id: 'service-1', name: 'POS Systém', monthlyFee: 89, status: 'active', commission: 22.25 },
+      { id: 'service-2', name: 'Online platby', monthlyFee: 45, status: 'active', commission: 11.25 },
+      { id: 'service-3', name: 'Inventúra', monthlyFee: 29, status: 'active', commission: 7.25 }
+    ]
   },
   {
     id: 'client-2',
-    name: 'Tech Store Slovakia',
-    email: 'info@techstore.sk',
-    phone: '+421 905 654 321',
+    name: 'Kaderníctvo Lucia',
+    email: 'lucia@salon.sk',
+    phone: '+421 900 654 321',
     businessPartnerId: 'bp-1',
-    locationsCount: 5,
-    devicesCount: 15,
-    totalRevenue: 89000,
-    monthlyRevenue: 7200,
-    expectedRevenue: 6000,
-    commissionRate: 0.5,
-    calculatedCommission: 36,
+    locationsCount: 1,
+    devicesCount: 3,
+    totalRevenue: 8400,
+    monthlyRevenue: 1680,
+    expectedRevenue: 1500,
+    commissionRate: 3.0,
+    calculatedCommission: 50.4,
     contractViolation: false,
     status: 'active',
     createdAt: '2024-02-20',
-    lastActivity: '2024-11-28T16:45:00Z',
-    industry: 'retail',
-    address: 'Obchodná 32, Košice',
-    website: 'www.techstore.sk',
-    contactPerson: 'Peter Svoboda',
-    assignedTeamMemberId: 'team-2'
+    industry: 'beauty',
+    address: 'Obchodná 28, Bratislava',
+    website: 'www.salon-lucia.sk',
+    contactPerson: 'Lucia Nováková',
+    assignedTeamMemberId: 'team-2',
+    services: [
+      { id: 'service-4', name: 'Rezervačný systém', monthlyFee: 39, status: 'active', commission: 11.7 },
+      { id: 'service-5', name: 'Online platby', monthlyFee: 25, status: 'active', commission: 7.5 }
+    ]
   },
   {
     id: 'client-3',
-    name: 'Hotel Grandeur',
-    email: 'reception@grandeur.sk',
-    phone: '+421 907 888 999',
+    name: 'Fitness Club Active',
+    email: 'info@activeclub.sk',
+    phone: '+421 900 789 123',
     businessPartnerId: 'bp-2',
     locationsCount: 1,
-    devicesCount: 12,
-    totalRevenue: 156000,
-    monthlyRevenue: 12800,
-    expectedRevenue: 10000,
-    commissionRate: 0.5,
-    calculatedCommission: 64,
+    devicesCount: 4,
+    totalRevenue: 15600,
+    monthlyRevenue: 3120,
+    expectedRevenue: 2800,
+    commissionRate: 2.8,
+    calculatedCommission: 87.36,
     contractViolation: false,
     status: 'active',
     createdAt: '2024-03-10',
-    lastActivity: '2024-11-28T12:20:00Z',
-    industry: 'hospitality',
-    address: 'Hviezdoslavovo nám. 5, Bratislava',
-    website: 'www.grandeur.sk',
-    contactPerson: 'Mária Hotelová',
-    assignedTeamMemberId: 'team-3'
+    industry: 'fitness',
+    address: 'Športová 12, Košice',
+    website: 'www.activeclub.sk',
+    contactPerson: 'Peter Športovec',
+    assignedTeamMemberId: 'team-3',
+    services: [
+      { id: 'service-6', name: 'Členský systém', monthlyFee: 79, status: 'active', commission: 22.12 },
+      { id: 'service-7', name: 'Vstupný systém', monthlyFee: 59, status: 'active', commission: 16.52 },
+      { id: 'service-8', name: 'Online platby', monthlyFee: 35, status: 'active', commission: 9.8 }
+    ]
   },
   {
     id: 'client-4',
-    name: 'Fitness Centrum Power',
-    email: 'info@fitnesspower.sk',
-    phone: '+421 911 555 777',
+    name: 'Obchod so športom',
+    email: 'shop@sport.sk',
+    phone: '+421 900 555 777',
     businessPartnerId: 'bp-1',
-    locationsCount: 3,
-    devicesCount: 6,
-    totalRevenue: 32000,
-    monthlyRevenue: 2800,
-    expectedRevenue: 4000,
-    commissionRate: 0.5,
-    calculatedCommission: 14,
+    locationsCount: 1,
+    devicesCount: 2,
+    totalRevenue: 6000,
+    monthlyRevenue: 1200,
+    expectedRevenue: 1800,
+    commissionRate: 3.5,
+    calculatedCommission: 42,
     contractViolation: true,
     status: 'active',
     createdAt: '2024-04-05',
-    lastActivity: '2024-11-28T10:15:00Z',
-    industry: 'fitness',
-    address: 'Športová 28, Žilina',
-    website: 'www.fitnesspower.sk',
-    contactPerson: 'Martin Silný',
-    assignedTeamMemberId: 'team-1'
-  },
-  {
-    id: 'client-5',
-    name: 'Kaderníctvo Bella',
-    email: 'bella@salon.sk',
-    phone: '+421 908 333 444',
-    businessPartnerId: 'bp-2',
-    locationsCount: 1,
-    devicesCount: 2,
-    totalRevenue: 18000,
-    monthlyRevenue: 1500,
-    expectedRevenue: 1800,
-    commissionRate: 0.5,
-    calculatedCommission: 7.5,
-    contractViolation: true,
-    status: 'active',
-    createdAt: '2024-05-12',
-    lastActivity: '2024-11-28T15:20:00Z',
-    industry: 'beauty',
-    address: 'Krásna 12, Trenčín',
-    website: 'www.bellasalon.sk',
-    contactPerson: 'Isabella Krásna',
-    assignedTeamMemberId: 'team-3'
+    industry: 'retail',
+    address: 'Nákupná 5, Prešov',
+    contactPerson: 'Michal Predajca',
+    assignedTeamMemberId: 'team-1',
+    services: [
+      { id: 'service-9', name: 'POS Systém', monthlyFee: 69, status: 'active', commission: 24.15 },
+      { id: 'service-10', name: 'Sklad', monthlyFee: 49, status: 'inactive', commission: 17.15 }
+    ]
   }
 ];
 
 export const ClientsPage: React.FC = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [clients, setClients] = useState<Client[]>(mockClients);
   const [searchTerm, setSearchTerm] = useState('');
+  const [industryFilter, setIndustryFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [violationFilter, setViolationFilter] = useState(false);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
-  const [activeTab, setActiveTab] = useState('list');
-  const [showViolationsOnly, setShowViolationsOnly] = useState(false);
+  const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [deletingClient, setDeletingClient] = useState<Client | null>(null);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [sortField, setSortField] = useState<keyof Client | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
-  const filteredClients = mockClients.filter(client => {
-    const matchesSearch = client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (client.industry && client.industry.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    const matchesViolationFilter = !showViolationsOnly || client.contractViolation;
-    
-    return matchesSearch && matchesViolationFilter;
-  });
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'bg-green-100 text-green-800';
-      case 'inactive':
-        return 'bg-red-100 text-red-800';
-      case 'suspended':
-        return 'bg-yellow-100 text-yellow-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+  const handleSort = (field: keyof Client) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
     }
   };
+
+  const filteredAndSortedClients = clients
+    .filter(client => {
+      const matchesSearch = client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        client.contactPerson?.toLowerCase().includes(searchTerm.toLowerCase()) || '';
+      
+      const matchesIndustry = industryFilter === 'all' || client.industry === industryFilter;
+      const matchesStatus = statusFilter === 'all' || client.status === statusFilter;
+      const matchesViolation = !violationFilter || client.contractViolation;
+      
+      return matchesSearch && matchesIndustry && matchesStatus && matchesViolation;
+    })
+    .sort((a, b) => {
+      if (!sortField) return 0;
+      
+      const aValue = a[sortField];
+      const bValue = b[sortField];
+      
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return sortDirection === 'asc' 
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      }
+      
+      if (typeof aValue === 'number' && typeof bValue === 'number') {
+        return sortDirection === 'asc' 
+          ? aValue - bValue
+          : bValue - aValue;
+      }
+      
+      return 0;
+    });
 
   const getIndustryLabel = (industry: string) => {
-    switch (industry) {
-      case 'restaurant': return 'Reštaurácia';
-      case 'retail': return 'Maloobchod';
-      case 'hospitality': return 'Hotelierstvo';
-      case 'fitness': return 'Fitness';
-      case 'beauty': return 'Kaderníctvo';
-      default: return 'Iné';
+    const labels = {
+      restaurant: 'Reštaurácia',
+      retail: 'Maloobchod',
+      beauty: 'Kaderníctvo',
+      fitness: 'Fitness',
+      hospitality: 'Hotel'
+    };
+    return labels[industry as keyof typeof labels] || industry;
+  };
+
+  const handleAddClient = (newClient: Client) => {
+    setClients(prev => [...prev, newClient]);
+    toast({
+      title: "Úspech",
+      description: "Klient bol úspešne pridaný.",
+    });
+  };
+
+  const handleEditClient = (client: Client) => {
+    setEditingClient(client);
+    setShowEditDialog(true);
+  };
+
+  const handleSaveClient = (updatedClient: Client) => {
+    setClients(prev => prev.map(c => c.id === updatedClient.id ? updatedClient : c));
+    toast({
+      title: "Úspech",
+      description: "Klient bol úspešne upravený.",
+    });
+  };
+
+  const handleDeleteClient = (client: Client) => {
+    setDeletingClient(client);
+    setShowDeleteDialog(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deletingClient) {
+      setClients(prev => prev.filter(c => c.id !== deletingClient.id));
+      toast({
+        title: "Úspech",
+        description: "Klient bol úspešne vymazaný.",
+      });
+      setDeletingClient(null);
+      setShowDeleteDialog(false);
     }
   };
 
-  const handleClientClick = (clientId: string) => {
-    navigate(`/dashboard/merchants/${clientId}`);
-  };
+  const violationCount = clients.filter(c => c.contractViolation).length;
+  const totalCommission = clients.reduce((sum, c) => sum + c.calculatedCommission, 0);
 
-  const handleAddNewMerchant = () => {
-    setActiveTab('add');
-  };
-
-  // Only admins can see this page
-  if (!user || user.role !== 'admin') {
+  if (user?.role !== 'admin') {
     return (
       <div className="text-center py-8">
         <p className="text-gray-600">
@@ -193,304 +243,296 @@ export const ClientsPage: React.FC = () => {
     );
   }
 
-  const activeMerchants = filteredClients.filter(c => c.status === 'active').length;
-  const totalValue = filteredClients.reduce((sum, c) => sum + c.totalRevenue, 0);
-  const newThisMonth = filteredClients.filter(c => {
-    const createdDate = new Date(c.createdAt);
-    const now = new Date();
-    return createdDate.getMonth() === now.getMonth() && createdDate.getFullYear() === now.getFullYear();
-  }).length;
-  const violationCount = filteredClients.filter(c => c.contractViolation).length;
-  const totalCommission = filteredClients.reduce((sum, c) => sum + c.calculatedCommission, 0);
-
   return (
-    <TooltipProvider>
-      <div className="space-y-8 p-6">
-        {/* Header Section */}
-        <div className="bg-gradient-to-br from-blue-50 via-white to-purple-50 rounded-3xl p-8 border border-blue-100 shadow-lg">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            <div>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl">
-                  <Users className="h-8 w-8 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                    Merchanti
-                  </h1>
-                  <p className="text-gray-600 text-lg">
-                    Vítajte späť, {user?.fullName}! Správa všetkých merchantov v systéme.
-                  </p>
-                </div>
-              </div>
-              
-              {/* Stats Overview */}
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                      <Users className="h-5 w-5 text-green-600 dark:text-green-400" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Celkom merchantov</p>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-white">{filteredClients.length}</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                      <TrendingUp className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Aktívni</p>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-white">{activeMerchants}</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                      <DollarSign className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Celkové tržby</p>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-white">€{totalValue.toLocaleString()}</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                      <DollarSign className="h-5 w-5 text-green-600 dark:text-green-400" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Moje provízie</p>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-white">€{totalCommission.toFixed(2)}</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
-                      <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Porušenia zmluvy</p>
-                      <p className="text-2xl font-bold text-red-600 dark:text-red-400">{violationCount}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Quick Actions */}
-            <div className="flex flex-wrap gap-3">
-              <Button 
-                onClick={handleAddNewMerchant}
-                className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg"
-              >
-                <UserPlus className="h-4 w-4 mr-2" />
-                Pridať nového merchanta
-              </Button>
-              <Button 
-                variant={showViolationsOnly ? "default" : "outline"}
-                onClick={() => setShowViolationsOnly(!showViolationsOnly)}
-                className={showViolationsOnly ? "bg-red-500 hover:bg-red-600 text-white" : "border-gray-200"}
-              >
-                <AlertTriangle className="h-4 w-4 mr-2" />
-                Porušenia ({violationCount})
-              </Button>
-              <Button variant="outline" className="border-gray-200">
-                <Calendar className="h-4 w-4 mr-2" />
-                Kalender
-              </Button>
-            </div>
-          </div>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Merchanti
+          </h1>
+          <p className="text-gray-600">
+            Správa klientov a ich obchodných aktivít
+          </p>
         </div>
-
-        {/* Tabs for List and Add New */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 max-w-md">
-            <TabsTrigger value="list">Zoznam merchantov</TabsTrigger>
-            <TabsTrigger value="add" className="flex items-center space-x-2">
-              <UserPlus className="h-4 w-4" />
-              <span>Pridať nového</span>
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="list" className="space-y-6">
-            {/* Search and Table */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center space-x-4">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                    <Input
-                      placeholder="Hľadať merchantov..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {filteredClients.length === 0 ? (
-                  <div className="text-center py-8">
-                    <p className="text-gray-500">
-                      {searchTerm ? 'Žiadni merchanti nevyhovujú hľadaniu.' : 'Žiadni merchanti neboli nájdení.'}
-                    </p>
-                  </div>
-                ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Merchant</TableHead>
-                        <TableHead>Odvetvie</TableHead>
-                        <TableHead>Lokácie</TableHead>
-                        <TableHead>Zariadenia</TableHead>
-                        <TableHead>Mesačné tržby</TableHead>
-                        <TableHead>Moja provízia</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Akcie</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredClients.map((client) => (
-                        <TableRow 
-                          key={client.id}
-                          className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-                          onClick={() => handleClientClick(client.id)}
-                        >
-                          <TableCell>
-                            <div className="flex items-center space-x-2">
-                              {client.contractViolation && (
-                                <Tooltip>
-                                  <TooltipTrigger>
-                                    <AlertTriangle className="h-4 w-4 text-red-500" />
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p>Obrat klienta je pod úrovňou deklarovanej zmluvy.</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              )}
-                              <div>
-                                <div className="font-medium">{client.name}</div>
-                                <div className="text-sm text-gray-500">{client.email}</div>
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="outline">
-                              {getIndustryLabel(client.industry || '')}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>{client.locationsCount}</TableCell>
-                          <TableCell>{client.devicesCount}</TableCell>
-                          <TableCell>
-                            <div>
-                              <div className="font-medium">€{client.monthlyRevenue.toLocaleString()}</div>
-                              {client.contractViolation && (
-                                <div className="text-xs text-red-500">
-                                  Očakávané: €{client.expectedRevenue.toLocaleString()}
-                                </div>
-                              )}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div>
-                              <div className="font-medium">€{client.calculatedCommission.toFixed(2)}</div>
-                              <div className="text-xs text-gray-500">{client.commissionRate}%</div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge className={getStatusColor(client.status)}>
-                              {client.status === 'active' ? 'Aktívny' : 
-                               client.status === 'inactive' ? 'Neaktívny' : 'Pozastavený'}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center space-x-2" onClick={(e) => e.stopPropagation()}>
-                              <Dialog>
-                                <DialogTrigger asChild>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => setSelectedClient(client)}
-                                  >
-                                    <Eye className="h-4 w-4" />
-                                  </Button>
-                                </DialogTrigger>
-                                <DialogContent className="max-w-2xl">
-                                  <DialogHeader>
-                                    <DialogTitle>Detail merchanta</DialogTitle>
-                                  </DialogHeader>
-                                  {selectedClient && (
-                                    <div className="space-y-4">
-                                      <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                          <p className="text-sm font-medium text-gray-500">Názov</p>
-                                          <p>{selectedClient.name}</p>
-                                        </div>
-                                        <div>
-                                          <p className="text-sm font-medium text-gray-500">Email</p>
-                                          <p>{selectedClient.email}</p>
-                                        </div>
-                                        <div>
-                                          <p className="text-sm font-medium text-gray-500">Telefón</p>
-                                          <p>{selectedClient.phone}</p>
-                                        </div>
-                                        <div>
-                                          <p className="text-sm font-medium text-gray-500">Adresa</p>
-                                          <p>{selectedClient.address}</p>
-                                        </div>
-                                        <div>
-                                          <p className="text-sm font-medium text-gray-500">Mesačné tržby</p>
-                                          <p>€{selectedClient.monthlyRevenue.toLocaleString()}</p>
-                                        </div>
-                                        <div>
-                                          <p className="text-sm font-medium text-gray-500">Očakávané tržby</p>
-                                          <p>€{selectedClient.expectedRevenue.toLocaleString()}</p>
-                                        </div>
-                                        <div>
-                                          <p className="text-sm font-medium text-gray-500">Moja provízia</p>
-                                          <p>€{selectedClient.calculatedCommission.toFixed(2)} ({selectedClient.commissionRate}%)</p>
-                                        </div>
-                                        <div>
-                                          <p className="text-sm font-medium text-gray-500">Vytvorený</p>
-                                          <p>{new Date(selectedClient.createdAt).toLocaleDateString('sk-SK')}</p>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  )}
-                                </DialogContent>
-                              </Dialog>
-                              <Button variant="outline" size="sm">
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="add" className="space-y-6">
-            <div className="max-w-2xl">
-              <OnboardingClientCard />
-            </div>
-          </TabsContent>
-        </Tabs>
+        <div className="flex items-center space-x-3">
+          <Button
+            variant={violationFilter ? "default" : "outline"}
+            onClick={() => setViolationFilter(!violationFilter)}
+            className="flex items-center space-x-2"
+          >
+            <AlertTriangle className="h-4 w-4" />
+            <span>Porušenia ({violationCount})</span>
+          </Button>
+          <AddClientDialog onClientAdded={handleAddClient} />
+        </div>
       </div>
-    </TooltipProvider>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <Users className="h-8 w-8 text-blue-500" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Celkom klientov</p>
+                <p className="text-2xl font-bold">{clients.length}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <Smartphone className="h-8 w-8 text-green-500" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Celkom zariadení</p>
+                <p className="text-2xl font-bold">{clients.reduce((sum, c) => sum + c.devicesCount, 0)}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <DollarSign className="h-8 w-8 text-purple-500" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Moja mesačná provízia</p>
+                <p className="text-2xl font-bold">€{totalCommission.toFixed(2)}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <AlertTriangle className="h-8 w-8 text-red-500" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Porušenia zmluvy</p>
+                <p className="text-2xl font-bold text-red-600">{violationCount}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Filters */}
+      <Card>
+        <CardHeader>
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="relative flex-1 min-w-64">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                placeholder="Hľadať klientov..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Select value={industryFilter} onValueChange={setIndustryFilter}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Odvetvie" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Všetky odvetvia</SelectItem>
+                <SelectItem value="restaurant">Reštaurácia</SelectItem>
+                <SelectItem value="retail">Maloobchod</SelectItem>
+                <SelectItem value="beauty">Kaderníctvo</SelectItem>
+                <SelectItem value="fitness">Fitness</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Všetky statusy</SelectItem>
+                <SelectItem value="active">Aktívny</SelectItem>
+                <SelectItem value="inactive">Neaktívny</SelectItem>
+                <SelectItem value="suspended">Pozastavený</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <TooltipProvider>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead 
+                    className="cursor-pointer hover:bg-gray-50"
+                    onClick={() => handleSort('name')}
+                  >
+                    <div className="flex items-center space-x-1">
+                      <span>Klient</span>
+                      <ArrowUpDown className="h-4 w-4" />
+                    </div>
+                  </TableHead>
+                  <TableHead 
+                    className="cursor-pointer hover:bg-gray-50"
+                    onClick={() => handleSort('industry')}
+                  >
+                    <div className="flex items-center space-x-1">
+                      <span>Odvetvie</span>
+                      <ArrowUpDown className="h-4 w-4" />
+                    </div>
+                  </TableHead>
+                  <TableHead>Lokácie</TableHead>
+                  <TableHead>Zariadenia</TableHead>
+                  <TableHead 
+                    className="cursor-pointer hover:bg-gray-50"
+                    onClick={() => handleSort('monthlyRevenue')}
+                  >
+                    <div className="flex items-center space-x-1">
+                      <span>Mesačný obrat</span>
+                      <ArrowUpDown className="h-4 w-4" />
+                    </div>
+                  </TableHead>
+                  <TableHead 
+                    className="cursor-pointer hover:bg-gray-50"
+                    onClick={() => handleSort('calculatedCommission')}
+                  >
+                    <div className="flex items-center space-x-1">
+                      <span>Moja provízia</span>
+                      <ArrowUpDown className="h-4 w-4" />
+                    </div>
+                  </TableHead>
+                  <TableHead>Akcie</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredAndSortedClients.map((client) => (
+                  <TableRow key={client.id}>
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        {client.contractViolation && (
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <AlertTriangle className="h-4 w-4 text-red-500" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Obrat klienta je pod úrovňou deklarovanej zmluvy.</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+                        <div>
+                          <div className="font-medium">{client.name}</div>
+                          <div className="text-sm text-gray-500">{client.email}</div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">
+                        {getIndustryLabel(client.industry || '')}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{client.locationsCount}</TableCell>
+                    <TableCell>{client.devicesCount}</TableCell>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">€{client.monthlyRevenue.toLocaleString()}</div>
+                        {client.contractViolation && (
+                          <div className="text-xs text-red-500">
+                            Očakávané: €{client.expectedRevenue.toLocaleString()}
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium text-green-600">€{client.calculatedCommission.toFixed(2)}</div>
+                        <div className="text-xs text-gray-500">{client.commissionRate}%</div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setSelectedClient(client)}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-2xl">
+                            <DialogHeader>
+                              <DialogTitle>Detail klienta</DialogTitle>
+                            </DialogHeader>
+                            {selectedClient && (
+                              <div className="space-y-4">
+                                <div className="grid grid-cols-2 gap-4">
+                                  <div>
+                                    <p className="text-sm font-medium text-gray-500">Názov</p>
+                                    <p>{selectedClient.name}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-medium text-gray-500">Email</p>
+                                    <p>{selectedClient.email}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-medium text-gray-500">Telefón</p>
+                                    <p>{selectedClient.phone}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-medium text-gray-500">Adresa</p>
+                                    <p>{selectedClient.address}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-medium text-gray-500">Celkové tržby</p>
+                                    <p>€{selectedClient.totalRevenue.toLocaleString()}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-medium text-gray-500">Vytvorený</p>
+                                    <p>{new Date(selectedClient.createdAt).toLocaleDateString('sk-SK')}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </DialogContent>
+                        </Dialog>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleEditClient(client)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleDeleteClient(client)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TooltipProvider>
+        </CardContent>
+      </Card>
+
+      {/* Edit Dialog */}
+      <EditClientDialog
+        open={showEditDialog}
+        onOpenChange={setShowEditDialog}
+        client={editingClient}
+        onSave={handleSaveClient}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDeleteDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        onConfirm={handleConfirmDelete}
+        title="Vymazať klienta"
+        description="Ste si istí, že chcete vymazať tohto klienta? Táto akcia sa nedá vrátiť späť."
+        itemName={deletingClient?.name}
+      />
+    </div>
   );
 };

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,6 +14,7 @@ import {
   Globe, 
   Calendar,
   DollarSign,
+  Euro,
   Smartphone,
   Settings,
   FileText,
@@ -35,8 +35,10 @@ const mockMerchantData = {
   industry: 'restaurant',
   status: 'active',
   createdAt: '2024-01-15',
-  totalRevenue: 45000,
-  monthlyRevenue: 3800,
+  totalRevenue: 12000,
+  monthlyRevenue: 2400,
+  commissionRate: 2.5,
+  calculatedCommission: 60,
   assignedTeamMember: {
     id: 'team-1',
     name: 'Peter Manažér',
@@ -44,9 +46,30 @@ const mockMerchantData = {
     phone: '+421 905 111 222'
   },
   activeServices: [
-    { id: 'service-1', name: 'POS Systém', status: 'active', monthlyFee: 89 },
-    { id: 'service-2', name: 'Online platby', status: 'active', monthlyFee: 45 },
-    { id: 'service-3', name: 'Inventúra', status: 'active', monthlyFee: 29 }
+    { 
+      id: 'service-1', 
+      name: 'POS Systém', 
+      status: 'active', 
+      monthlyFee: 89,
+      commission: 22.25,
+      description: 'Pokladničný systém s online synchronizáciou'
+    },
+    { 
+      id: 'service-2', 
+      name: 'Online platby', 
+      status: 'active', 
+      monthlyFee: 45,
+      commission: 11.25,
+      description: 'Platobná brána pre online objednávky'
+    },
+    { 
+      id: 'service-3', 
+      name: 'Inventúra', 
+      status: 'active', 
+      monthlyFee: 29,
+      commission: 7.25,
+      description: 'Automatická správa skladu a zásob'
+    }
   ],
   locations: [
     { 
@@ -191,6 +214,18 @@ export const MerchantDetailPage: React.FC = () => {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center">
+              <Euro className="h-8 w-8 text-purple-500" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Moja provízia</p>
+                <p className="text-2xl font-bold text-green-600">€{merchant.calculatedCommission.toFixed(2)}</p>
+                <p className="text-xs text-gray-500">{merchant.commissionRate}%</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
               <MapPin className="h-8 w-8 text-blue-500" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Lokácie</p>
@@ -202,7 +237,7 @@ export const MerchantDetailPage: React.FC = () => {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center">
-              <Smartphone className="h-8 w-8 text-purple-500" />
+              <Smartphone className="h-8 w-8 text-orange-500" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Zariadenia</p>
                 <p className="text-2xl font-bold">{merchant.devices.length}</p>
@@ -227,8 +262,9 @@ export const MerchantDetailPage: React.FC = () => {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="overview">Prehľad</TabsTrigger>
+          <TabsTrigger value="commission">Provízia</TabsTrigger>
           <TabsTrigger value="services">Služby</TabsTrigger>
           <TabsTrigger value="locations">Lokácie</TabsTrigger>
           <TabsTrigger value="devices">Zariadenia</TabsTrigger>
@@ -310,6 +346,73 @@ export const MerchantDetailPage: React.FC = () => {
           </div>
         </TabsContent>
 
+        <TabsContent value="commission" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <DollarSign className="h-5 w-5" />
+                  <span>Breakdown provízie podľa služieb</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {merchant.activeServices.map((service) => (
+                    <div key={service.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div>
+                        <p className="font-medium">{service.name}</p>
+                        <p className="text-sm text-gray-500">{service.description}</p>
+                        <p className="text-sm text-gray-600">Mesačný poplatok: €{service.monthlyFee}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-lg font-bold text-green-600">€{service.commission.toFixed(2)}</p>
+                        <p className="text-sm text-gray-500">{merchant.commissionRate}%</p>
+                        <Badge className={service.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
+                          {service.status === 'active' ? 'Aktívna' : 'Neaktívna'}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                  <div className="border-t pt-4">
+                    <div className="flex justify-between items-center text-lg font-bold">
+                      <span>Celková provízia:</span>
+                      <span className="text-green-600">€{merchant.calculatedCommission.toFixed(2)}</span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>Prehľad provízie</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Mesačný obrat klienta:</span>
+                    <span className="font-medium">€{merchant.monthlyRevenue.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Percento provízie:</span>
+                    <span className="font-medium">{merchant.commissionRate}%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Počet aktívnych služieb:</span>
+                    <span className="font-medium">{merchant.activeServices.filter(s => s.status === 'active').length}</span>
+                  </div>
+                  <div className="border-t pt-4">
+                    <div className="flex justify-between text-lg font-bold">
+                      <span>Moja mesačná provízia:</span>
+                      <span className="text-green-600">€{merchant.calculatedCommission.toFixed(2)}</span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
         <TabsContent value="services" className="space-y-6">
           <Card>
             <CardHeader>
@@ -322,19 +425,26 @@ export const MerchantDetailPage: React.FC = () => {
                     <TableHead>Služba</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Mesačný poplatok</TableHead>
+                    <TableHead>Moja provízia</TableHead>
                     <TableHead>Akcie</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {merchant.activeServices.map((service) => (
                     <TableRow key={service.id}>
-                      <TableCell className="font-medium">{service.name}</TableCell>
                       <TableCell>
-                        <Badge className={getStatusColor(service.status)}>
+                        <div>
+                          <p className="font-medium">{service.name}</p>
+                          <p className="text-sm text-gray-500">{service.description}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={service.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
                           {service.status === 'active' ? 'Aktívna' : 'Neaktívna'}
                         </Badge>
                       </TableCell>
                       <TableCell>€{service.monthlyFee}</TableCell>
+                      <TableCell className="text-green-600 font-medium">€{service.commission.toFixed(2)}</TableCell>
                       <TableCell>
                         <Button variant="outline" size="sm">
                           <Settings className="h-4 w-4" />
