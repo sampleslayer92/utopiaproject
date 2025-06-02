@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -16,8 +15,8 @@ export const DashboardHeader: React.FC = () => {
         <div className="flex items-center space-x-4">
           <NotificationCenter />
           
-          {/* Minimalistic Profile Widget Card */}
-          <Card className="bg-white shadow-lg border border-gray-200">
+          {/* Minimalistic Profile Widget Card - removed shadow-lg class */}
+          <Card className="bg-white border border-gray-200">
             <CardContent className="p-3">
               <div className="flex items-center space-x-3">
                 {/* User Info */}
@@ -31,10 +30,10 @@ export const DashboardHeader: React.FC = () => {
                   </Avatar>
                   
                   <div className="flex flex-col space-y-0.5">
-                    {/* Name */}
+                    {/* Name - changed to Marián Lapoš */}
                     <div className="flex items-center space-x-2">
                       <span className="text-sm font-semibold text-gray-900">
-                        {user?.fullName || 'Marián Lapoš'}
+                        Marián Lapoš
                       </span>
                       {/* Online Status Indicator */}
                       <div className="flex items-center space-x-1">
@@ -47,7 +46,7 @@ export const DashboardHeader: React.FC = () => {
                     
                     {/* Email */}
                     <span className="text-xs text-gray-500">
-                      {user?.email || 'marian.lapos@onepos.eu'}
+                      marian.lapos@onepos.eu
                     </span>
                   </div>
                 </div>
@@ -69,4 +68,3 @@ export const DashboardHeader: React.FC = () => {
     </header>
   );
 };
-
