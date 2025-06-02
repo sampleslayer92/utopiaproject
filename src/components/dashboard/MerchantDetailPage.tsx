@@ -19,9 +19,17 @@ import {
   Settings,
   FileText,
   Users,
-  Activity
+  Activity,
+  Edit,
+  Trash2,
+  Plus
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { Contract } from '@/types/dashboard';
+import { EditContractDialog } from './EditContractDialog';
+import { AddContractDialog } from './AddContractDialog';
+import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog';
 
 // Mock data for merchant detail
 const mockMerchantData = {
@@ -135,7 +143,16 @@ export const MerchantDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('overview');
+  
+  // Contract management state
+  const [contracts, setContracts] = useState(mockMerchantData.contracts);
+  const [editingContract, setEditingContract] = useState<Contract | null>(null);
+  const [showEditContractDialog, setShowEditContractDialog] = useState(false);
+  const [showAddContractDialog, setShowAddContractDialog] = useState(false);
+  const [deletingContract, setDeletingContract] = useState<Contract | null>(null);
+  const [showDeleteContractDialog, setShowDeleteContractDialog] = useState(false);
 
   const merchant = mockMerchantData; // In real app, fetch by id
 
@@ -535,7 +552,13 @@ export const MerchantDetailPage: React.FC = () => {
         <TabsContent value="contracts" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Zmluvy</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle>Zmluvy</CardTitle>
+                <Button onClick={() => setShowAddContractDialog(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Pridať zmluvu
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               <Table>
@@ -546,10 +569,11 @@ export const MerchantDetailPage: React.FC = () => {
                     <TableHead>Status</TableHead>
                     <TableHead>Hodnota</TableHead>
                     <TableHead>Platnosť</TableHead>
+                    <TableHead>Akcie</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {merchant.contracts.map((contract) => (
+                  {contracts.map((contract) => (
                     <TableRow key={contract.id}>
                       <TableCell className="font-medium">{contract.title}</TableCell>
                       <TableCell>{contract.type}</TableCell>
@@ -561,6 +585,24 @@ export const MerchantDetailPage: React.FC = () => {
                       <TableCell>€{contract.value.toLocaleString()}</TableCell>
                       <TableCell>
                         {new Date(contract.startDate).toLocaleDateString('sk-SK')} - {new Date(contract.endDate).toLocaleDateString('sk-SK')}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex space-x-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEditContract(contract)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDeleteContract(contract)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -616,6 +658,30 @@ export const MerchantDetailPage: React.FC = () => {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Contract Management Dialogs */}
+      <EditContractDialog
+        contract={editingContract}
+        open={showEditContractDialog}
+        onOpenChange={setShowEditContractDialog}
+        onSave={handleSaveContract}
+      />
+
+      <AddContractDialog
+        open={showAddContractDialog}
+        onOpenChange={setShowAddContractDialog}
+        onAdd={handleAddContract}
+        clientId={merchant.id}
+        businessPartnerId={merchant.assignedTeamMember.id}
+      />
+
+      <ConfirmDeleteDialog
+        open={showDeleteContractDialog}
+        onOpenChange={setShowDeleteContractDialog}
+        onConfirm={handleConfirmDeleteContract}
+        title="Vymazať zmluvu"
+        description={`Ste si istí, že chcete vymazať zmluvu "${deletingContract?.title}"? Táto akcia sa nedá vrátiť späť.`}
+      />
     </div>
   );
 };
