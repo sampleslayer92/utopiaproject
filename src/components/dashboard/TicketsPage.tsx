@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Search, Filter, Clock, AlertCircle, CheckCircle, User } from 'lucide-react';
+import { Plus, Search, Filter, Clock, AlertCircle, CheckCircle, User, FileText, BarChart3 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { mockTickets, getClientName, getAssignedToName } from '@/data/demoData';
 import { getFilteredData } from '@/utils/roleUtils';
@@ -81,12 +80,37 @@ export const TicketsPage: React.FC = () => {
             {user?.role === 'client' && 'Vaše tikety a požiadavky'}
           </p>
         </div>
-        
-        <Button className={`${designSystem.gradients.primary} ${designSystem.gradients.primaryHover} text-white ${designSystem.shadows.button} ${designSystem.transitions.default}`}>
-          <Plus className={`${designSystem.spacing.iconSize} mr-2`} />
-          Nový tiket
-        </Button>
       </div>
+
+      {/* Action Panel */}
+      <Card className={`${designSystem.borderRadius.card} ${designSystem.shadows.card} ${designSystem.gradients.card} mb-6`}>
+        <CardContent className={designSystem.spacing.cardPadding}>
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                Správa tiketov
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Vytvárajte, spravujte a analyzujte tikety
+              </p>
+            </div>
+            <div className="flex items-center space-x-3">
+              <Button variant="outline" className="flex items-center space-x-2">
+                <FileText className="h-4 w-4" />
+                <span>Export</span>
+              </Button>
+              <Button variant="outline" className="flex items-center space-x-2">
+                <BarChart3 className="h-4 w-4" />
+                <span>Analýza</span>
+              </Button>
+              <Button className={`${designSystem.gradients.primary} ${designSystem.gradients.primaryHover} text-white ${designSystem.shadows.button} ${designSystem.transitions.default}`}>
+                <Plus className={`${designSystem.spacing.iconSize} mr-2`} />
+                Nový tiket
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">

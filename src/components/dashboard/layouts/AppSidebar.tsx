@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -26,6 +25,7 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { LanguageSwitcher } from '@/components/ui/language-switcher';
+import { Card, CardContent } from '@/components/ui/card';
 
 export function AppSidebar() {
   const { user } = useAuth();
@@ -112,19 +112,23 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader className="p-6">
-        <div className="flex items-center space-x-3">
-          <img 
-            src="https://cdn.prod.website-files.com/65bb58bd9feeda1fd2e1b551/65bb58bd9feeda1fd2e1b5ad_logo-header.svg" 
-            alt="Onepos Logo" 
-            className="h-8 w-auto"
-          />
-          <div>
-            <h2 className="text-lg font-semibold">Onepos</h2>
-            <p className="text-xs text-gray-500">
-              ISO Organizácia
-            </p>
-          </div>
-        </div>
+        <Card className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 border-0 shadow-sm">
+          <CardContent className="p-4">
+            <div className="flex flex-col items-center text-center space-y-3">
+              <img 
+                src="https://cdn.prod.website-files.com/65bb58bd9feeda1fd2e1b551/65bb58bd9feeda1fd2e1b5ad_logo-header.svg" 
+                alt="Onepos Logo" 
+                className="h-10 w-auto"
+              />
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Onepos</h2>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  ISO Organizácia
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </SidebarHeader>
       
       <SidebarContent>

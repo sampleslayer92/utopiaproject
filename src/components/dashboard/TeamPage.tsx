@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, Plus, Users, TrendingUp, Award, Target, Eye, Edit, Trash2 } from 'lucide-react';
+import { Search, Plus, Users, TrendingUp, Award, Target, Eye, Edit, Trash2, FileText, Settings } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { TeamMember } from '@/types/team';
 import { useNavigate } from 'react-router-dom';
@@ -183,8 +182,34 @@ export const TeamPage: React.FC = () => {
             Správa vašich zamestnancov a ich výkonnosti
           </p>
         </div>
-        <AddEmployeeDialog onAddEmployee={handleAddEmployee} />
       </div>
+
+      {/* Action Panel */}
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                Správa tímu
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Spravujte zamestnancov a analyzujte ich výkonnosť
+              </p>
+            </div>
+            <div className="flex items-center space-x-3">
+              <Button variant="outline" className="flex items-center space-x-2">
+                <FileText className="h-4 w-4" />
+                <span>Výkonnostný report</span>
+              </Button>
+              <Button variant="outline" className="flex items-center space-x-2">
+                <Settings className="h-4 w-4" />
+                <span>Nastavenia tímu</span>
+              </Button>
+              <AddEmployeeDialog onAddEmployee={handleAddEmployee} />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">

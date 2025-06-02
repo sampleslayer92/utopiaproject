@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { BarChart3, TrendingUp, Users, DollarSign, FileText, Download, Filter, Calendar } from 'lucide-react';
+import { BarChart3, TrendingUp, Users, DollarSign, FileText, Download, Filter, Calendar, Clock, Settings } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 
 // Mock data for reports
@@ -61,17 +60,37 @@ export const ReportsPage: React.FC = () => {
             Komplexná analýza výkonnosti a kľúčových metrík
           </p>
         </div>
-        <div className="flex items-center space-x-3">
-          <Button variant="outline" onClick={() => exportReport('pdf')}>
-            <Download className="h-4 w-4 mr-2" />
-            Export PDF
-          </Button>
-          <Button variant="outline" onClick={() => exportReport('excel')}>
-            <Download className="h-4 w-4 mr-2" />
-            Export Excel
-          </Button>
-        </div>
       </div>
+
+      {/* Action Panel */}
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                Reporty a analýzy
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Generujte, plánujte a spravujte vaše reporty
+              </p>
+            </div>
+            <div className="flex items-center space-x-3">
+              <Button variant="outline" className="flex items-center space-x-2">
+                <Clock className="h-4 w-4" />
+                <span>Naplánovaný report</span>
+              </Button>
+              <Button variant="outline" className="flex items-center space-x-2">
+                <Settings className="h-4 w-4" />
+                <span>Nastavenia reportov</span>
+              </Button>
+              <Button className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+                <BarChart3 className="h-4 w-4 mr-2" />
+                Generovať report
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Report Type Selection */}
       <Card>
@@ -127,10 +146,16 @@ export const ReportsPage: React.FC = () => {
               </Select>
             </div>
             <div className="flex items-end">
-              <Button className="w-full bg-gradient-to-r from-blue-500 to-purple-500">
-                <BarChart3 className="h-4 w-4 mr-2" />
-                Generovať report
-              </Button>
+              <div className="flex space-x-2 w-full">
+                <Button variant="outline" onClick={() => exportReport('pdf')} className="flex-1">
+                  <Download className="h-4 w-4 mr-2" />
+                  PDF
+                </Button>
+                <Button variant="outline" onClick={() => exportReport('excel')} className="flex-1">
+                  <Download className="h-4 w-4 mr-2" />
+                  Excel
+                </Button>
+              </div>
             </div>
           </div>
         </CardContent>
