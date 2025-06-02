@@ -733,6 +733,12 @@ export const demoLocations: LocationData[] = [
 // Export mockTickets as alias for demoTickets
 export const mockTickets = demoTickets;
 
+// Helper function to get business partner name
+export const getBusinessPartnerName = (businessPartnerId: string): string => {
+  const businessPartner = demoBusinessPartners.find(bp => bp.id === businessPartnerId);
+  return businessPartner ? businessPartner.name : 'Neznámy business partner';
+};
+
 // Helper function to get assigned team member name
 export const getAssignedToName = (assignedToId: string): string => {
   const teamMembers = [
