@@ -31,7 +31,7 @@ export const LocationsPage: React.FC = () => {
   const filteredLocations = getFilteredData(demoLocations, user).filter(location =>
     location.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     location.address.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  ) as LocationData[];
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -57,6 +57,7 @@ export const LocationsPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Header and Summary Cards */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">

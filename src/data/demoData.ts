@@ -1,4 +1,3 @@
-
 export interface TeamMemberData {
   id: string;
   name: string;
@@ -90,6 +89,7 @@ export interface TransactionData {
   paymentMethod: string;
   terminalId: string;
   receiptNumber: string;
+  locationId: string;
   errorCode?: string;
 }
 
@@ -135,8 +135,9 @@ export interface LocationData {
   country: string;
   clientId: string;
   devicesCount: number;
-  status: "active" | "inactive";
+  status: "active" | "inactive" | "pending";
   createdAt: string;
+  type: string;
 }
 
 // Enhanced demo data with more comprehensive information
@@ -343,7 +344,8 @@ export const demoTransactions = [
     timestamp: '2024-11-26T12:34:56Z',
     paymentMethod: 'Visa **** 1234',
     terminalId: 'PAX-001',
-    receiptNumber: 'RCP-001234'
+    receiptNumber: 'RCP-001234',
+    locationId: 'location-1'
   },
   {
     id: 'trans-2',
@@ -356,7 +358,8 @@ export const demoTransactions = [
     timestamp: '2024-11-26T11:22:15Z',
     paymentMethod: 'Mastercard Contactless',
     terminalId: 'ING-002',
-    receiptNumber: 'RCP-001235'
+    receiptNumber: 'RCP-001235',
+    locationId: 'location-4'
   },
   {
     id: 'trans-3',
@@ -370,6 +373,7 @@ export const demoTransactions = [
     paymentMethod: 'Visa **** 5678',
     terminalId: 'PAX-003',
     receiptNumber: 'RCP-001236',
+    locationId: 'location-2',
     errorCode: 'insufficient_funds'
   }
 ];
@@ -645,7 +649,8 @@ export const demoLocations: LocationData[] = [
     clientId: 'client-1',
     devicesCount: 1,
     status: 'active',
-    createdAt: '2022-05-15'
+    createdAt: '2022-05-15',
+    type: 'restaurant'
   },
   {
     id: 'location-2',
@@ -656,7 +661,8 @@ export const demoLocations: LocationData[] = [
     clientId: 'client-2',
     devicesCount: 1,
     status: 'active',
-    createdAt: '2022-08-01'
+    createdAt: '2022-08-01',
+    type: 'cafe'
   },
   {
     id: 'location-3',
@@ -667,7 +673,8 @@ export const demoLocations: LocationData[] = [
     clientId: 'client-3',
     devicesCount: 1,
     status: 'active',
-    createdAt: '2022-10-10'
+    createdAt: '2022-10-10',
+    type: 'restaurant'
   },
   {
     id: 'location-4',
@@ -678,7 +685,8 @@ export const demoLocations: LocationData[] = [
     clientId: 'client-4',
     devicesCount: 1,
     status: 'active',
-    createdAt: '2023-01-20'
+    createdAt: '2023-01-20',
+    type: 'fitness'
   },
   {
     id: 'location-5',
@@ -688,10 +696,14 @@ export const demoLocations: LocationData[] = [
     country: 'Slovensko',
     clientId: 'client-5',
     devicesCount: 1,
-    status: 'active',
-    createdAt: '2023-03-01'
+    status: 'pending',
+    createdAt: '2023-03-01',
+    type: 'retail'
   }
 ];
+
+// Export mockTickets as alias for demoTickets
+export const mockTickets = demoTickets;
 
 // Helper function to get assigned team member name
 export const getAssignedToName = (assignedToId: string): string => {
@@ -703,4 +715,10 @@ export const getAssignedToName = (assignedToId: string): string => {
   
   const member = teamMembers.find(m => m.id === assignedToId);
   return member ? member.name : assignedToId;
+};
+
+// Helper function to get client name
+export const getClientName = (clientId: string): string => {
+  const client = demoClients.find(c => c.id === clientId);
+  return client ? client.name : 'Neznámy klient';
 };

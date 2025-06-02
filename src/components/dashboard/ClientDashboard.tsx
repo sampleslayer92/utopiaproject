@@ -22,11 +22,11 @@ export const ClientDashboard: React.FC = () => {
     );
   }
 
-  // Get client's data
-  const clientLocations = getFilteredData(demoLocations, user);
-  const clientDevices = getFilteredData(demoDevices, user);
-  const clientTransactions = getFilteredData(demoTransactions, user);
-  const clientContracts = getFilteredData(demoContracts, user);
+  // Get client's data - properly typed
+  const clientLocations = getFilteredData(demoLocations, user) as LocationData[];
+  const clientDevices = getFilteredData(demoDevices, user) as DeviceData[];
+  const clientTransactions = getFilteredData(demoTransactions, user) as TransactionData[];
+  const clientContracts = getFilteredData(demoContracts, user) as ContractData[];
 
   // Filter devices by selected location
   const filteredDevices = selectedLocation === 'all' 

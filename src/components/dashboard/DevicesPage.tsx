@@ -37,7 +37,7 @@ export const DevicesPage: React.FC = () => {
   const filteredDevices = getFilteredData(demoDevices, user).filter(device =>
     device.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     device.serialNumber.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  ) as DeviceData[];
 
   const getStatusColor = (status: string) => {
     switch (status) {

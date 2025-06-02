@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Search, Filter, Clock, AlertCircle, CheckCircle, User, FileText, BarChart3 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { mockTickets, getClientName, getAssignedToName } from '@/data/demoData';
+import { demoTickets, getClientName, getAssignedToName } from '@/data/demoData';
 import { getFilteredData } from '@/utils/roleUtils';
 
 export const TicketsPage: React.FC = () => {
@@ -16,8 +15,9 @@ export const TicketsPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
 
-  // Filter tickets based on user role
-  const filteredTickets = getFilteredData(mockTickets, user!).filter(ticket => {
+  // Filter tickets based on user role - properly typed
+  const filteredTickets = getFilteredData(demoTickets, user!) as TicketData[];
+  const finalFilteredTickets = filteredTickets.filter(ticket => {
     const clientName = getClientName(ticket.clientId);
     const matchesSearch = ticket.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          ticket.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -60,10 +60,10 @@ export const TicketsPage: React.FC = () => {
 
   const getTicketStats = () => {
     const stats = {
-      total: filteredTickets.length,
-      open: filteredTickets.filter(t => t.status === 'open').length,
-      inProgress: filteredTickets.filter(t => t.status === 'in_progress').length,
-      resolved: filteredTickets.filter(t => t.status === 'resolved').length
+      total: finalFilteredTickets.length,
+      open: finalFilteredTickets.filter(t => t.status === 'open').length,
+      inProgress: finalFilteredTickets.filter(t => t.status === 'in_progress').length,
+      resolved: finalFilteredTickets.filter(t => t.status === 'resolved').length
     };
     return stats;
   };
@@ -216,7 +216,7 @@ export const TicketsPage: React.FC = () => {
 
       {/* Tickets List */}
       <div className="space-y-4">
-        {filteredTickets.map((ticket) => (
+        {finalFilteredTickets.map((ticket) => (
           <Card key={ticket.id} className="hover:shadow-md transition-shadow cursor-pointer">
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
@@ -264,7 +264,7 @@ export const TicketsPage: React.FC = () => {
         ))}
       </div>
 
-      {filteredTickets.length === 0 && (
+      {finalFilteredTickets.length === 0 && (
         <Card>
           <CardContent className="text-center py-12">
             <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
