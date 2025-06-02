@@ -6,6 +6,7 @@ import { LogOut, Bell, Search, Menu } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { NotificationCenter } from '@/components/notifications/NotificationCenter';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 
 export const DashboardHeader: React.FC = () => {
   const { user, logout } = useAuth();
