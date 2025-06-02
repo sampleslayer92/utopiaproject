@@ -192,12 +192,10 @@ export const ClientsPage: React.FC = () => {
     return labels[industry as keyof typeof labels] || industry;
   };
 
-  const handleAddClient = (newClient: Client) => {
-    setClients(prev => [...prev, newClient]);
-    toast({
-      title: "Úspech",
-      description: "Klient bol úspešne pridaný.",
-    });
+  const handleAddClient = () => {
+    // Refresh the clients list or trigger a re-fetch
+    // Since we're using mock data, we don't need to do anything here
+    // In a real app, this would trigger a refetch of the clients
   };
 
   const handleEditClient = (client: Client) => {
