@@ -102,7 +102,6 @@ export const ClientsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [industryFilter, setIndustryFilter] = useState('all');
-  const [showAddMerchantDialog, setShowAddMerchantDialog] = useState(false);
 
   const filteredMerchants = mockMerchants.filter(merchant => {
     const searchMatch = merchant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -165,10 +164,7 @@ export const ClientsPage: React.FC = () => {
             Správa klientov a ich obchodných aktivít
           </p>
         </div>
-        <Button onClick={() => setShowAddMerchantDialog(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Pridať merchanta
-        </Button>
+        <AddMerchantDialog />
       </div>
 
       {/* KPI Cards */}
@@ -359,11 +355,8 @@ export const ClientsPage: React.FC = () => {
           </Table>
         </CardContent>
       </Card>
-
-      <AddMerchantDialog
-        open={showAddMerchantDialog}
-        onOpenChange={setShowAddMerchantDialog}
-      />
     </div>
   );
 };
+
+export default ClientsPage;
