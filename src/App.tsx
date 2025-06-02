@@ -117,6 +117,11 @@ const App = () => (
                           <DashboardLayout />
                         </ProtectedRoute>
                       } />
+                      <Route path="/dashboard/contracts/:contractId" element={
+                        <ProtectedRoute>
+                          <DashboardLayout />
+                        </ProtectedRoute>
+                      } />
                       <Route path="/dashboard/tickets" element={
                         <ProtectedRoute>
                           <DashboardLayout />

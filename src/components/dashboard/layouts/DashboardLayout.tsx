@@ -8,6 +8,7 @@ import { AdminDashboard } from '../AdminDashboard';
 import { ClientDashboard } from '../ClientDashboard';
 import { ClientsPage } from '../ClientsPage';
 import { ContractsPage } from '../ContractsPage';
+import { ContractDetailPage } from '../ContractDetailPage';
 import { TicketsPage } from '../TicketsPage';
 import { TeamPage } from '../TeamPage';
 import { TeamMemberDetail } from '../TeamMemberDetail';
@@ -56,6 +57,10 @@ export const DashboardLayout: React.FC = () => {
     
     if (location.pathname === '/dashboard/contracts') {
       return <ContractsPage />;
+    }
+    
+    if (location.pathname.startsWith('/dashboard/contracts/')) {
+      return <ContractDetailPage />;
     }
     
     if (location.pathname === '/dashboard/tickets') {
