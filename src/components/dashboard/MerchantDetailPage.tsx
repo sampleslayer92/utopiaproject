@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -38,7 +37,6 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Contract } from '@/types/dashboard';
-import { EditContractDialog } from './EditContractDialog';
 import { AddContractDialog } from './AddContractDialog';
 import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog';
 import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, LineChart, Line, AreaChart, Area } from 'recharts';
@@ -220,15 +218,13 @@ const mockMerchantData = {
   contracts: [
     {
       id: 'contract-1',
-      clientId: 'client-1',
-      businessPartnerId: 'team-1',
+      client: 'Reštaurácia U Jána',
       title: 'Základný POS balík',
       type: 'subscription' as const,
       status: 'active' as const,
       value: 1068,
       startDate: '2024-01-15',
       endDate: '2025-01-15',
-      autoRenewal: true,
       terms: 'Štandardné podmienky pre POS systém s mesačným poplatkom.'
     }
   ],
@@ -307,7 +303,6 @@ export const MerchantDetailPage: React.FC = () => {
   // Contract management state - explicitly type as Contract[]
   const [contracts, setContracts] = useState<Contract[]>(mockMerchantData.contracts);
   const [editingContract, setEditingContract] = useState<Contract | null>(null);
-  const [showEditContractDialog, setShowEditContractDialog] = useState(false);
   const [showAddContractDialog, setShowAddContractDialog] = useState(false);
   const [deletingContract, setDeletingContract] = useState<Contract | null>(null);
   const [showDeleteContractDialog, setShowDeleteContractDialog] = useState(false);
@@ -332,7 +327,6 @@ export const MerchantDetailPage: React.FC = () => {
   // Contract handler functions
   const handleEditContract = (contract: Contract) => {
     setEditingContract(contract);
-    setShowEditContractDialog(true);
   };
 
   const handleDeleteContract = (contract: Contract) => {
@@ -1140,19 +1134,11 @@ export const MerchantDetailPage: React.FC = () => {
       </Tabs>
 
       {/* Contract Management Dialogs */}
-      <EditContractDialog
-        contract={editingContract}
-        open={showEditContractDialog}
-        onOpenChange={setShowEditContractDialog}
-        onSave={handleSaveContract}
-      />
-
       <AddContractDialog
         open={showAddContractDialog}
         onOpenChange={setShowAddContractDialog}
         onAdd={handleAddContract}
-        clientId={merchant.id}
-        businessPartnerId={merchant.assignedTeamMember.id}
+        client={merchant.name}
       />
 
       <ConfirmDeleteDialog

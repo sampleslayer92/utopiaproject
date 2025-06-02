@@ -21,13 +21,11 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { demoContracts, getClientName, ContractData } from '@/data/demoData';
-import { EditContractDialog } from './EditContractDialog';
 
 export const ContractDetailPage: React.FC = () => {
   const { contractId } = useParams<{ contractId: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [contract, setContract] = useState<ContractData | null>(null);
 
   React.useEffect(() => {
@@ -46,12 +44,6 @@ export const ContractDetailPage: React.FC = () => {
       </div>
     );
   }
-
-  const handleSaveContract = (updatedContract: ContractData) => {
-    setContract(updatedContract);
-    // Here you would typically update the contract in your data store
-    console.log('Contract updated:', updatedContract);
-  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -97,10 +89,7 @@ export const ContractDetailPage: React.FC = () => {
             <Download className="h-4 w-4" />
             <span>Stiahnuť PDF</span>
           </Button>
-          <Button 
-            onClick={() => setIsEditDialogOpen(true)}
-            className="flex items-center space-x-2"
-          >
+          <Button className="flex items-center space-x-2">
             <Edit className="h-4 w-4" />
             <span>Upraviť</span>
           </Button>
@@ -342,14 +331,6 @@ export const ContractDetailPage: React.FC = () => {
           </Card>
         </TabsContent>
       </Tabs>
-
-      {/* Edit Dialog */}
-      <EditContractDialog
-        contract={contract}
-        open={isEditDialogOpen}
-        onOpenChange={setIsEditDialogOpen}
-        onSave={handleSaveContract}
-      />
     </div>
   );
 };

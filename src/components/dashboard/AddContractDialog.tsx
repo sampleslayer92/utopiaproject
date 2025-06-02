@@ -13,16 +13,14 @@ interface AddContractDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onAdd: (contract: Contract) => void;
-  clientId: string;
-  businessPartnerId: string;
+  client: string;
 }
 
 export const AddContractDialog: React.FC<AddContractDialogProps> = ({
   open,
   onOpenChange,
   onAdd,
-  clientId,
-  businessPartnerId
+  client
 }) => {
   const [formData, setFormData] = useState({
     title: '',
@@ -31,8 +29,7 @@ export const AddContractDialog: React.FC<AddContractDialogProps> = ({
     status: 'pending' as Contract['status'],
     startDate: '',
     endDate: '',
-    terms: '',
-    autoRenewal: false
+    terms: ''
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -40,16 +37,14 @@ export const AddContractDialog: React.FC<AddContractDialogProps> = ({
     if (formData.title && formData.type && formData.value && formData.startDate && formData.endDate) {
       const newContract: Contract = {
         id: uuidv4(),
-        clientId,
-        businessPartnerId,
+        client,
         title: formData.title,
         type: formData.type,
         value: Number(formData.value),
         status: formData.status,
         startDate: formData.startDate,
         endDate: formData.endDate,
-        terms: formData.terms,
-        autoRenewal: formData.autoRenewal
+        terms: formData.terms
       };
       onAdd(newContract);
       onOpenChange(false);
@@ -60,8 +55,7 @@ export const AddContractDialog: React.FC<AddContractDialogProps> = ({
         status: 'pending',
         startDate: '',
         endDate: '',
-        terms: '',
-        autoRenewal: false
+        terms: ''
       });
     }
   };
