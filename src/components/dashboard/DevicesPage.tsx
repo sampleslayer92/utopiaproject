@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Plus, Search, Smartphone, Clock, CheckCircle, AlertTriangle, XCircle, Activity } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { demoDevices, demoLocations } from '@/data/demoData';
+import { demoDevices, demoLocations, DeviceData } from '@/data/demoData';
 import { getFilteredData } from '@/utils/roleUtils';
 
 export const DevicesPage: React.FC = () => {
@@ -34,7 +35,7 @@ export const DevicesPage: React.FC = () => {
     );
   }
 
-  const filteredDevices = getFilteredData(demoDevices, user).filter(device =>
+  const filteredDevices: DeviceData[] = getFilteredData(demoDevices, user).filter(device =>
     device.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     device.serialNumber.toLowerCase().includes(searchTerm.toLowerCase())
   ) as DeviceData[];

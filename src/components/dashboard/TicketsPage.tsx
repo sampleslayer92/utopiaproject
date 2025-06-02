@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Search, Filter, Clock, AlertCircle, CheckCircle, User, FileText, BarChart3 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { demoTickets, getClientName, getAssignedToName } from '@/data/demoData';
+import { demoTickets, getClientName, getAssignedToName, TicketData } from '@/data/demoData';
 import { getFilteredData } from '@/utils/roleUtils';
 
 export const TicketsPage: React.FC = () => {
@@ -16,7 +16,7 @@ export const TicketsPage: React.FC = () => {
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
 
   // Filter tickets based on user role - properly typed
-  const filteredTickets = getFilteredData(demoTickets, user!) as TicketData[];
+  const filteredTickets: TicketData[] = getFilteredData(demoTickets, user!) as TicketData[];
   const finalFilteredTickets = filteredTickets.filter(ticket => {
     const clientName = getClientName(ticket.clientId);
     const matchesSearch = ticket.title.toLowerCase().includes(searchTerm.toLowerCase()) ||

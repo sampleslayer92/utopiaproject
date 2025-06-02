@@ -40,6 +40,8 @@ export interface ContractData {
   devices: string[];
   signedBy: string;
   notes: string;
+  businessPartnerId?: string;
+  organizationId?: string;
 }
 
 export interface TicketData {
@@ -49,12 +51,14 @@ export interface TicketData {
   clientId: string;
   clientName: string;
   status: "open" | "in_progress" | "resolved" | "closed";
-  priority: "high" | "medium" | "low";
+  priority: "high" | "medium" | "low" | "urgent";
   assignedTo: string;
   createdAt: string;
   updatedAt: string;
   category: string;
   estimatedResolution: string;
+  businessPartnerId?: string;
+  organizationId?: string;
 }
 
 export interface ReportData {
@@ -91,6 +95,9 @@ export interface TransactionData {
   receiptNumber: string;
   locationId: string;
   errorCode?: string;
+  clientId: string;
+  businessPartnerId?: string;
+  organizationId?: string;
 }
 
 export interface ClientData {
@@ -111,6 +118,7 @@ export interface ClientData {
   website?: string;
   contactPerson?: string;
   notes?: string;
+  organizationId?: string;
 }
 
 export interface DeviceData {
@@ -125,6 +133,8 @@ export interface DeviceData {
   firmwareVersion: string;
   tid: string;
   clientId: string;
+  businessPartnerId?: string;
+  organizationId?: string;
 }
 
 export interface LocationData {
@@ -138,6 +148,8 @@ export interface LocationData {
   status: "active" | "inactive" | "pending";
   createdAt: string;
   type: string;
+  businessPartnerId?: string;
+  organizationId?: string;
 }
 
 // Enhanced demo data with more comprehensive information
@@ -332,20 +344,22 @@ export const demoReports = [
   }
 ];
 
-export const demoTransactions = [
+export const demoTransactions: TransactionData[] = [
   {
     id: 'trans-1',
     merchantId: 'client-1',
     merchantName: 'Reštaurácia U Jána',
     amount: 89.50,
     currency: 'EUR',
-    status: 'completed' as const,
-    type: 'card_payment' as const,
+    status: 'completed',
+    type: 'card_payment',
     timestamp: '2024-11-26T12:34:56Z',
     paymentMethod: 'Visa **** 1234',
     terminalId: 'PAX-001',
     receiptNumber: 'RCP-001234',
-    locationId: 'location-1'
+    locationId: 'location-1',
+    clientId: 'client-1',
+    businessPartnerId: 'bp-1'
   },
   {
     id: 'trans-2',
@@ -353,13 +367,15 @@ export const demoTransactions = [
     merchantName: 'Fitness Centrum Power',
     amount: 35.00,
     currency: 'EUR',
-    status: 'completed' as const,
-    type: 'contactless' as const,
+    status: 'completed',
+    type: 'contactless',
     timestamp: '2024-11-26T11:22:15Z',
     paymentMethod: 'Mastercard Contactless',
     terminalId: 'ING-002',
     receiptNumber: 'RCP-001235',
-    locationId: 'location-4'
+    locationId: 'location-4',
+    clientId: 'client-4',
+    businessPartnerId: 'bp-1'
   },
   {
     id: 'trans-3',
@@ -367,14 +383,16 @@ export const demoTransactions = [
     merchantName: 'Kaviarňa Central',
     amount: 12.80,
     currency: 'EUR',
-    status: 'failed' as const,
-    type: 'card_payment' as const,
+    status: 'failed',
+    type: 'card_payment',
     timestamp: '2024-11-26T10:15:30Z',
     paymentMethod: 'Visa **** 5678',
     terminalId: 'PAX-003',
     receiptNumber: 'RCP-001236',
     locationId: 'location-2',
-    errorCode: 'insufficient_funds'
+    errorCode: 'insufficient_funds',
+    clientId: 'client-2',
+    businessPartnerId: 'bp-1'
   }
 ];
 
@@ -583,7 +601,8 @@ export const demoDevices: DeviceData[] = [
     lastActivity: '2024-11-26T14:30:00Z',
     firmwareVersion: '2.1.5',
     tid: 'TID001234',
-    clientId: 'client-1'
+    clientId: 'client-1',
+    businessPartnerId: 'bp-1'
   },
   {
     id: 'device-2',
@@ -596,7 +615,8 @@ export const demoDevices: DeviceData[] = [
     lastActivity: '2024-11-26T13:45:00Z',
     firmwareVersion: '1.8.2',
     tid: 'TID005678',
-    clientId: 'client-2'
+    clientId: 'client-2',
+    businessPartnerId: 'bp-1'
   },
   {
     id: 'device-3',
@@ -609,7 +629,8 @@ export const demoDevices: DeviceData[] = [
     lastActivity: '2024-11-25T18:20:00Z',
     firmwareVersion: '2.1.3',
     tid: 'TID009876',
-    clientId: 'client-3'
+    clientId: 'client-3',
+    businessPartnerId: 'bp-1'
   },
   {
     id: 'device-4',
@@ -622,7 +643,8 @@ export const demoDevices: DeviceData[] = [
     lastActivity: '2024-11-26T16:15:00Z',
     firmwareVersion: '3.2.1',
     tid: 'TID004567',
-    clientId: 'client-4'
+    clientId: 'client-4',
+    businessPartnerId: 'bp-1'
   },
   {
     id: 'device-5',
@@ -635,7 +657,8 @@ export const demoDevices: DeviceData[] = [
     lastActivity: '2024-11-24T09:30:00Z',
     firmwareVersion: '1.9.1',
     tid: 'TID007890',
-    clientId: 'client-5'
+    clientId: 'client-5',
+    businessPartnerId: 'bp-1'
   }
 ];
 
@@ -650,7 +673,8 @@ export const demoLocations: LocationData[] = [
     devicesCount: 1,
     status: 'active',
     createdAt: '2022-05-15',
-    type: 'restaurant'
+    type: 'restaurant',
+    businessPartnerId: 'bp-1'
   },
   {
     id: 'location-2',
@@ -662,7 +686,8 @@ export const demoLocations: LocationData[] = [
     devicesCount: 1,
     status: 'active',
     createdAt: '2022-08-01',
-    type: 'cafe'
+    type: 'cafe',
+    businessPartnerId: 'bp-1'
   },
   {
     id: 'location-3',
@@ -674,7 +699,8 @@ export const demoLocations: LocationData[] = [
     devicesCount: 1,
     status: 'active',
     createdAt: '2022-10-10',
-    type: 'restaurant'
+    type: 'restaurant',
+    businessPartnerId: 'bp-1'
   },
   {
     id: 'location-4',
@@ -686,7 +712,8 @@ export const demoLocations: LocationData[] = [
     devicesCount: 1,
     status: 'active',
     createdAt: '2023-01-20',
-    type: 'fitness'
+    type: 'fitness',
+    businessPartnerId: 'bp-1'
   },
   {
     id: 'location-5',
@@ -698,7 +725,8 @@ export const demoLocations: LocationData[] = [
     devicesCount: 1,
     status: 'pending',
     createdAt: '2023-03-01',
-    type: 'retail'
+    type: 'retail',
+    businessPartnerId: 'bp-1'
   }
 ];
 

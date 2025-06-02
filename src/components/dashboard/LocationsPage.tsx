@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Plus, Search, MapPin, Users, TrendingUp, DollarSign } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { demoLocations, demoDevices, demoTransactions } from '@/data/demoData';
+import { demoLocations, demoDevices, demoTransactions, LocationData } from '@/data/demoData';
 import { getFilteredData } from '@/utils/roleUtils';
 
 export const LocationsPage: React.FC = () => {
@@ -28,7 +29,7 @@ export const LocationsPage: React.FC = () => {
     // Clients can view and manage their own locations
   }
 
-  const filteredLocations = getFilteredData(demoLocations, user).filter(location =>
+  const filteredLocations: LocationData[] = getFilteredData(demoLocations, user).filter(location =>
     location.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     location.address.toLowerCase().includes(searchTerm.toLowerCase())
   ) as LocationData[];

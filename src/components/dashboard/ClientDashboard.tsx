@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Eye, Edit, Trash2, Plus, TrendingUp, Users, Building2, Activity, AlertTriangle, CheckCircle, DollarSign } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { demoDevices, demoLocations, demoTransactions, demoContracts } from '@/data/demoData';
+import { demoDevices, demoLocations, demoTransactions, demoContracts, LocationData, DeviceData, TransactionData, ContractData } from '@/data/demoData';
 import { getFilteredData } from '@/utils/roleUtils';
 
 export const ClientDashboard: React.FC = () => {
