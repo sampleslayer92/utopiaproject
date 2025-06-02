@@ -30,7 +30,8 @@ export const ContractsPage: React.FC = () => {
 
   const filteredContracts: ContractData[] = getFilteredData(demoContracts, user).filter(contract => {
     const clientName = getClientName(contract.clientId);
-    const matchesSearch = contract.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const contractTitle = `${contract.contractNumber} - ${contract.type}`;
+    const matchesSearch = contractTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          clientName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || contract.status === statusFilter;
     const matchesType = typeFilter === 'all' || contract.type === typeFilter;
@@ -43,7 +44,6 @@ export const ContractsPage: React.FC = () => {
       case 'active': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
       case 'pending': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
       case 'expired': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
-      case 'draft': return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
       default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
     }
   };
@@ -129,7 +129,6 @@ export const ContractsPage: React.FC = () => {
                 <SelectItem value="active">Aktívne</SelectItem>
                 <SelectItem value="pending">Čakajúce</SelectItem>
                 <SelectItem value="expired">Expirované</SelectItem>
-                <SelectItem value="draft">Návrh</SelectItem>
               </SelectContent>
             </Select>
 
@@ -171,7 +170,7 @@ export const ContractsPage: React.FC = () => {
                   <TableCell>
                     <div className="flex items-center">
                       <FileText className="h-4 w-4 mr-2 text-gray-400" />
-                      <span className="font-medium">{contract.title}</span>
+                      <span className="font-medium">{contract.contractNumber} - {contract.type}</span>
                     </div>
                   </TableCell>
                   <TableCell>{getClientName(contract.clientId)}</TableCell>
@@ -188,7 +187,6 @@ export const ContractsPage: React.FC = () => {
                       {contract.status === 'active' && 'Aktívna'}
                       {contract.status === 'pending' && 'Čakajúca'}
                       {contract.status === 'expired' && 'Expirovaná'}
-                      {contract.status === 'draft' && 'Návrh'}
                     </Badge>
                   </TableCell>
                   <TableCell>
