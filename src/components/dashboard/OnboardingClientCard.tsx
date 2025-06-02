@@ -5,14 +5,21 @@ import { Button } from '@/components/ui/button';
 import { UserPlus, ArrowRight, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const OnboardingClientCard: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const handleStartOnboarding = () => {
-    toast.success('Spúšťa sa onboarding nového klienta...');
-    // Store context that this is partner-initiated onboarding
-    localStorage.setItem('partner_onboarding', 'true');
+    // Set merchant onboarding context
+    localStorage.setItem('onboarding_context', JSON.stringify({ 
+      type: 'merchant',
+      initiatedBy: user?.role,
+      organizationId: user?.organizationId 
+    }));
+    
+    toast.success('Spúšťa sa onboarding nového merchanta...');
     navigate('/onboarding/company');
   };
 
@@ -26,10 +33,10 @@ export const OnboardingClientCard: React.FC = () => {
           </div>
           <div>
             <CardTitle className="text-xl text-emerald-800 dark:text-emerald-200">
-              Onboarding nového klienta
+              Onboarding nového merchanta
             </CardTitle>
             <p className="text-sm text-emerald-600 dark:text-emerald-400 mt-1">
-              Pridajte a nastavte nového klienta v systéme
+              Pridajte a nastavte nového merchanta v systéme
             </p>
           </div>
         </div>

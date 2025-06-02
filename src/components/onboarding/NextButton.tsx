@@ -4,12 +4,11 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useOnboarding } from '@/contexts/OnboardingContext';
-import { OnboardingStep } from '@/types/onboarding';
 
 interface NextButtonProps {
   className?: string;
   disabled?: boolean;
-  onClick?: () => void; // Added onClick prop
+  onClick?: () => void;
   onBeforeNext?: () => boolean;
 }
 
@@ -46,12 +45,12 @@ export const NextButton: React.FC<NextButtonProps> = ({
       onClick={handleClick}
       disabled={isDisabled}
       className={cn(
-        "gap-2 bg-utopia-600 hover:bg-utopia-700",
+        "gap-2 bg-blue-600 hover:bg-blue-700 text-white",
         isDisabled ? "opacity-50" : "",
         className
       )}
     >
-      {isLastStep ? "Dokončiť" : "Pokračovať"}
+      {isLastStep ? "Dokončiť onboarding" : "Pokračovať"}
       {!isLastStep && <ArrowRight className="h-4 w-4" />}
     </Button>
   );

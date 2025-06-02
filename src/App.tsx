@@ -28,6 +28,8 @@ import { ErrorBoundary } from "react-error-boundary";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { DashboardLayout } from "./components/dashboard/layouts/DashboardLayout";
 import { LocationProvider } from "./contexts/LocationContext";
+import { MerchantDetailPage } from "./components/dashboard/MerchantDetailPage";
+import { LocationDashboard } from "./components/dashboard/LocationDashboard";
 
 const queryClient = new QueryClient();
 
@@ -64,25 +66,77 @@ const App = () => (
                       <Route path="/" element={<Index />} />
                       <Route path="/register" element={<RegistrationPage />} />
                       
-                      {/* Protected dashboard routes */}
+                      {/* Dashboard routes - moved to top level */}
                       <Route path="/dashboard" element={
                         <ProtectedRoute>
                           <DashboardLayout />
                         </ProtectedRoute>
-                      }>
-                        <Route index element={<DashboardPage />} />
-                        <Route path="transactions" element={<TransactionsPage />} />
-                        <Route path="devices" element={<DevicesPage />} />
-                        <Route path="business-partners" element={<BusinessPartnersPage />} />
-                        <Route path="clients" element={<ClientsPage />} />
-                        <Route path="locations" element={<LocationsPage />} />
-                        <Route path="contracts" element={<ContractsPage />} />
-                        <Route path="tickets" element={<TicketsPage />} />
-                        <Route path="settings" element={<SettingsPage />} />
-                        <Route path="team" element={<TeamPage />} />
-                        <Route path="team/:memberId" element={<TeamMemberDetail />} />
-                        <Route path="reports" element={<ReportsPage />} />
-                      </Route>
+                      } />
+                      <Route path="/dashboard/merchants" element={
+                        <ProtectedRoute>
+                          <DashboardLayout />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/dashboard/merchants/:id" element={
+                        <ProtectedRoute>
+                          <DashboardLayout />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/dashboard/business-partners" element={
+                        <ProtectedRoute>
+                          <DashboardLayout />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/dashboard/devices" element={
+                        <ProtectedRoute>
+                          <DashboardLayout />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/dashboard/locations" element={
+                        <ProtectedRoute>
+                          <DashboardLayout />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/dashboard/location/:id" element={
+                        <ProtectedRoute>
+                          <DashboardLayout />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/dashboard/transactions" element={
+                        <ProtectedRoute>
+                          <DashboardLayout />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/dashboard/reports" element={
+                        <ProtectedRoute>
+                          <DashboardLayout />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/dashboard/contracts" element={
+                        <ProtectedRoute>
+                          <DashboardLayout />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/dashboard/tickets" element={
+                        <ProtectedRoute>
+                          <DashboardLayout />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/dashboard/team" element={
+                        <ProtectedRoute>
+                          <DashboardLayout />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/dashboard/team/:id" element={
+                        <ProtectedRoute>
+                          <DashboardLayout />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/dashboard/settings" element={
+                        <ProtectedRoute>
+                          <DashboardLayout />
+                        </ProtectedRoute>
+                      } />
                       
                       {/* Onboarding routes */}
                       <Route path="/onboarding/:step" element={

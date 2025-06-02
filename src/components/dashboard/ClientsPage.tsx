@@ -10,6 +10,7 @@ import { Search, Edit, Eye, MapPin, Users, Smartphone, DollarSign, Plus } from '
 import { useAuth } from '@/contexts/AuthContext';
 import { Client } from '@/types/dashboard';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const mockClients: Client[] = [
   {
@@ -71,6 +72,46 @@ const mockClients: Client[] = [
     website: 'www.grandeur.sk',
     contactPerson: 'Mária Hotelová',
     assignedTeamMemberId: 'team-3'
+  },
+  {
+    id: 'client-4',
+    name: 'Fitness Centrum Power',
+    email: 'info@fitnesspower.sk',
+    phone: '+421 911 555 777',
+    businessPartnerId: 'bp-1',
+    locationsCount: 3,
+    devicesCount: 6,
+    totalRevenue: 32000,
+    monthlyRevenue: 2800,
+    status: 'active',
+    createdAt: '2024-04-05',
+    lastActivity: '2024-11-28T10:15:00Z',
+    contracts: [],
+    industry: 'fitness',
+    address: 'Športová 28, Žilina',
+    website: 'www.fitnesspower.sk',
+    contactPerson: 'Martin Silný',
+    assignedTeamMemberId: 'team-1'
+  },
+  {
+    id: 'client-5',
+    name: 'Kaderníctvo Bella',
+    email: 'bella@salon.sk',
+    phone: '+421 908 333 444',
+    businessPartnerId: 'bp-2',
+    locationsCount: 1,
+    devicesCount: 2,
+    totalRevenue: 18000,
+    monthlyRevenue: 1500,
+    status: 'active',
+    createdAt: '2024-05-12',
+    lastActivity: '2024-11-28T15:20:00Z',
+    contracts: [],
+    industry: 'beauty',
+    address: 'Krásna 12, Trenčín',
+    website: 'www.bellasalon.sk',
+    contactPerson: 'Isabella Krásna',
+    assignedTeamMemberId: 'team-3'
   }
 ];
 
@@ -80,11 +121,24 @@ export const ClientsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
 
-  const filteredClients = mockClients.filter(client =>
-    client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (client.industry && client.industry.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  // Filter clients based on user role
+  const getFilteredClients = () => {
+    let clients = mockClients;
+    
+    // If business partner, show only their assigned clients
+    if (user?.role === 'business_partner') {
+      clients = clients.filter(client => client.businessPartnerId === user.organizationId);
+    }
+    
+    // Apply search filter
+    return clients.filter(client =>
+      client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (client.industry && client.industry.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+  };
+
+  const filteredClients = getFilteredClients();
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -99,13 +153,29 @@ export const ClientsPage: React.FC = () => {
     }
   };
 
+  const getIndustryLabel = (industry: string) => {
+    switch (industry) {
+      case 'restaurant': return 'Reštaurácia';
+      case 'retail': return 'Maloobchod';
+      case 'hospitality': return 'Hotelierstvo';
+      case 'fitness': return 'Fitness';
+      case 'beauty': return 'Kaderníctvo';
+      default: return 'Iné';
+    }
+  };
+
   const handleClientClick = (clientId: string) => {
     navigate(`/dashboard/merchants/${clientId}`);
   };
 
   const handleAddClient = () => {
-    // Set onboarding context for merchant
-    localStorage.setItem('onboarding_context', JSON.stringify({ type: 'merchant' }));
+    // Set merchant onboarding context
+    localStorage.setItem('onboarding_context', JSON.stringify({ 
+      type: 'merchant',
+      initiatedBy: user?.role,
+      organizationId: user?.organizationId 
+    }));
+    toast.success('Spúšťa sa onboarding nového merchanta...');
     navigate('/onboarding/company');
   };
 
@@ -128,18 +198,19 @@ export const ClientsPage: React.FC = () => {
             Merchanti
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Správa vašich klientov a ich prevádzok
+            {user.role === 'admin' 
+              ? 'Správa všetkých merchantov v systéme'
+              : 'Správa vašich pridelených merchantov'
+            }
           </p>
         </div>
-        {user.role === 'admin' && (
-          <Button 
-            onClick={handleAddClient}
-            className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Pridať merchanta
-          </Button>
-        )}
+        <Button 
+          onClick={handleAddClient}
+          className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Pridať merchanta
+        </Button>
       </div>
 
       {/* Summary Cards */}
@@ -149,8 +220,8 @@ export const ClientsPage: React.FC = () => {
             <div className="flex items-center">
               <Users className="h-8 w-8 text-blue-500" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Celkom klientov</p>
-                <p className="text-2xl font-bold">{mockClients.length}</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Celkom merchantov</p>
+                <p className="text-2xl font-bold">{filteredClients.length}</p>
               </div>
             </div>
           </CardContent>
@@ -161,7 +232,7 @@ export const ClientsPage: React.FC = () => {
               <MapPin className="h-8 w-8 text-green-500" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Celkom lokácií</p>
-                <p className="text-2xl font-bold">{mockClients.reduce((sum, c) => sum + c.locationsCount, 0)}</p>
+                <p className="text-2xl font-bold">{filteredClients.reduce((sum, c) => sum + c.locationsCount, 0)}</p>
               </div>
             </div>
           </CardContent>
@@ -172,7 +243,7 @@ export const ClientsPage: React.FC = () => {
               <Smartphone className="h-8 w-8 text-purple-500" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Aktívne zariadenia</p>
-                <p className="text-2xl font-bold">{mockClients.reduce((sum, c) => sum + c.devicesCount, 0)}</p>
+                <p className="text-2xl font-bold">{filteredClients.reduce((sum, c) => sum + c.devicesCount, 0)}</p>
               </div>
             </div>
           </CardContent>
@@ -183,21 +254,21 @@ export const ClientsPage: React.FC = () => {
               <DollarSign className="h-8 w-8 text-orange-500" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Mesačné tržby</p>
-                <p className="text-2xl font-bold">€{mockClients.reduce((sum, c) => sum + c.monthlyRevenue, 0).toLocaleString()}</p>
+                <p className="text-2xl font-bold">€{filteredClients.reduce((sum, c) => sum + c.monthlyRevenue, 0).toLocaleString()}</p>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Search and Filters */}
+      {/* Search and Table */}
       <Card>
         <CardHeader>
           <div className="flex items-center space-x-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
-                placeholder="Hľadať klientov..."
+                placeholder="Hľadať merchantov..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -206,104 +277,110 @@ export const ClientsPage: React.FC = () => {
           </div>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Klient</TableHead>
-                <TableHead>Odvetvie</TableHead>
-                <TableHead>Lokácie</TableHead>
-                <TableHead>Zariadenia</TableHead>
-                <TableHead>Mesačné tržby</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Akcie</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredClients.map((client) => (
-                <TableRow 
-                  key={client.id}
-                  className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-                  onClick={() => handleClientClick(client.id)}
-                >
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{client.name}</div>
-                      <div className="text-sm text-gray-500">{client.email}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">
-                      {client.industry === 'restaurant' ? 'Reštaurácia' :
-                       client.industry === 'retail' ? 'Maloobchod' :
-                       client.industry === 'hospitality' ? 'Hotelierstvo' : 'Iné'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{client.locationsCount}</TableCell>
-                  <TableCell>{client.devicesCount}</TableCell>
-                  <TableCell>€{client.monthlyRevenue.toLocaleString()}</TableCell>
-                  <TableCell>
-                    <Badge className={getStatusColor(client.status)}>
-                      {client.status === 'active' ? 'Aktívny' : 
-                       client.status === 'inactive' ? 'Neaktívny' : 'Pozastavený'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-2" onClick={(e) => e.stopPropagation()}>
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setSelectedClient(client)}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-2xl">
-                          <DialogHeader>
-                            <DialogTitle>Detail klienta</DialogTitle>
-                          </DialogHeader>
-                          {selectedClient && (
-                            <div className="space-y-4">
-                              <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                  <p className="text-sm font-medium text-gray-500">Názov</p>
-                                  <p>{selectedClient.name}</p>
-                                </div>
-                                <div>
-                                  <p className="text-sm font-medium text-gray-500">Email</p>
-                                  <p>{selectedClient.email}</p>
-                                </div>
-                                <div>
-                                  <p className="text-sm font-medium text-gray-500">Telefón</p>
-                                  <p>{selectedClient.phone}</p>
-                                </div>
-                                <div>
-                                  <p className="text-sm font-medium text-gray-500">Adresa</p>
-                                  <p>{selectedClient.address}</p>
-                                </div>
-                                <div>
-                                  <p className="text-sm font-medium text-gray-500">Celkové tržby</p>
-                                  <p>€{selectedClient.totalRevenue.toLocaleString()}</p>
-                                </div>
-                                <div>
-                                  <p className="text-sm font-medium text-gray-500">Vytvorený</p>
-                                  <p>{new Date(selectedClient.createdAt).toLocaleDateString('sk-SK')}</p>
+          {filteredClients.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500 dark:text-gray-400">
+                {searchTerm ? 'Žiadni merchanti nevyhovujú hľadaniu.' : 'Žiadni merchanti neboli nájdení.'}
+              </p>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Merchant</TableHead>
+                  <TableHead>Odvetvie</TableHead>
+                  <TableHead>Lokácie</TableHead>
+                  <TableHead>Zariadenia</TableHead>
+                  <TableHead>Mesačné tržby</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Akcie</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredClients.map((client) => (
+                  <TableRow 
+                    key={client.id}
+                    className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                    onClick={() => handleClientClick(client.id)}
+                  >
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{client.name}</div>
+                        <div className="text-sm text-gray-500">{client.email}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">
+                        {getIndustryLabel(client.industry || '')}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{client.locationsCount}</TableCell>
+                    <TableCell>{client.devicesCount}</TableCell>
+                    <TableCell>€{client.monthlyRevenue.toLocaleString()}</TableCell>
+                    <TableCell>
+                      <Badge className={getStatusColor(client.status)}>
+                        {client.status === 'active' ? 'Aktívny' : 
+                         client.status === 'inactive' ? 'Neaktívny' : 'Pozastavený'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-2" onClick={(e) => e.stopPropagation()}>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setSelectedClient(client)}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-2xl">
+                            <DialogHeader>
+                              <DialogTitle>Detail merchanta</DialogTitle>
+                            </DialogHeader>
+                            {selectedClient && (
+                              <div className="space-y-4">
+                                <div className="grid grid-cols-2 gap-4">
+                                  <div>
+                                    <p className="text-sm font-medium text-gray-500">Názov</p>
+                                    <p>{selectedClient.name}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-medium text-gray-500">Email</p>
+                                    <p>{selectedClient.email}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-medium text-gray-500">Telefón</p>
+                                    <p>{selectedClient.phone}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-medium text-gray-500">Adresa</p>
+                                    <p>{selectedClient.address}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-medium text-gray-500">Celkové tržby</p>
+                                    <p>€{selectedClient.totalRevenue.toLocaleString()}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-medium text-gray-500">Vytvorený</p>
+                                    <p>{new Date(selectedClient.createdAt).toLocaleDateString('sk-SK')}</p>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          )}
-                        </DialogContent>
-                      </Dialog>
-                      <Button variant="outline" size="sm">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                            )}
+                          </DialogContent>
+                        </Dialog>
+                        <Button variant="outline" size="sm">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>

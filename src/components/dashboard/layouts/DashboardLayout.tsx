@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from './AppSidebar';
 import { DashboardHeader } from './DashboardHeader';
@@ -25,6 +25,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 export const DashboardLayout: React.FC = () => {
   const { user } = useAuth();
+  const location = useLocation();
 
   const getDashboardComponent = () => {
     switch (user?.role) {
@@ -39,6 +40,66 @@ export const DashboardLayout: React.FC = () => {
     }
   };
 
+  const getPageComponent = () => {
+    if (location.pathname === '/dashboard') {
+      return getDashboardComponent();
+    }
+    
+    if (location.pathname === '/dashboard/merchants') {
+      return <ClientsPage />;
+    }
+    
+    if (location.pathname.startsWith('/dashboard/merchants/')) {
+      return <MerchantDetailPage />;
+    }
+    
+    if (location.pathname === '/dashboard/business-partners') {
+      return <BusinessPartnersPage />;
+    }
+    
+    if (location.pathname === '/dashboard/devices') {
+      return <DevicesPage />;
+    }
+    
+    if (location.pathname === '/dashboard/locations') {
+      return <LocationsPage />;
+    }
+    
+    if (location.pathname.startsWith('/dashboard/location/')) {
+      return <LocationDashboard />;
+    }
+    
+    if (location.pathname === '/dashboard/transactions') {
+      return <TransactionsPage />;
+    }
+    
+    if (location.pathname === '/dashboard/reports') {
+      return <ReportsPage />;
+    }
+    
+    if (location.pathname === '/dashboard/contracts') {
+      return <ContractsPage />;
+    }
+    
+    if (location.pathname === '/dashboard/tickets') {
+      return <TicketsPage />;
+    }
+    
+    if (location.pathname === '/dashboard/team') {
+      return <TeamPage />;
+    }
+    
+    if (location.pathname.startsWith('/dashboard/team/')) {
+      return <TeamMemberDetail />;
+    }
+    
+    if (location.pathname === '/dashboard/settings') {
+      return <SettingsPage />;
+    }
+    
+    return getDashboardComponent();
+  };
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
@@ -47,22 +108,7 @@ export const DashboardLayout: React.FC = () => {
           <DashboardHeader />
           <main className="flex-1 overflow-auto">
             <div className="p-6">
-              <Routes>
-                <Route path="" element={getDashboardComponent()} />
-                <Route path="merchants" element={<ClientsPage />} />
-                <Route path="merchants/:id" element={<MerchantDetailPage />} />
-                <Route path="business-partners" element={<BusinessPartnersPage />} />
-                <Route path="devices" element={<DevicesPage />} />
-                <Route path="locations" element={<LocationsPage />} />
-                <Route path="location/:id" element={<LocationDashboard />} />
-                <Route path="transactions" element={<TransactionsPage />} />
-                <Route path="reports" element={<ReportsPage />} />
-                <Route path="contracts" element={<ContractsPage />} />
-                <Route path="tickets" element={<TicketsPage />} />
-                <Route path="team" element={<TeamPage />} />
-                <Route path="team/:id" element={<TeamMemberDetail />} />
-                <Route path="settings" element={<SettingsPage />} />
-              </Routes>
+              {getPageComponent()}
             </div>
           </main>
         </div>
