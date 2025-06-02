@@ -1,3 +1,4 @@
+
 import { Ticket } from '@/types/tickets';
 
 // Users data - updated to new 2-level structure
@@ -107,7 +108,7 @@ export const demoClients = [
   }
 ];
 
-// Locations data - updated with organizationId
+// Locations data - updated with organizationId and missing properties
 export const demoLocations = [
   {
     id: 'loc-1',
@@ -119,7 +120,8 @@ export const demoLocations = [
     status: 'active' as const,
     type: 'retail' as const,
     monthlyRevenue: 2500,
-    manager: 'Jana Svobodová'
+    manager: 'Jana Svobodová',
+    createdAt: '2023-06-15T10:00:00Z'
   },
   {
     id: 'loc-2',
@@ -131,7 +133,8 @@ export const demoLocations = [
     status: 'active' as const,
     type: 'hospitality' as const,
     monthlyRevenue: 5000,
-    manager: 'Martin Tatra'
+    manager: 'Martin Tatra',
+    createdAt: '2023-08-20T10:00:00Z'
   },
   {
     id: 'loc-3',
@@ -140,10 +143,11 @@ export const demoLocations = [
     clientId: 'usr-client-2',
     organizationId: 'org-1',
     devicesCount: 2,
-    status: 'active' as const,
+    status: 'inactive' as const,
     type: 'hospitality' as const,
     monthlyRevenue: 3500,
-    manager: 'Martin Tatra'
+    manager: 'Martin Tatra',
+    createdAt: '2023-08-20T10:00:00Z'
   },
   {
     id: 'loc-4',
@@ -155,7 +159,8 @@ export const demoLocations = [
     status: 'active' as const,
     type: 'retail' as const,
     monthlyRevenue: 4500,
-    manager: 'Eva Športová'
+    manager: 'Eva Športová',
+    createdAt: '2023-07-10T10:00:00Z'
   },
   {
     id: 'loc-5',
@@ -164,14 +169,15 @@ export const demoLocations = [
     clientId: 'usr-client-4',
     organizationId: 'org-1',
     devicesCount: 2,
-    status: 'active' as const,
+    status: 'pending' as const,
     type: 'retail' as const,
     monthlyRevenue: 3200,
-    manager: 'Tomáš Zdravý'
+    manager: 'Tomáš Zdravý',
+    createdAt: '2023-09-05T10:00:00Z'
   }
 ];
 
-// Devices data - updated with organizationId
+// Devices data - updated with correct status values and missing properties
 export const demoDevices = [
   {
     id: 'dev-1',
@@ -180,15 +186,17 @@ export const demoDevices = [
     brand: 'Ingenico',
     model: 'iWL250',
     tid: 'T1001',
-    status: 'online' as const,
+    status: 'active' as const,
     locationId: 'loc-1',
     clientId: 'usr-client-1',
     organizationId: 'org-1',
     lastTransaction: '2024-01-15T14:30:00Z',
+    lastActivity: '2024-01-15T14:30:00Z',
     transactions: 1250,
     revenue: 15600,
     uptime: 98.5,
     serialNumber: 'IGN-2023-001',
+    firmwareVersion: 'v2.1.4',
     installDate: '2023-06-15',
     lastMaintenance: '2024-01-01'
   },
@@ -199,15 +207,17 @@ export const demoDevices = [
     brand: 'Verifone',
     model: 'V240m',
     tid: 'T1002',
-    status: 'online' as const,
+    status: 'active' as const,
     locationId: 'loc-1',
     clientId: 'usr-client-1',
     organizationId: 'org-1',
     lastTransaction: '2024-01-15T16:45:00Z',
+    lastActivity: '2024-01-15T16:45:00Z',
     transactions: 980,
     revenue: 12400,
     uptime: 97.2,
     serialNumber: 'VRF-2023-002',
+    firmwareVersion: 'v3.0.1',
     installDate: '2023-06-16'
   },
   {
@@ -217,16 +227,58 @@ export const demoDevices = [
     brand: 'PAX',
     model: 'A920Pro',
     tid: 'T2001',
-    status: 'online' as const,
+    status: 'maintenance' as const,
     locationId: 'loc-2',
     clientId: 'usr-client-2',
     organizationId: 'org-1',
     lastTransaction: '2024-01-15T18:20:00Z',
+    lastActivity: '2024-01-14T18:20:00Z',
     transactions: 2150,
     revenue: 28900,
     uptime: 99.1,
     serialNumber: 'PAX-2023-003',
+    firmwareVersion: 'v1.5.2',
     installDate: '2023-08-20'
+  },
+  {
+    id: 'dev-4',
+    name: 'Terminal Offline',
+    type: 'terminal' as const,
+    brand: 'Ingenico',
+    model: 'iWL220',
+    tid: 'T2002',
+    status: 'inactive' as const,
+    locationId: 'loc-4',
+    clientId: 'usr-client-3',
+    organizationId: 'org-1',
+    lastTransaction: '2024-01-10T10:20:00Z',
+    lastActivity: '2024-01-10T10:20:00Z',
+    transactions: 450,
+    revenue: 8900,
+    uptime: 85.2,
+    serialNumber: 'IGN-2023-004',
+    firmwareVersion: 'v2.0.3',
+    installDate: '2023-07-10'
+  },
+  {
+    id: 'dev-5',
+    name: 'Terminal Error',
+    type: 'terminal' as const,
+    brand: 'Verifone',
+    model: 'V240m',
+    tid: 'T3001',
+    status: 'error' as const,
+    locationId: 'loc-5',
+    clientId: 'usr-client-4',
+    organizationId: 'org-1',
+    lastTransaction: '2024-01-12T15:30:00Z',
+    lastActivity: '2024-01-12T15:30:00Z',
+    transactions: 120,
+    revenue: 2400,
+    uptime: 45.8,
+    serialNumber: 'VRF-2023-005',
+    firmwareVersion: 'v2.8.1',
+    installDate: '2023-09-05'
   }
 ];
 
