@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,6 +8,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { TeamEfficiencyChart } from './TeamEfficiencyChart';
 import { RevenueBreakdownChart } from './RevenueBreakdownChart';
 import { TeamPerformanceTable } from './TeamPerformanceTable';
+import { SectionHeader } from '@/components/ui/section-header';
 
 // Mock data for existing reports
 const performanceData = [
@@ -52,48 +52,53 @@ export const ReportsPage: React.FC = () => {
     // TODO: Implement actual export functionality
   };
 
+  const stats = [
+    {
+      label: 'Celkové tržby',
+      value: '€295,000',
+      icon: DollarSign,
+      color: 'bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400'
+    },
+    {
+      label: 'Aktívne reporty',
+      value: 12,
+      icon: BarChart3,
+      color: 'bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
+    },
+    {
+      label: 'Mesačný rast',
+      value: '+12%',
+      icon: TrendingUp,
+      color: 'bg-purple-100 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400'
+    }
+  ];
+
+  const actions = (
+    <>
+      <Button variant="outline" className="flex items-center space-x-2">
+        <Clock className="h-4 w-4" />
+        <span>Naplánovaný report</span>
+      </Button>
+      <Button variant="outline" className="flex items-center space-x-2">
+        <Settings className="h-4 w-4" />
+        <span>Nastavenia reportov</span>
+      </Button>
+      <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-200">
+        <BarChart3 className="h-4 w-4 mr-2" />
+        Generovať report
+      </Button>
+    </>
+  );
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Detailné reporty
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Komplexná analýza výkonnosti a kľúčových metrík
-          </p>
-        </div>
-      </div>
-
-      {/* Action Panel */}
-      <Card className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 border-0 shadow-sm">
-        <CardContent className="p-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                Reporty a analýzy
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Generujte, plánujte a spravujte vaše reporty
-              </p>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Button variant="outline" className="flex items-center space-x-2">
-                <Clock className="h-4 w-4" />
-                <span>Naplánovaný report</span>
-              </Button>
-              <Button variant="outline" className="flex items-center space-x-2">
-                <Settings className="h-4 w-4" />
-                <span>Nastavenia reportov</span>
-              </Button>
-              <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-200">
-                <BarChart3 className="h-4 w-4 mr-2" />
-                Generovať report
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <SectionHeader
+        icon={BarChart3}
+        title="Detailné reporty"
+        description="Komplexná analýza výkonnosti a kľúčových metrík"
+        stats={stats}
+        actions={actions}
+      />
 
       {/* Report Type Selection */}
       <Card>
@@ -161,7 +166,6 @@ export const ReportsPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Management Overview - New Default View */}
       {selectedReport === 'management' && (
         <div className="space-y-6">
           {/* Team Efficiency and Revenue Breakdown */}

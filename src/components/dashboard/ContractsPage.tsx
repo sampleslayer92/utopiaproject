@@ -1,5 +1,5 @@
-
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -14,6 +14,7 @@ import { SectionHeader } from '@/components/ui/section-header';
 
 export const ContractsPage: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
@@ -38,6 +39,10 @@ export const ContractsPage: React.FC = () => {
     
     return matchesSearch && matchesStatus && matchesType;
   }) as ContractData[];
+
+  const handleContractClick = (contractId: string) => {
+    navigate(`/dashboard/contracts/${contractId}`);
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -166,7 +171,11 @@ export const ContractsPage: React.FC = () => {
             </TableHeader>
             <TableBody>
               {filteredContracts.map((contract) => (
-                <TableRow key={contract.id}>
+                <TableRow 
+                  key={contract.id}
+                  className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                  onClick={() => handleContractClick(contract.id)}
+                >
                   <TableCell>
                     <div className="flex items-center">
                       <FileText className="h-4 w-4 mr-2 text-gray-400" />
@@ -191,10 +200,24 @@ export const ContractsPage: React.FC = () => {
                   </TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
-                      <Button size="sm" variant="outline">
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleContractClick(contract.id);
+                        }}
+                      >
                         Zobraziť
                       </Button>
-                      <Button size="sm" variant="outline">
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          console.log('Edit contract', contract.id);
+                        }}
+                      >
                         Upraviť
                       </Button>
                     </div>
