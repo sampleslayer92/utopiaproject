@@ -113,11 +113,15 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarHeader className="p-6">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg"></div>
+          <img 
+            src="https://cdn.prod.website-files.com/65bb58bd9feeda1fd2e1b551/65bb58bd9feeda1fd2e1b5ad_logo-header.svg" 
+            alt="Onepos Logo" 
+            className="h-8 w-auto"
+          />
           <div>
-            <h2 className="text-lg font-semibold">Utopia</h2>
+            <h2 className="text-lg font-semibold">Onepos</h2>
             <p className="text-xs text-gray-500">
-              {user?.role === 'admin' ? 'ISO Platform' : 'Client Portal'}
+              ISO Organizácia
             </p>
           </div>
         </div>
@@ -144,22 +148,22 @@ export function AppSidebar() {
       </SidebarContent>
       
       <SidebarFooter className="p-4">
-        <div className="space-y-4">
-          <div className="border-t pt-4">
-            <div className="space-y-3">
+        <div className="space-y-3">
+          <div className="border-t pt-3">
+            <div className="grid grid-cols-2 gap-2">
               <div>
-                <p className="text-xs text-gray-500 mb-2">Téma</p>
+                <p className="text-xs text-gray-500 mb-1">Téma</p>
                 <ThemeToggle />
               </div>
               <div>
-                <p className="text-xs text-gray-500 mb-2">Jazyk</p>
+                <p className="text-xs text-gray-500 mb-1">Jazyk</p>
                 <LanguageSwitcher />
               </div>
             </div>
           </div>
           
           <div className="text-xs text-gray-500 text-center">
-            © 2025 Utopia Platform
+            © 2025 Onepos Platform
           </div>
         </div>
       </SidebarFooter>
