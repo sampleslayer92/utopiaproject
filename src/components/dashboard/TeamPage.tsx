@@ -1,17 +1,25 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, Plus, Users, TrendingUp, Award, Target, Eye, Edit, Trash2, FileText, Settings } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { TeamMember } from '@/types/team';
-import { useNavigate } from 'react-router-dom';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { 
+  Users, 
+  Search, 
+  Mail, 
+  Phone, 
+  MapPin,
+  UserPlus,
+  Settings,
+  FileText,
+  Calendar,
+  Target
+} from 'lucide-react';
 import { AddEmployeeDialog } from './AddEmployeeDialog';
+import { TeamMember } from '@/types/team';
 
+// Mock data pre tím
 const mockTeamMembers: TeamMember[] = [
   {
     id: 'team-1',
@@ -26,184 +34,112 @@ const mockTeamMembers: TeamMember[] = [
     hireDate: '2023-01-15',
     performance: {
       monthlyRevenue: 23800,
-      totalRevenue: 286000,
-      merchantsManaged: 3,
+      totalRevenue: 285600,
+      merchantsManaged: 15,
       contractsSigned: 12,
       efficiency: 95
     },
-    assignedMerchants: ['merchant-1', 'merchant-2', 'merchant-6'],
-    lastActivity: '2024-11-28T14:30:00Z',
-    permissions: ['view_merchants', 'edit_contracts', 'create_reports', 'manage_team'],
+    assignedMerchants: ['merchant-1', 'merchant-2'],
+    permissions: ['view_merchants', 'edit_contracts', 'create_reports'],
     salary: 3200,
-    commissionRate: 8,
-    notes: 'Výborný senior account manager s dlhoročnými skúsenosťami. Špecializuje sa na veľkých klientov v reštauračnom a retail sektore. Má najvyšší conversion rate v tíme.'
+    commissionRate: 6.5
   },
   {
     id: 'team-2',
     firstName: 'Ladislav',
     lastName: 'Mathis',
     email: 'ladislav.mathis@iso-org.sk',
-    phone: '+421 900 234 567',
+    phone: '+421 900 654 321',
     position: 'Account Manager',
     department: 'Sales',
     businessPartnerId: 'bp-1',
     status: 'active',
-    hireDate: '2023-06-01',
+    hireDate: '2023-03-20',
     performance: {
       monthlyRevenue: 18800,
-      totalRevenue: 131600,
-      merchantsManaged: 3,
+      totalRevenue: 188000,
+      merchantsManaged: 12,
       contractsSigned: 8,
       efficiency: 92
     },
-    assignedMerchants: ['merchant-3', 'merchant-5', 'merchant-7'],
-    lastActivity: '2024-11-28T16:45:00Z',
-    permissions: ['view_merchants', 'edit_contracts', 'create_reports'],
+    assignedMerchants: ['merchant-3', 'merchant-4'],
+    permissions: ['view_merchants', 'edit_contracts'],
     salary: 2800,
-    commissionRate: 6,
-    notes: 'Rýchlo sa rozvíjajúci account manager so silnými komunikačnými schopnosťami. Špecializuje sa na tech a retail segmenty. Výborný v cross-selling produktov.'
+    commissionRate: 5.5
   },
   {
     id: 'team-3',
     firstName: 'Richie',
-    lastName: 'Plichta ❤️',
+    lastName: 'Plichta',
     email: 'richie.plichta@iso-org.sk',
-    phone: '+421 900 345 678',
+    phone: '+421 900 789 123',
     position: 'Technical Support Manager',
     department: 'Support',
     businessPartnerId: 'bp-1',
     status: 'active',
-    hireDate: '2023-03-20',
+    hireDate: '2022-11-10',
     performance: {
       monthlyRevenue: 16600,
-      totalRevenue: 132800,
-      merchantsManaged: 2,
+      totalRevenue: 199200,
+      merchantsManaged: 8,
       contractsSigned: 6,
       efficiency: 98
     },
-    assignedMerchants: ['merchant-4', 'merchant-8'],
-    lastActivity: '2024-11-28T12:20:00Z',
-    permissions: ['view_merchants', 'technical_support', 'maintenance_contracts'],
+    assignedMerchants: ['merchant-5'],
+    permissions: ['technical_support', 'maintenance_contracts'],
     salary: 3000,
-    commissionRate: 5,
-    notes: 'Expert na technické riešenia s najvyššou customer satisfaction v tíme. Špecializuje sa na komplexné integrácie a maintenance zmluvy. Výborný problem solver.'
+    commissionRate: 4.0
   }
 ];
 
 export const TeamPage: React.FC = () => {
-  const { user } = useAuth();
-  const navigate = useNavigate();
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>(mockTeamMembers);
   const [searchTerm, setSearchTerm] = useState('');
-  const [memberToDelete, setMemberToDelete] = useState<TeamMember | null>(null);
-  const [reassignTo, setReassignTo] = useState<string>('');
-  const [performanceFilter, setPerformanceFilter] = useState('all');
-  const [revenueFilter, setRevenueFilter] = useState('all');
 
-  const filteredMembers = mockTeamMembers.filter(member => {
-    const matchesSearch = `${member.firstName} ${member.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         member.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         member.position.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesPerformance = performanceFilter === 'all' || 
-      (performanceFilter === 'high' && member.performance.efficiency >= 95) ||
-      (performanceFilter === 'medium' && member.performance.efficiency >= 90 && member.performance.efficiency < 95) ||
-      (performanceFilter === 'low' && member.performance.efficiency < 90);
-    
-    const matchesRevenue = revenueFilter === 'all' ||
-      (revenueFilter === 'high' && member.performance.monthlyRevenue >= 20000) ||
-      (revenueFilter === 'medium' && member.performance.monthlyRevenue >= 15000 && member.performance.monthlyRevenue < 20000) ||
-      (revenueFilter === 'low' && member.performance.monthlyRevenue < 15000);
+  const handleAddEmployee = (newEmployee: TeamMember) => {
+    setTeamMembers(prev => [...prev, newEmployee]);
+  };
 
-    return matchesSearch && matchesPerformance && matchesRevenue;
-  });
-
-  const totalRevenue = mockTeamMembers.reduce((sum, member) => sum + member.performance.monthlyRevenue, 0);
-  const averageEfficiency = mockTeamMembers.reduce((sum, member) => sum + member.performance.efficiency, 0) / mockTeamMembers.length;
-  const topPerformer = mockTeamMembers.reduce((top, member) => 
-    member.performance.monthlyRevenue > top.performance.monthlyRevenue ? member : top
+  const filteredMembers = teamMembers.filter(member =>
+    `${member.firstName} ${member.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    member.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    member.position.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
-      case 'inactive':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
-      case 'on_leave':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+      case 'active': return 'bg-green-500';
+      case 'inactive': return 'bg-red-500';
+      case 'pending': return 'bg-yellow-500';
+      default: return 'bg-gray-500';
     }
   };
-
-  const handleMemberClick = (memberId: string) => {
-    navigate(`/dashboard/team/${memberId}`);
-  };
-
-  const handleDeleteMember = (member: TeamMember) => {
-    setMemberToDelete(member);
-  };
-
-  const handleAddEmployee = (employee: TeamMember) => {
-    console.log('Pridáva sa nový zamestnanec:', employee);
-    // TODO: Implement actual employee addition logic
-  };
-
-  const confirmDeleteMember = () => {
-    if (memberToDelete && reassignTo) {
-      console.log(`Deleting member ${memberToDelete.id} and reassigning to ${reassignTo}`);
-      // TODO: Implement actual deletion and reassignment
-      setMemberToDelete(null);
-      setReassignTo('');
-    }
-  };
-
-  const otherMembers = mockTeamMembers.filter(m => m.id !== memberToDelete?.id);
-
-  // Only admins (ISO Organizácia) can view team management
-  if (!user || user.role !== 'admin') {
-    return (
-      <div className="text-center py-8">
-        <p className="text-gray-600 dark:text-gray-400">
-          Nemáte oprávnenie na zobrazenie tejto stránky. Správa tímu je dostupná len pre ISO Organizáciu.
-        </p>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Tím
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Správa vašich zamestnancov a ich výkonnosti
-          </p>
-        </div>
-      </div>
-
       {/* Action Panel */}
-      <Card className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 border-0 shadow-sm">
+      <Card className="border-0 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
         <CardContent className="p-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                Správa tímu
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Spravujte zamestnancov a analyzujte ich výkonnosť
-              </p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-white/20 rounded-lg">
+                <Users className="h-8 w-8" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold mb-1">Správa tímu</h2>
+                <p className="text-blue-100 text-sm">
+                  Spravujte členov vášho tímu, sledujte výkonnosť a koordinujte prácu
+                </p>
+              </div>
             </div>
             <div className="flex items-center space-x-3">
-              <Button variant="outline" className="flex items-center space-x-2">
-                <FileText className="h-4 w-4" />
-                <span>Výkonnostný report</span>
+              <Button variant="outline" className="bg-white/20 hover:bg-white/30 border-white/30 text-white">
+                <FileText className="h-4 w-4 mr-2" />
+                Export tímu
               </Button>
-              <Button variant="outline" className="flex items-center space-x-2">
-                <Settings className="h-4 w-4" />
-                <span>Nastavenia tímu</span>
+              <Button variant="outline" className="bg-white/20 hover:bg-white/30 border-white/30 text-white">
+                <Settings className="h-4 w-4 mr-2" />
+                Nastavenia
               </Button>
               <AddEmployeeDialog onAddEmployee={handleAddEmployee} />
             </div>
@@ -211,211 +147,138 @@ export const TeamPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Summary Cards */}
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
           <CardContent className="p-6">
-            <div className="flex items-center">
-              <Users className="h-8 w-8 text-blue-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Celkom členov</p>
-                <p className="text-2xl font-bold">{mockTeamMembers.length}</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-blue-600">Celkom členov</p>
+                <p className="text-3xl font-bold text-blue-900">{teamMembers.length}</p>
               </div>
+              <Users className="h-8 w-8 text-blue-600" />
             </div>
           </CardContent>
         </Card>
-        <Card>
+        
+        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
           <CardContent className="p-6">
-            <div className="flex items-center">
-              <TrendingUp className="h-8 w-8 text-green-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Mesačné tržby</p>
-                <p className="text-2xl font-bold">€{totalRevenue.toLocaleString()}</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-green-600">Aktívni</p>
+                <p className="text-3xl font-bold text-green-900">
+                  {teamMembers.filter(m => m.status === 'active').length}
+                </p>
               </div>
+              <Target className="h-8 w-8 text-green-600" />
             </div>
           </CardContent>
         </Card>
-        <Card>
+        
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
           <CardContent className="p-6">
-            <div className="flex items-center">
-              <Target className="h-8 w-8 text-purple-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Priemerná efektivita</p>
-                <p className="text-2xl font-bold">{averageEfficiency.toFixed(1)}%</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-purple-600">Priemerná efektivita</p>
+                <p className="text-3xl font-bold text-purple-900">
+                  {Math.round(teamMembers.reduce((acc, m) => acc + m.performance.efficiency, 0) / teamMembers.length)}%
+                </p>
               </div>
+              <Calendar className="h-8 w-8 text-purple-600" />
             </div>
           </CardContent>
         </Card>
-        <Card>
+        
+        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
           <CardContent className="p-6">
-            <div className="flex items-center">
-              <Award className="h-8 w-8 text-orange-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Top výkonnosť</p>
-                <p className="text-lg font-bold">{topPerformer.firstName} {topPerformer.lastName}</p>
-                <p className="text-sm text-gray-500">€{topPerformer.performance.monthlyRevenue.toLocaleString()}</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-orange-600">Celkom zmluv</p>
+                <p className="text-3xl font-bold text-orange-900">
+                  {teamMembers.reduce((acc, m) => acc + m.performance.contractsSigned, 0)}
+                </p>
               </div>
+              <FileText className="h-8 w-8 text-orange-600" />
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Search and Filters */}
+      {/* Search and Filter */}
       <Card>
-        <CardHeader>
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div className="flex items-center space-x-4 flex-1">
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  placeholder="Hľadať členov tímu..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              <Select value={performanceFilter} onValueChange={setPerformanceFilter}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Výkonnosť" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Všetky úrovne</SelectItem>
-                  <SelectItem value="high">Vysoká (95%+)</SelectItem>
-                  <SelectItem value="medium">Stredná (90-95%)</SelectItem>
-                  <SelectItem value="low">Nízka (&lt;90%)</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={revenueFilter} onValueChange={setRevenueFilter}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Tržby" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Všetky tržby</SelectItem>
-                  <SelectItem value="high">Vysoké (€20k+)</SelectItem>
-                  <SelectItem value="medium">Stredné (€15-20k)</SelectItem>
-                  <SelectItem value="low">Nízke (&lt;€15k)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+        <CardContent className="p-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              placeholder="Hľadať člena tímu..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
           </div>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Meno</TableHead>
-                <TableHead>Pozícia</TableHead>
-                <TableHead>Oddelenie</TableHead>
-                <TableHead>Merchanti</TableHead>
-                <TableHead>Mesačné tržby</TableHead>
-                <TableHead>Provízia</TableHead>
-                <TableHead>Efektivita</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Akcie</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredMembers.map((member) => (
-                <TableRow 
-                  key={member.id}
-                  className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-                  onClick={() => handleMemberClick(member.id)}
-                >
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{member.firstName} {member.lastName}</div>
-                      <div className="text-sm text-gray-500">{member.email}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell>{member.position}</TableCell>
-                  <TableCell>{member.department}</TableCell>
-                  <TableCell>{member.performance.merchantsManaged}</TableCell>
-                  <TableCell>€{member.performance.monthlyRevenue.toLocaleString()}</TableCell>
-                  <TableCell>{member.commissionRate}%</TableCell>
-                  <TableCell>
-                    <div className="flex items-center">
-                      <div className="w-12 bg-gray-200 rounded-full h-2 mr-2">
-                        <div 
-                          className="bg-blue-600 h-2 rounded-full" 
-                          style={{ width: `${member.performance.efficiency}%` }}
-                        ></div>
-                      </div>
-                      <span className="text-sm font-medium">{member.performance.efficiency}%</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={getStatusColor(member.status)}>
-                      {member.status === 'active' ? 'Aktívny' : 
-                       member.status === 'inactive' ? 'Neaktívny' : 'Na dovolenke'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-2" onClick={(e) => e.stopPropagation()}>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => handleMemberClick(member.id)}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => handleDeleteMember(member)}
-                            className="text-red-600 hover:text-red-700"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Odstrániť člena tímu</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Naozaj chcete odstrániť {member.firstName} {member.lastName} z tímu? 
-                              Musíte vybrať iného člena tímu, ktorému sa priradia jeho merchanti a zmluvy.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <div className="py-4">
-                            <Select value={reassignTo} onValueChange={setReassignTo}>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Vyber člena tímu..." />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {otherMembers.map((otherMember) => (
-                                  <SelectItem key={otherMember.id} value={otherMember.id}>
-                                    {otherMember.firstName} {otherMember.lastName}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel onClick={() => {setMemberToDelete(null); setReassignTo('');}}>
-                              Zrušiť
-                            </AlertDialogCancel>
-                            <AlertDialogAction 
-                              onClick={confirmDeleteMember}
-                              disabled={!reassignTo}
-                              className="bg-red-600 hover:bg-red-700"
-                            >
-                              Odstrániť a priradiť
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
         </CardContent>
       </Card>
+
+      {/* Team Members Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredMembers.map((member) => (
+          <Card key={member.id} className="hover:shadow-lg transition-shadow duration-200">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                    {member.firstName[0]}{member.lastName[0]}
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">{member.firstName} {member.lastName}</CardTitle>
+                    <p className="text-sm text-gray-600">{member.position}</p>
+                  </div>
+                </div>
+                <div className={`w-3 h-3 rounded-full ${getStatusColor(member.status)}`}></div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2 text-sm">
+                  <Mail className="h-4 w-4 text-gray-400" />
+                  <span className="text-gray-600">{member.email}</span>
+                </div>
+                <div className="flex items-center space-x-2 text-sm">
+                  <Phone className="h-4 w-4 text-gray-400" />
+                  <span className="text-gray-600">{member.phone}</span>
+                </div>
+                <div className="flex items-center space-x-2 text-sm">
+                  <MapPin className="h-4 w-4 text-gray-400" />
+                  <span className="text-gray-600">{member.department}</span>
+                </div>
+              </div>
+              
+              <div className="pt-3 border-t">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium">Efektivita</span>
+                  <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                    {member.performance.efficiency}%
+                  </Badge>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Zmluvy:</span>
+                    <span className="font-medium">{member.performance.contractsSigned}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Tržby:</span>
+                    <span className="font-medium">€{member.performance.monthlyRevenue.toLocaleString()}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <Button className="w-full" variant="outline">
+                Zobraziť detail
+              </Button>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 };

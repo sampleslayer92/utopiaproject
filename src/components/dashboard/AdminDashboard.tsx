@@ -12,9 +12,12 @@ import {
   BarChart3,
   UserPlus,
   Settings,
-  FileText
+  FileText,
+  Calendar,
+  Activity
 } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
+import { AddEmployeeDialog } from './AddEmployeeDialog';
 
 // Mock data pre tímovú výkonnosť
 const teamPerformanceData = [
@@ -32,70 +35,58 @@ const monthlyRevenueData = [
   { name: 'Richie Plichta', revenue: 16600, contracts: 6, efficiency: 98 }
 ];
 
+const departmentData = [
+  { name: 'Sales', value: 45, color: '#3b82f6' },
+  { name: 'Support', value: 30, color: '#10b981' },
+  { name: 'Management', value: 25, color: '#f59e0b' }
+];
+
 export const AdminDashboard: React.FC = () => {
   const [periodFilter, setPeriodFilter] = useState('6months');
   const [memberFilter, setMemberFilter] = useState('all');
   const [roleFilter, setRoleFilter] = useState('all');
 
+  const handleAddEmployee = (employee: any) => {
+    console.log('New employee added:', employee);
+  };
+
   return (
     <div className="space-y-6">
-      {/* Welcome Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 text-white">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Vitajte Marián Lapoš</h1>
-            <p className="text-blue-100">
-              Prehľad výkonnosti vašej organizácie a tímu. Spravujte svojich zamestnancov a analyzujte ich úspešnosť.
-            </p>
-          </div>
-          <div className="hidden md:flex items-center space-x-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold">3</div>
-              <div className="text-sm text-blue-200">Aktívni členovia</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold">€59k</div>
-              <div className="text-sm text-blue-200">Mesačné tržby tímu</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Action Panel */}
-      <Card className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 border-0 shadow-sm">
+      <Card className="border-0 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
         <CardContent className="p-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                Správa tímu a výkonnosti
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Analyzujte výkonnosť vašich zamestnancov a optimalizujte procesy
-              </p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-white/20 rounded-lg">
+                <Users className="h-8 w-8" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold mb-1">Správa tímu</h2>
+                <p className="text-blue-100 text-sm">
+                  Analyzujte výkonnosť vašich zamestnancov a optimalizujte procesy
+                </p>
+              </div>
             </div>
             <div className="flex items-center space-x-3">
-              <Button variant="outline" className="flex items-center space-x-2">
-                <FileText className="h-4 w-4" />
-                <span>Výkonnostný report</span>
+              <Button variant="outline" className="bg-white/20 hover:bg-white/30 border-white/30 text-white">
+                <FileText className="h-4 w-4 mr-2" />
+                Výkonnostný report
               </Button>
-              <Button variant="outline" className="flex items-center space-x-2">
-                <Settings className="h-4 w-4" />
-                <span>Nastavenia tímu</span>
+              <Button variant="outline" className="bg-white/20 hover:bg-white/30 border-white/30 text-white">
+                <Settings className="h-4 w-4 mr-2" />
+                Nastavenia tímu
               </Button>
-              <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-200">
-                <UserPlus className="h-4 w-4 mr-2" />
-                Pridať člena tímu
-              </Button>
+              <AddEmployeeDialog onAddEmployee={handleAddEmployee} />
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Filters */}
-      <Card>
+      <Card className="shadow-sm">
         <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
                 Časové obdobie
               </label>
@@ -111,7 +102,7 @@ export const AdminDashboard: React.FC = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex-1">
+            <div>
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
                 Člen tímu
               </label>
@@ -127,7 +118,7 @@ export const AdminDashboard: React.FC = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex-1">
+            <div>
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
                 Funkcia
               </label>
@@ -143,71 +134,97 @@ export const AdminDashboard: React.FC = () => {
                 </SelectContent>
               </Select>
             </div>
+            <div className="flex items-end">
+              <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                <Activity className="h-4 w-4 mr-2" />
+                Aplikovať filter
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Team Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
+      {/* Enhanced Team Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200">
           <CardContent className="p-6">
-            <div className="flex items-center">
-              <Users className="h-8 w-8 text-blue-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Aktívni členovia</p>
-                <p className="text-2xl font-bold">3</p>
-                <p className="text-xs text-green-600">100% aktívnych</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-blue-600 dark:text-blue-400">Aktívni členovia</p>
+                <p className="text-3xl font-bold text-blue-900 dark:text-blue-100">3</p>
+                <div className="flex items-center mt-2">
+                  <TrendingUp className="h-4 w-4 text-green-600 mr-1" />
+                  <span className="text-sm text-green-600">100% aktívnych</span>
+                </div>
+              </div>
+              <div className="p-3 bg-blue-600 rounded-full">
+                <Users className="h-6 w-6 text-white" />
               </div>
             </div>
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-green-200">
           <CardContent className="p-6">
-            <div className="flex items-center">
-              <TrendingUp className="h-8 w-8 text-green-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Priemerná efektivita</p>
-                <p className="text-2xl font-bold">95%</p>
-                <p className="text-xs text-green-600">+3% oproti minulému</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-green-600 dark:text-green-400">Priemerná efektivita</p>
+                <p className="text-3xl font-bold text-green-900 dark:text-green-100">95%</p>
+                <div className="flex items-center mt-2">
+                  <TrendingUp className="h-4 w-4 text-green-600 mr-1" />
+                  <span className="text-sm text-green-600">+3% oproti minulému</span>
+                </div>
+              </div>
+              <div className="p-3 bg-green-600 rounded-full">
+                <BarChart3 className="h-6 w-6 text-white" />
               </div>
             </div>
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200">
           <CardContent className="p-6">
-            <div className="flex items-center">
-              <Target className="h-8 w-8 text-purple-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Celkom zmluv</p>
-                <p className="text-2xl font-bold">26</p>
-                <p className="text-xs text-green-600">+8 tento mesiac</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-purple-600 dark:text-purple-400">Celkom zmluv</p>
+                <p className="text-3xl font-bold text-purple-900 dark:text-purple-100">26</p>
+                <div className="flex items-center mt-2">
+                  <TrendingUp className="h-4 w-4 text-green-600 mr-1" />
+                  <span className="text-sm text-green-600">+8 tento mesiac</span>
+                </div>
+              </div>
+              <div className="p-3 bg-purple-600 rounded-full">
+                <Target className="h-6 w-6 text-white" />
               </div>
             </div>
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950 dark:to-orange-900 border-orange-200">
           <CardContent className="p-6">
-            <div className="flex items-center">
-              <Award className="h-8 w-8 text-orange-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Top performer</p>
-                <p className="text-lg font-bold">Richie Plichta</p>
-                <p className="text-sm text-gray-500">98% efektivita</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-orange-600 dark:text-orange-400">Top performer</p>
+                <p className="text-lg font-bold text-orange-900 dark:text-orange-100">Richie Plichta</p>
+                <div className="flex items-center mt-2">
+                  <Award className="h-4 w-4 text-orange-600 mr-1" />
+                  <span className="text-sm text-orange-600">98% efektivita</span>
+                </div>
+              </div>
+              <div className="p-3 bg-orange-600 rounded-full">
+                <Award className="h-6 w-6 text-white" />
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
+      {/* Enhanced Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5" />
+              <BarChart3 className="h-5 w-5 text-blue-600" />
               Vývoj efektivity tímu
             </CardTitle>
           </CardHeader>
@@ -215,13 +232,41 @@ export const AdminDashboard: React.FC = () => {
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={teamPerformanceData}>
-                  <CartesianGrid strokeDasharray="3 3" />
+                  <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                   <XAxis dataKey="month" />
                   <YAxis />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="peter" stroke="#8884d8" strokeWidth={2} name="Peter Fekiač" />
-                  <Line type="monotone" dataKey="ladislav" stroke="#82ca9d" strokeWidth={2} name="Ladislav Mathis" />
-                  <Line type="monotone" dataKey="richie" stroke="#ffc658" strokeWidth={2} name="Richie Plichta" />
+                  <Tooltip 
+                    contentStyle={{
+                      backgroundColor: 'white',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                    }}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="peter" 
+                    stroke="#3b82f6" 
+                    strokeWidth={3} 
+                    name="Peter Fekiač"
+                    dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="ladislav" 
+                    stroke="#10b981" 
+                    strokeWidth={3} 
+                    name="Ladislav Mathis"
+                    dot={{ fill: '#10b981', strokeWidth: 2, r: 4 }}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="richie" 
+                    stroke="#f59e0b" 
+                    strokeWidth={3} 
+                    name="Richie Plichta"
+                    dot={{ fill: '#f59e0b', strokeWidth: 2, r: 4 }}
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -231,59 +276,128 @@ export const AdminDashboard: React.FC = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Target className="h-5 w-5" />
-              Mesačné výkony tímu
+              <Users className="h-5 w-5 text-purple-600" />
+              Rozdelenie tímu
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={monthlyRevenueData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
+                <PieChart>
+                  <Pie
+                    data={departmentData}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    dataKey="value"
+                    label={({ name, value }) => `${name}: ${value}%`}
+                  >
+                    {departmentData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
                   <Tooltip />
-                  <Bar dataKey="revenue" fill="#8884d8" />
-                </BarChart>
+                </PieChart>
               </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Team Performance Details */}
+      {/* Monthly Performance Chart */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
+            <Target className="h-5 w-5 text-green-600" />
+            Mesačné výkony tímu
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={monthlyRevenueData}>
+                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: 'white',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                  }}
+                />
+                <Bar 
+                  dataKey="revenue" 
+                  fill="url(#colorGradient)" 
+                  radius={[4, 4, 0, 0]}
+                />
+                <defs>
+                  <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                  </linearGradient>
+                </defs>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Enhanced Team Performance Details */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5 text-blue-600" />
             Detailná výkonnosť členov tímu
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {monthlyRevenueData.map((member, index) => (
-              <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
+              <div key={index} className="flex items-center justify-between p-4 border rounded-xl bg-gray-50 dark:bg-gray-800 hover:shadow-md transition-all duration-200">
                 <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
                     {member.name.split(' ').map(n => n[0]).join('')}
                   </div>
                   <div>
-                    <h4 className="font-semibold">{member.name}</h4>
-                    <p className="text-sm text-gray-600">
-                      {member.contracts} zmluv • €{member.revenue.toLocaleString()} tržby
-                    </p>
+                    <h4 className="font-semibold text-lg">{member.name}</h4>
+                    <div className="flex items-center space-x-4 text-sm text-gray-600">
+                      <span className="flex items-center">
+                        <Target className="h-4 w-4 mr-1" />
+                        {member.contracts} zmluv
+                      </span>
+                      <span className="flex items-center">
+                        <Calendar className="h-4 w-4 mr-1" />
+                        €{member.revenue.toLocaleString()} tržby
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-6">
                   <div className="text-right">
-                    <p className="text-sm font-medium">Efektivita</p>
-                    <Badge variant="secondary">{member.efficiency}%</Badge>
+                    <p className="text-sm font-medium text-gray-600">Efektivita</p>
+                    <Badge 
+                      variant="secondary" 
+                      className={`text-white ${
+                        member.efficiency >= 95 ? 'bg-green-500' : 
+                        member.efficiency >= 90 ? 'bg-blue-500' : 'bg-orange-500'
+                      }`}
+                    >
+                      {member.efficiency}%
+                    </Badge>
                   </div>
-                  <div className="w-20 bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full" 
-                      style={{ width: `${member.efficiency}%` }}
-                    ></div>
+                  <div className="w-24">
+                    <div className="w-full bg-gray-200 rounded-full h-3">
+                      <div 
+                        className={`h-3 rounded-full transition-all duration-500 ${
+                          member.efficiency >= 95 ? 'bg-gradient-to-r from-green-400 to-green-600' : 
+                          member.efficiency >= 90 ? 'bg-gradient-to-r from-blue-400 to-blue-600' : 
+                          'bg-gradient-to-r from-orange-400 to-orange-600'
+                        }`}
+                        style={{ width: `${member.efficiency}%` }}
+                      ></div>
+                    </div>
                   </div>
                 </div>
               </div>

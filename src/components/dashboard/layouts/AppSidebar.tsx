@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -111,16 +110,16 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
-      <SidebarHeader className="p-4">
-        <div className="flex flex-col items-center text-center space-y-2">
+      <SidebarHeader className="px-4 py-3">
+        <div className="flex items-center space-x-3">
           <img 
             src="https://cdn.prod.website-files.com/65bb58bd9feeda1fd2e1b551/65bb58bd9feeda1fd2e1b5ad_logo-header.svg" 
             alt="Onepos Logo" 
-            className="h-8 w-auto"
+            className="h-6 w-auto flex-shrink-0"
           />
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Onepos</h2>
-            <p className="text-xs text-gray-600 dark:text-gray-400">ISO Organizácia</p>
+          <div className="min-w-0">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white truncate">Onepos</h2>
+            <p className="text-xs text-gray-600 dark:text-gray-400 truncate">ISO Organizácia</p>
           </div>
         </div>
       </SidebarHeader>
