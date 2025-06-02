@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,6 +10,7 @@ import { TeamMember } from '@/types/team';
 import { useNavigate } from 'react-router-dom';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AddEmployeeDialog } from './AddEmployeeDialog';
 
 const mockTeamMembers: TeamMember[] = [
   {
@@ -96,12 +96,26 @@ export const TeamPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [memberToDelete, setMemberToDelete] = useState<TeamMember | null>(null);
   const [reassignTo, setReassignTo] = useState<string>('');
+  const [performanceFilter, setPerformanceFilter] = useState('all');
+  const [revenueFilter, setRevenueFilter] = useState('all');
 
-  const filteredMembers = mockTeamMembers.filter(member =>
-    `${member.firstName} ${member.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    member.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    member.position.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredMembers = mockTeamMembers.filter(member => {
+    const matchesSearch = `${member.firstName} ${member.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         member.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         member.position.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesPerformance = performanceFilter === 'all' || 
+      (performanceFilter === 'high' && member.performance.efficiency >= 95) ||
+      (performanceFilter === 'medium' && member.performance.efficiency >= 90 && member.performance.efficiency < 95) ||
+      (performanceFilter === 'low' && member.performance.efficiency < 90);
+    
+    const matchesRevenue = revenueFilter === 'all' ||
+      (revenueFilter === 'high' && member.performance.monthlyRevenue >= 20000) ||
+      (revenueFilter === 'medium' && member.performance.monthlyRevenue >= 15000 && member.performance.monthlyRevenue < 20000) ||
+      (revenueFilter === 'low' && member.performance.monthlyRevenue < 15000);
+
+    return matchesSearch && matchesPerformance && matchesRevenue;
+  });
 
   const totalRevenue = mockTeamMembers.reduce((sum, member) => sum + member.performance.monthlyRevenue, 0);
   const averageEfficiency = mockTeamMembers.reduce((sum, member) => sum + member.performance.efficiency, 0) / mockTeamMembers.length;
@@ -157,16 +171,13 @@ export const TeamPage: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Team
+            Tím
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
             Správa vašich zamestnancov a ich výkonnosti
           </p>
         </div>
-        <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600">
-          <Plus className="h-4 w-4 mr-2" />
-          Pridať člena tímu
-        </Button>
+        <AddEmployeeDialog onAddEmployee={handleAddEmployee} />
       </div>
 
       {/* Summary Cards */}
@@ -218,18 +229,42 @@ export const TeamPage: React.FC = () => {
         </Card>
       </div>
 
-      {/* Search and Table */}
+      {/* Search and Filters */}
       <Card>
         <CardHeader>
-          <div className="flex items-center space-x-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                placeholder="Hľadať členov tímu..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div className="flex items-center space-x-4 flex-1">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  placeholder="Hľadať členov tímu..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Select value={performanceFilter} onValueChange={setPerformanceFilter}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Výkonnosť" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Všetky úrovne</SelectItem>
+                  <SelectItem value="high">Vysoká (95%+)</SelectItem>
+                  <SelectItem value="medium">Stredná (90-95%)</SelectItem>
+                  <SelectItem value="low">Nízka (<90%)</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={revenueFilter} onValueChange={setRevenueFilter}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Tržby" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Všetky tržby</SelectItem>
+                  <SelectItem value="high">Vysoké (€20k+)</SelectItem>
+                  <SelectItem value="medium">Stredné (€15-20k)</SelectItem>
+                  <SelectItem value="low">Nízke (<€15k)</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </CardHeader>

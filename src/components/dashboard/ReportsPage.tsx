@@ -1,252 +1,325 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { Calendar, Download, TrendingUp, TrendingDown, DollarSign, Users, CreditCard, AlertCircle } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { BarChart3, TrendingUp, Users, DollarSign, FileText, Download, Filter, Calendar } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 
-const monthlyData = [
-  { name: 'Jan', revenue: 45000, transactions: 1200, clients: 45 },
-  { name: 'Feb', revenue: 52000, transactions: 1350, clients: 48 },
-  { name: 'Mar', revenue: 48000, transactions: 1280, clients: 50 },
-  { name: 'Apr', revenue: 61000, transactions: 1450, clients: 53 },
-  { name: 'Máj', revenue: 58000, transactions: 1380, clients: 55 },
-  { name: 'Jún', revenue: 67000, transactions: 1520, clients: 58 },
+// Mock data for reports
+const performanceData = [
+  { month: 'Jan', revenue: 42000, contracts: 15, merchants: 8 },
+  { month: 'Feb', revenue: 45000, contracts: 18, merchants: 12 },
+  { month: 'Mar', revenue: 48000, contracts: 22, merchants: 15 },
+  { month: 'Apr', revenue: 52000, contracts: 20, merchants: 18 },
+  { month: 'Máj', revenue: 49000, contracts: 25, merchants: 20 },
+  { month: 'Jún', revenue: 59000, contracts: 28, merchants: 24 }
 ];
 
-const transactionTypeData = [
-  { name: 'Kartové platby', value: 68, color: '#8884d8' },
-  { name: 'Bezkontaktné', value: 25, color: '#82ca9d' },
-  { name: 'Mobilné platby', value: 7, color: '#ffc658' },
+const industryData = [
+  { name: 'Reštaurácie', value: 35, color: '#8884d8' },
+  { name: 'Maloobchod', value: 28, color: '#82ca9d' },
+  { name: 'Hotelierstvo', value: 20, color: '#ffc658' },
+  { name: 'Lekárne', value: 10, color: '#ff7300' },
+  { name: 'Služby', value: 7, color: '#0088fe' }
+];
+
+const teamPerformanceData = [
+  { name: 'Peter Fekiač', revenue: 23800, efficiency: 95, contracts: 12 },
+  { name: 'Ladislav Mathis', revenue: 18800, efficiency: 92, contracts: 8 },
+  { name: 'Richie Plichta', revenue: 16600, efficiency: 98, contracts: 6 }
 ];
 
 export const ReportsPage: React.FC = () => {
-  const { user } = useAuth();
-  const [selectedPeriod, setSelectedPeriod] = useState('month');
-  const [selectedReport, setSelectedReport] = useState('overview');
+  const [selectedReport, setSelectedReport] = useState('performance');
+  const [dateRange, setDateRange] = useState('6months');
+  const [teamMemberFilter, setTeamMemberFilter] = useState('all');
 
-  // Only admins (ISO Organizácia) can view reports
-  if (!user || user.role !== 'admin') {
-    return (
-      <div className="space-y-6">
-        <div className="text-center py-12">
-          <AlertCircle className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            Prístup zamietnutý
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
-            Reporty sú dostupné len pre ISO Organizáciu. Ako klient nemáte oprávnenie na zobrazenie týchto dát.
-          </p>
-        </div>
-      </div>
-    );
-  }
+  const reportTypes = [
+    { id: 'performance', name: 'Výkonnostný report', icon: TrendingUp },
+    { id: 'financial', name: 'Finančný report', icon: DollarSign },
+    { id: 'team', name: 'Report tímu', icon: Users },
+    { id: 'clients', name: 'Klientsky report', icon: FileText }
+  ];
 
-  const currentRevenue = 67000;
-  const previousRevenue = 58000;
-  const revenueGrowth = ((currentRevenue - previousRevenue) / previousRevenue) * 100;
-
-  const currentTransactions = 1520;
-  const previousTransactions = 1380;
-  const transactionGrowth = ((currentTransactions - previousTransactions) / previousTransactions) * 100;
+  const exportReport = (format: string) => {
+    console.log(`Exportujem report vo formáte: ${format}`);
+    // TODO: Implement actual export functionality
+  };
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Reporty
+            Detailné reporty
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Komplexné analýzy a štatistiky výkonnosti
+            Komplexná analýza výkonnosti a kľúčových metrík
           </p>
         </div>
-        
-        <div className="flex flex-wrap gap-3">
-          <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-            <SelectTrigger className="w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="week">Týždeň</SelectItem>
-              <SelectItem value="month">Mesiac</SelectItem>
-              <SelectItem value="quarter">Štvrťrok</SelectItem>
-              <SelectItem value="year">Rok</SelectItem>
-            </SelectContent>
-          </Select>
-          
-          <Select value={selectedReport} onValueChange={setSelectedReport}>
-            <SelectTrigger className="w-48">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="overview">Prehľad</SelectItem>
-              <SelectItem value="financial">Finančné</SelectItem>
-              <SelectItem value="clients">Klienti</SelectItem>
-              <SelectItem value="transactions">Transakcie</SelectItem>
-            </SelectContent>
-          </Select>
-          
-          <Button variant="outline">
-            <Calendar className="h-4 w-4 mr-2" />
-            Vlastný rozsah
-          </Button>
-          
-          <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600">
+        <div className="flex items-center space-x-3">
+          <Button variant="outline" onClick={() => exportReport('pdf')}>
             <Download className="h-4 w-4 mr-2" />
-            Export
+            Export PDF
+          </Button>
+          <Button variant="outline" onClick={() => exportReport('excel')}>
+            <Download className="h-4 w-4 mr-2" />
+            Export Excel
           </Button>
         </div>
       </div>
 
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Mesačné tržby</p>
-                <p className="text-2xl font-bold">€{currentRevenue.toLocaleString()}</p>
-                <div className="flex items-center mt-1">
-                  {revenueGrowth > 0 ? (
-                    <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
-                  ) : (
-                    <TrendingDown className="h-4 w-4 text-red-500 mr-1" />
-                  )}
-                  <span className={`text-sm ${revenueGrowth > 0 ? 'text-green-500' : 'text-red-500'}`}>
-                    {Math.abs(revenueGrowth).toFixed(1)}%
-                  </span>
-                </div>
-              </div>
-              <DollarSign className="h-8 w-8 text-green-500" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Transakcie</p>
-                <p className="text-2xl font-bold">{currentTransactions.toLocaleString()}</p>
-                <div className="flex items-center mt-1">
-                  {transactionGrowth > 0 ? (
-                    <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
-                  ) : (
-                    <TrendingDown className="h-4 w-4 text-red-500 mr-1" />
-                  )}
-                  <span className={`text-sm ${transactionGrowth > 0 ? 'text-green-500' : 'text-red-500'}`}>
-                    {Math.abs(transactionGrowth).toFixed(1)}%
-                  </span>
-                </div>
-              </div>
-              <CreditCard className="h-8 w-8 text-blue-500" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Aktívni klienti</p>
-                <p className="text-2xl font-bold">58</p>
-                <div className="flex items-center mt-1">
-                  <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
-                  <span className="text-sm text-green-500">5.5%</span>
-                </div>
-              </div>
-              <Users className="h-8 w-8 text-purple-500" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Priemerná transakcia</p>
-                <p className="text-2xl font-bold">€{Math.round(currentRevenue / currentTransactions)}</p>
-                <div className="flex items-center mt-1">
-                  <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
-                  <span className="text-sm text-green-500">2.1%</span>
-                </div>
-              </div>
-              <TrendingUp className="h-8 w-8 text-orange-500" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Mesačné tržby</CardTitle>
-            <CardDescription>Vývoj tržieb za posledných 6 mesiacov</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={monthlyData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip formatter={(value) => [`€${value?.toLocaleString()}`, 'Tržby']} />
-                <Bar dataKey="revenue" fill="#8884d8" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Typy platieb</CardTitle>
-            <CardDescription>Rozloženie platieb podľa typu</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={transactionTypeData}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  dataKey="value"
-                  label={({ name, value }) => `${name}: ${value}%`}
-                >
-                  {transactionTypeData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
+      {/* Report Type Selection */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Filter className="h-5 w-5" />
+            Typ reportu a filtre
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <Label htmlFor="reportType">Typ reportu</Label>
+              <Select value={selectedReport} onValueChange={setSelectedReport}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {reportTypes.map(type => (
+                    <SelectItem key={type.id} value={type.id}>
+                      {type.name}
+                    </SelectItem>
                   ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="dateRange">Časové obdobie</Label>
+              <Select value={dateRange} onValueChange={setDateRange}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1month">Posledný mesiac</SelectItem>
+                  <SelectItem value="3months">Posledné 3 mesiace</SelectItem>
+                  <SelectItem value="6months">Posledných 6 mesiacov</SelectItem>
+                  <SelectItem value="1year">Posledný rok</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="teamFilter">Člen tímu</Label>
+              <Select value={teamMemberFilter} onValueChange={setTeamMemberFilter}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Celý tím</SelectItem>
+                  <SelectItem value="team-1">Peter Fekiač</SelectItem>
+                  <SelectItem value="team-2">Ladislav Mathis</SelectItem>
+                  <SelectItem value="team-3">Richie Plichta</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-end">
+              <Button className="w-full bg-gradient-to-r from-blue-500 to-purple-500">
+                <BarChart3 className="h-4 w-4 mr-2" />
+                Generovať report
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-      <div className="grid grid-cols-1 gap-6">
+      {/* Performance Report */}
+      {selectedReport === 'performance' && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Vývoj výkonnosti</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={performanceData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="revenue" stroke="#8884d8" strokeWidth={2} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Rozdelenie klientov podľa odvetvia</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={industryData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {industryData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Team Report */}
+      {selectedReport === 'team' && (
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Porovnanie výkonnosti tímu</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={teamPerformanceData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="revenue" fill="#8884d8" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {teamPerformanceData.map((member, index) => (
+              <Card key={index}>
+                <CardHeader>
+                  <CardTitle className="text-lg">{member.name}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Mesačné tržby:</span>
+                    <span className="font-semibold">€{member.revenue.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Efektivita:</span>
+                    <Badge variant="secondary">{member.efficiency}%</Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Zmluvy:</span>
+                    <span className="font-semibold">{member.contracts}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Financial Report */}
+      {selectedReport === 'financial' && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <DollarSign className="h-8 w-8 text-green-500" />
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Celkové tržby</p>
+                  <p className="text-2xl font-bold">€295,000</p>
+                  <p className="text-xs text-green-600">+12% oproti minulému obdobiu</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <TrendingUp className="h-8 w-8 text-blue-500" />
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Priemerná marža</p>
+                  <p className="text-2xl font-bold">24.5%</p>
+                  <p className="text-xs text-blue-600">+2.1% oproti minulému obdobiu</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <FileText className="h-8 w-8 text-purple-500" />
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Počet transakcií</p>
+                  <p className="text-2xl font-bold">12,847</p>
+                  <p className="text-xs text-purple-600">+8% oproti minulému obdobiu</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <Users className="h-8 w-8 text-orange-500" />
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Aktívni klienti</p>
+                  <p className="text-2xl font-bold">145</p>
+                  <p className="text-xs text-orange-600">+5 nových klientov</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Client Report */}
+      {selectedReport === 'clients' && (
         <Card>
           <CardHeader>
-            <CardTitle>Trend transakcií</CardTitle>
-            <CardDescription>Počet transakcií za posledných 6 mesiacov</CardDescription>
+            <CardTitle>Klientska analýza</CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={monthlyData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip formatter={(value) => [value?.toLocaleString(), 'Transakcie']} />
-                <Line type="monotone" dataKey="transactions" stroke="#82ca9d" strokeWidth={2} />
-              </LineChart>
-            </ResponsiveContainer>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-green-50 p-4 rounded-lg">
+                  <h3 className="font-semibold text-green-800">Nový klienti</h3>
+                  <p className="text-2xl font-bold text-green-600">24</p>
+                  <p className="text-sm text-green-600">Za posledných 30 dní</p>
+                </div>
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <h3 className="font-semibold text-blue-800">Retention rate</h3>
+                  <p className="text-2xl font-bold text-blue-600">94.2%</p>
+                  <p className="text-sm text-blue-600">12-mesačný priemer</p>
+                </div>
+                <div className="bg-purple-50 p-4 rounded-lg">
+                  <h3 className="font-semibold text-purple-800">LTV</h3>
+                  <p className="text-2xl font-bold text-purple-600">€18,500</p>
+                  <p className="text-sm text-purple-600">Priemerná hodnota klienta</p>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
-      </div>
+      )}
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,13 +10,42 @@ import { DashboardCard } from '@/types/dashboard';
 import { TeamMember } from '@/types/team';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { useNavigate } from 'react-router-dom';
+import { AddMerchantDialog } from './AddMerchantDialog';
+import { AddEmployeeDialog } from './AddEmployeeDialog';
 
 const dashboardData: DashboardCard[] = [
-  { title: 'Celkom klientů', value: 145, change: '+8', trend: 'up', icon: Users },
-  { title: 'Aktivní zařízení', value: 2847, change: '+23', trend: 'up', icon: Building2 },
-  { title: 'Měsíční tržby', value: '€48,392', change: '+12%', trend: 'up', icon: TrendingUp },
-  { title: 'Tým výkonnosť', value: '94.2%', change: '+2.1%', trend: 'up', icon: Target },
+  { title: 'Celkom klientov', value: 145, change: '+8', trend: 'up', icon: Users },
+  { title: 'Aktívne zariadenia', value: 2847, change: '+23', trend: 'up', icon: Building2 },
+  { title: 'Mesačné tržby', value: '€48,392', change: '+12%', trend: 'up', icon: TrendingUp },
+  { title: 'Výkonnosť tímu', value: '94.2%', change: '+2.1%', trend: 'up', icon: Target },
 ];
+
+// Mock earnings data for the chart
+const generateEarningsData = (period: string, teamMember: string = 'all') => {
+  const baseData = {
+    'day': Array.from({ length: 24 }, (_, i) => ({
+      time: `${i}:00`,
+      earnings: Math.floor(Math.random() * 2000) + 500,
+      teamMember: teamMember
+    })),
+    'week': Array.from({ length: 7 }, (_, i) => ({
+      time: ['Pondelok', 'Utorok', 'Streda', 'Štvrtok', 'Piatok', 'Sobota', 'Nedeľa'][i],
+      earnings: Math.floor(Math.random() * 15000) + 5000,
+      teamMember: teamMember
+    })),
+    'month': Array.from({ length: 30 }, (_, i) => ({
+      time: `${i + 1}`,
+      earnings: Math.floor(Math.random() * 8000) + 2000,
+      teamMember: teamMember
+    })),
+    'year': Array.from({ length: 12 }, (_, i) => ({
+      time: ['Jan', 'Feb', 'Mar', 'Apr', 'Máj', 'Jún', 'Júl', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec'][i],
+      earnings: Math.floor(Math.random() * 50000) + 20000,
+      teamMember: teamMember
+    }))
+  };
+  return baseData[period as keyof typeof baseData] || baseData.month;
+};
 
 const mockTeamMembers: TeamMember[] = [
   {
@@ -97,33 +125,6 @@ const mockTeamMembers: TeamMember[] = [
   }
 ];
 
-// Mock earnings data for the chart
-const generateEarningsData = (period: string, teamMember: string = 'all') => {
-  const baseData = {
-    'day': Array.from({ length: 24 }, (_, i) => ({
-      time: `${i}:00`,
-      earnings: Math.floor(Math.random() * 2000) + 500,
-      teamMember: teamMember
-    })),
-    'week': Array.from({ length: 7 }, (_, i) => ({
-      time: ['Pondelok', 'Utorok', 'Streda', 'Štvrtok', 'Piatok', 'Sobota', 'Nedeľa'][i],
-      earnings: Math.floor(Math.random() * 15000) + 5000,
-      teamMember: teamMember
-    })),
-    'month': Array.from({ length: 30 }, (_, i) => ({
-      time: `${i + 1}`,
-      earnings: Math.floor(Math.random() * 8000) + 2000,
-      teamMember: teamMember
-    })),
-    'year': Array.from({ length: 12 }, (_, i) => ({
-      time: ['Jan', 'Feb', 'Mar', 'Apr', 'Máj', 'Jún', 'Júl', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec'][i],
-      earnings: Math.floor(Math.random() * 50000) + 20000,
-      teamMember: teamMember
-    }))
-  };
-  return baseData[period as keyof typeof baseData] || baseData.month;
-};
-
 export const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
@@ -162,6 +163,20 @@ export const AdminDashboard: React.FC = () => {
     navigate(`/dashboard/team/${memberId}`);
   };
 
+  const handleAddMerchant = (merchant: any) => {
+    console.log('Pridaný nový merchant:', merchant);
+    // TODO: Add to state management
+  };
+
+  const handleAddEmployee = (employee: TeamMember) => {
+    console.log('Pridaný nový zamestnanec:', employee);
+    // TODO: Add to state management
+  };
+
+  const handleDetailedReports = () => {
+    navigate('/dashboard/reports');
+  };
+
   return (
     <div className="p-6 space-y-8 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 min-h-full">
       {/* Enhanced Welcome Header */}
@@ -187,6 +202,8 @@ export const AdminDashboard: React.FC = () => {
             </div>
             
             <div className="flex flex-wrap gap-3">
+              <AddMerchantDialog onAddMerchant={handleAddMerchant} />
+              <AddEmployeeDialog onAddEmployee={handleAddEmployee} />
               <Button 
                 size="lg" 
                 className="bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105"
@@ -198,6 +215,7 @@ export const AdminDashboard: React.FC = () => {
                 size="lg"
                 variant="outline"
                 className="bg-transparent hover:bg-white/10 border-white/30 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105"
+                onClick={() => navigate('/dashboard/settings')}
               >
                 <Settings className="h-5 w-5 mr-2" />
                 Systémové nastavenia
@@ -206,6 +224,7 @@ export const AdminDashboard: React.FC = () => {
                 size="lg"
                 variant="outline"
                 className="bg-transparent hover:bg-white/10 border-white/30 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105"
+                onClick={handleDetailedReports}
               >
                 <BarChart3 className="h-5 w-5 mr-2" />
                 Detailný report
