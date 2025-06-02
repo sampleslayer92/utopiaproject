@@ -293,7 +293,7 @@ export const ClientsPage: React.FC = () => {
   if (user?.role !== 'admin') {
     return (
       <div className="text-center py-8">
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="text-gray-600">
           Nemáte oprávnenie na zobrazenie tejto stránky.
         </p>
       </div>
@@ -306,7 +306,8 @@ export const ClientsPage: React.FC = () => {
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Klienti</h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Spravujte všetkých klientov v systéme
+            {user?.role === 'admin' && 'Spravujte všetkých klientov v systéme'}
+            {user?.role === 'business_partner' && 'Vaši klienti a obchodní partneri'}
           </p>
         </div>
         <AddClientDialog onClientAdded={handleClientAdded} />

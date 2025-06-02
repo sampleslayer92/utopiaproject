@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -37,9 +38,8 @@ export const ContractsPage: React.FC = () => {
   
   let finalFilteredContracts = filteredContracts.filter(contract => {
     const clientName = getClientName(contract.clientId);
-    const matchesSearch = contract.contractNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         contract.type.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = contract.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         clientName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || contract.status === statusFilter;
     const matchesType = typeFilter === 'all' || contract.type === typeFilter;
     
@@ -53,9 +53,9 @@ export const ContractsPage: React.FC = () => {
       let bValue: any;
 
       switch (sortField) {
-        case 'contractNumber':
-          aValue = a.contractNumber;
-          bValue = b.contractNumber;
+        case 'title':
+          aValue = a.title;
+          bValue = b.title;
           break;
         case 'client':
           aValue = getClientName(a.clientId);
@@ -260,11 +260,11 @@ export const ContractsPage: React.FC = () => {
               <TableRow>
                 <TableHead 
                   className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-                  onClick={() => handleSort('contractNumber')}
+                  onClick={() => handleSort('title')}
                 >
                   <div className="flex items-center space-x-1">
-                    <span>Číslo zmluvy</span>
-                    {getSortIcon('contractNumber')}
+                    <span>Názov</span>
+                    {getSortIcon('title')}
                   </div>
                 </TableHead>
                 <TableHead 
@@ -310,11 +310,13 @@ export const ContractsPage: React.FC = () => {
             <TableBody>
               {finalFilteredContracts.map((contract) => (
                 <TableRow key={contract.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
-                  <TableCell className="font-medium">{contract.contractNumber}</TableCell>
+                  <TableCell className="font-medium">{contract.title}</TableCell>
                   <TableCell>{getClientName(contract.clientId)}</TableCell>
                   <TableCell>
                     <Badge variant="outline">
-                      {contract.type}
+                      {contract.type === 'subscription' ? 'Predplatné' :
+                       contract.type === 'lease' ? 'Prenájom' :
+                       contract.type === 'purchase' ? 'Kúpa' : 'Údržba'}
                     </Badge>
                   </TableCell>
                   <TableCell>€{contract.value.toLocaleString()}</TableCell>

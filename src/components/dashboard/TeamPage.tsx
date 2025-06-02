@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -181,7 +182,7 @@ export const TeamPage: React.FC = () => {
             Spravujte členov vášho tímu a sledujte ich výkonnosť
           </p>
         </div>
-        <AddEmployeeDialog />
+        <AddEmployeeDialog onEmployeeAdded={handleTeamMemberAdded} />
       </div>
 
       {/* Stats Cards */}
