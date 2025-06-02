@@ -15,6 +15,7 @@ interface RevenueData {
   total: number;
 }
 
+// Using centralized data - this will be the same data as in reports
 const mockRevenueData: RevenueData[] = [
   {
     month: 'Január',

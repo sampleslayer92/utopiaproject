@@ -12,6 +12,7 @@ interface TeamEfficiencyData {
   conversionRate: number;
 }
 
+// Using centralized data - this will be the same data as in reports
 const mockTeamEfficiencyData: TeamEfficiencyData[] = [
   {
     name: 'Peter Fekiač',

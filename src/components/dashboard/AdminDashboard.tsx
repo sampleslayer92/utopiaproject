@@ -1,9 +1,6 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   Users, 
   TrendingUp, 
@@ -11,13 +8,17 @@ import {
   Target,
   BarChart3,
   Settings,
-  FileText,
-  Activity,
   DollarSign,
   Download
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, ComposedChart } from 'recharts';
 import { AddEmployeeDialog } from './AddEmployeeDialog';
+import { DashboardFiltersComponent } from './DashboardFilters';
+import { RecentTeamActivity } from './RecentTeamActivity';
+import { TeamEfficiencyChart } from './TeamEfficiencyChart';
+import { RevenueBreakdownChart } from './RevenueBreakdownChart';
+import { DashboardFilters } from '@/types/activity';
+import { getTeamActivities, getTeamPerformanceData, getRevenueData } from '@/services/dashboardDataService';
 
 // Mock data pre tímovú výkonnosť s filtrovaním
 const teamPerformanceData = [
@@ -47,24 +48,31 @@ const monthlyRevenueData = [
 ];
 
 export const AdminDashboard: React.FC = () => {
-  const [periodFilter, setPeriodFilter] = useState('6months');
-  const [memberFilter, setMemberFilter] = useState('all');
-  const [roleFilter, setRoleFilter] = useState('all');
+  const [filters, setFilters] = useState<DashboardFilters>({
+    period: 'quarter',
+    teamMember: 'all',
+    actionType: 'all'
+  });
 
   const handleAddEmployee = (employee: any) => {
     console.log('New employee added:', employee);
   };
+
+  // Get filtered data using the centralized service
+  const activities = getTeamActivities(filters);
+  const teamData = getTeamPerformanceData(filters);
+  const revenueData = getRevenueData(filters);
 
   // Funkcionalita filtra - filtrovanie dát na základe vybraných filtrov
   const getFilteredPerformanceData = () => {
     let data = [...teamPerformanceData];
     
     // Filter by period
-    if (periodFilter === '1month') {
+    if (filters.period === '1month') {
       data = data.slice(-1);
-    } else if (periodFilter === '3months') {
+    } else if (filters.period === '3months') {
       data = data.slice(-3);
-    } else if (periodFilter === '6months') {
+    } else if (filters.period === '6months') {
       data = data.slice(-6);
     }
     
@@ -74,11 +82,11 @@ export const AdminDashboard: React.FC = () => {
   const getFilteredRevenueData = () => {
     let data = [...revenueAndProfitData];
     
-    if (periodFilter === '1month') {
+    if (filters.period === '1month') {
       data = data.slice(-1);
-    } else if (periodFilter === '3months') {
+    } else if (filters.period === '3months') {
       data = data.slice(-3);
-    } else if (periodFilter === '6months') {
+    } else if (filters.period === '6months') {
       data = data.slice(-6);
     }
     
@@ -87,11 +95,12 @@ export const AdminDashboard: React.FC = () => {
 
   const applyFilters = () => {
     // Trigger re-render with new filtered data
-    console.log('Applying filters:', { periodFilter, memberFilter, roleFilter });
+    console.log('Applying filters:', { filters });
   };
 
   // Get lines to display based on member filter
   const getPerformanceLines = () => {
+    const memberFilter = filters.teamMember;
     if (memberFilter === 'all') {
       return (
         <>
@@ -139,69 +148,8 @@ export const AdminDashboard: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Functional Filters */}
-      <Card className="shadow-sm">
-        <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
-                Časové obdobie
-              </label>
-              <Select value={periodFilter} onValueChange={setPeriodFilter}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1month">Posledný mesiac</SelectItem>
-                  <SelectItem value="3months">Posledné 3 mesiace</SelectItem>
-                  <SelectItem value="6months">Posledných 6 mesiacov</SelectItem>
-                  <SelectItem value="1year">Posledný rok</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
-                Člen tímu
-              </label>
-              <Select value={memberFilter} onValueChange={setMemberFilter}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Celý tím</SelectItem>
-                  <SelectItem value="peter">Peter Fekiač</SelectItem>
-                  <SelectItem value="ladislav">Ladislav Mathis</SelectItem>
-                  <SelectItem value="richie">Richie Plichta</SelectItem>
-                  <SelectItem value="maria">Mária Novotná</SelectItem>
-                  <SelectItem value="jan">Ján Kováč</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
-                Funkcia
-              </label>
-              <Select value={roleFilter} onValueChange={setRoleFilter}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Všetky funkcie</SelectItem>
-                  <SelectItem value="sales">Sales</SelectItem>
-                  <SelectItem value="support">Support</SelectItem>
-                  <SelectItem value="management">Management</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex items-end">
-              <Button onClick={applyFilters} className="w-full bg-blue-600 hover:bg-blue-700">
-                <Activity className="h-4 w-4 mr-2" />
-                Aplikovať filter
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Dashboard Filters */}
+      <DashboardFiltersComponent filters={filters} onFiltersChange={setFilters} />
 
       {/* Enhanced Team Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -278,135 +226,14 @@ export const AdminDashboard: React.FC = () => {
         </Card>
       </div>
 
-      {/* Charts Section - Vývoj efektivity tímu a Tržby & Zisky */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-blue-600" />
-              Vývoj efektivity tímu
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={getFilteredPerformanceData()}>
-                  <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip 
-                    contentStyle={{
-                      backgroundColor: 'white',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                    }}
-                  />
-                  {getPerformanceLines()}
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-green-600" />
-              Tržby a zisky
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={getFilteredRevenueData()}>
-                  <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip 
-                    contentStyle={{
-                      backgroundColor: 'white',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                    }}
-                    formatter={(value: any, name: string) => [
-                      `€${value.toLocaleString()}`,
-                      name === 'revenue' ? 'Tržby' : 
-                      name === 'profit' ? 'Zisk' : 'Náklady'
-                    ]}
-                  />
-                  <Bar dataKey="revenue" fill="#3b82f6" name="Tržby" />
-                  <Bar dataKey="profit" fill="#10b981" name="Zisk" />
-                  <Line type="monotone" dataKey="expenses" stroke="#ef4444" strokeWidth={2} name="Náklady" />
-                </ComposedChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Charts Section - Team Efficiency and Revenue Breakdown */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <TeamEfficiencyChart />
+        <RevenueBreakdownChart />
       </div>
 
-      {/* Enhanced Team Performance Details */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-blue-600" />
-            Detailná výkonnosť členov tímu
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {monthlyRevenueData.map((member, index) => (
-              <div key={index} className="flex items-center justify-between p-4 border rounded-xl bg-gray-50 dark:bg-gray-800 hover:shadow-md transition-all duration-200">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                    {member.name.split(' ').map(n => n[0]).join('')}
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-lg">{member.name}</h4>
-                    <div className="flex items-center space-x-4 text-sm text-gray-600">
-                      <span className="flex items-center">
-                        <Target className="h-4 w-4 mr-1" />
-                        {member.contracts} zmluv
-                      </span>
-                      <span className="flex items-center">
-                        <DollarSign className="h-4 w-4 mr-1" />
-                        €{member.revenue.toLocaleString()} tržby
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-6">
-                  <div className="text-right">
-                    <p className="text-sm font-medium text-gray-600">Efektivita</p>
-                    <Badge 
-                      variant="secondary" 
-                      className={`text-white ${
-                        member.efficiency >= 95 ? 'bg-green-500' : 
-                        member.efficiency >= 90 ? 'bg-blue-500' : 'bg-orange-500'
-                      }`}
-                    >
-                      {member.efficiency}%
-                    </Badge>
-                  </div>
-                  <div className="w-24">
-                    <div className="w-full bg-gray-200 rounded-full h-3">
-                      <div 
-                        className={`h-3 rounded-full transition-all duration-500 ${
-                          member.efficiency >= 95 ? 'bg-gradient-to-r from-green-400 to-green-600' : 
-                          member.efficiency >= 90 ? 'bg-gradient-to-r from-blue-400 to-blue-600' : 
-                          'bg-gradient-to-r from-orange-400 to-orange-600'
-                        }`}
-                        style={{ width: `${member.efficiency}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      {/* Recent Team Activity - Replaces Team Performance Details */}
+      <RecentTeamActivity activities={activities} />
     </div>
   );
 };
