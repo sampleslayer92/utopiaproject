@@ -27,10 +27,6 @@ export interface Client {
   devicesCount: number;
   totalRevenue: number;
   monthlyRevenue: number;
-  expectedRevenue: number; // New: Deklarovaný očakávaný obrat
-  commissionRate: number; // New: Percento provízie (default 0.5)
-  calculatedCommission: number; // New: Vypočítaná provízia
-  contractViolation: boolean; // New: Flag pre porušenie zmluvy
   status: 'active' | 'inactive' | 'suspended';
   createdAt: string;
   lastActivity?: string;
