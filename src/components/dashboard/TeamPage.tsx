@@ -11,7 +11,6 @@ import {
   Search, 
   Mail, 
   Phone, 
-  MapPin,
   Settings,
   FileText,
   Calendar,
@@ -21,7 +20,8 @@ import {
   Plus,
   Download,
   Edit,
-  Trash2
+  Trash2,
+  Euro
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { AddEmployeeDialog } from './AddEmployeeDialog';
@@ -152,7 +152,7 @@ export const TeamPage: React.FC = () => {
   const { toast } = useToast();
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>(mockTeamMembers);
   const [searchTerm, setSearchTerm] = useState('');
-  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>('table'); // Changed default to table
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
   const [deletingMember, setDeletingMember] = useState<TeamMember | null>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -194,13 +194,8 @@ export const TeamPage: React.FC = () => {
     member.position.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active': return 'bg-green-500';
-      case 'inactive': return 'bg-red-500';
-      case 'pending': return 'bg-yellow-500';
-      default: return 'bg-gray-500';
-    }
+  const calculateCommission = (member: TeamMember) => {
+    return member.performance.monthlyRevenue * (member.commissionRate || 0) / 100;
   };
 
   return (
@@ -281,12 +276,12 @@ export const TeamPage: React.FC = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-orange-600">Celkom zmluv</p>
+                <p className="text-sm font-medium text-orange-600">Celkom provízie</p>
                 <p className="text-3xl font-bold text-orange-900">
-                  {teamMembers.reduce((acc, m) => acc + m.performance.contractsSigned, 0)}
+                  €{teamMembers.reduce((acc, m) => acc + calculateCommission(m), 0).toLocaleString()}
                 </p>
               </div>
-              <FileText className="h-8 w-8 text-orange-600" />
+              <Euro className="h-8 w-8 text-orange-600" />
             </div>
           </CardContent>
         </Card>
@@ -341,7 +336,6 @@ export const TeamPage: React.FC = () => {
                       <p className="text-sm text-gray-600">{member.position}</p>
                     </div>
                   </div>
-                  <div className={`w-3 h-3 rounded-full ${getStatusColor(member.status)}`}></div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -355,8 +349,8 @@ export const TeamPage: React.FC = () => {
                     <span className="text-gray-600">{member.phone}</span>
                   </div>
                   <div className="flex items-center space-x-2 text-sm">
-                    <MapPin className="h-4 w-4 text-gray-400" />
-                    <span className="text-gray-600">{member.department}</span>
+                    <Euro className="h-4 w-4 text-gray-400" />
+                    <span className="text-gray-600">Provízia: {member.commissionRate}%</span>
                   </div>
                 </div>
                 
@@ -375,6 +369,10 @@ export const TeamPage: React.FC = () => {
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Tržby:</span>
                       <span className="font-medium">€{member.performance.monthlyRevenue.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Provízia:</span>
+                      <span className="font-medium text-green-600">€{calculateCommission(member).toLocaleString()}</span>
                     </div>
                   </div>
                 </div>
@@ -415,10 +413,10 @@ export const TeamPage: React.FC = () => {
                   <TableHead>Pozícia</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Telefón</TableHead>
-                  <TableHead>Oddelenie</TableHead>
                   <TableHead>Efektivita</TableHead>
                   <TableHead>Tržby</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>Provízia %</TableHead>
+                  <TableHead>Moja provízia</TableHead>
                   <TableHead>Akcie</TableHead>
                 </TableRow>
               </TableHeader>
@@ -436,7 +434,6 @@ export const TeamPage: React.FC = () => {
                     <TableCell>{member.position}</TableCell>
                     <TableCell>{member.email}</TableCell>
                     <TableCell>{member.phone}</TableCell>
-                    <TableCell>{member.department}</TableCell>
                     <TableCell>
                       <Badge variant="secondary" className="bg-blue-100 text-blue-800">
                         {member.performance.efficiency}%
@@ -444,7 +441,14 @@ export const TeamPage: React.FC = () => {
                     </TableCell>
                     <TableCell>€{member.performance.monthlyRevenue.toLocaleString()}</TableCell>
                     <TableCell>
-                      <div className={`w-3 h-3 rounded-full ${getStatusColor(member.status)} inline-block`}></div>
+                      <Badge variant="outline" className="text-purple-600">
+                        {member.commissionRate}%
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <span className="font-medium text-green-600">
+                        €{calculateCommission(member).toLocaleString()}
+                      </span>
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
