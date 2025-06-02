@@ -15,12 +15,14 @@ import {
   MapPin,
   Phone,
   Mail,
-  Calendar
+  Calendar,
+  Plus,
+  UserPlus
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { AddMerchantDialog } from './AddMerchantDialog';
-import { PageHeader } from '@/components/ui/page-header';
 import { EntityActions } from '@/components/ui/entity-actions';
+import { SectionHeader } from '@/components/ui/section-header';
 
 // Mock data for merchants
 const mockMerchants = [
@@ -152,40 +154,59 @@ export const ClientsPage: React.FC = () => {
     );
   }
 
+  const activeMerchants = mockMerchants.filter(m => m.status === 'active').length;
+  const totalRevenue = mockMerchants.reduce((sum, m) => sum + m.monthlyRevenue, 0);
+  const newThisMonth = mockMerchants.filter(m => {
+    const createdDate = new Date(m.createdAt);
+    const now = new Date();
+    return createdDate.getMonth() === now.getMonth() && createdDate.getFullYear() === now.getFullYear();
+  }).length;
+
   const stats = [
     {
-      label: 'Celkom merchantov',
-      value: mockMerchants.length,
+      label: 'Aktívni merchanti',
+      value: activeMerchants,
       icon: Users,
-      color: 'text-blue-500'
+      color: 'bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400'
     },
     {
-      label: 'Aktívni',
-      value: mockMerchants.filter(m => m.status === 'active').length,
-      icon: TrendingUp,
-      color: 'text-green-500'
-    },
-    {
-      label: 'Celkové tržby',
-      value: `€${mockMerchants.reduce((sum, m) => sum + m.monthlyRevenue, 0).toLocaleString()}`,
+      label: 'Mesačné tržby',
+      value: `€${totalRevenue.toLocaleString()}`,
       icon: DollarSign,
-      color: 'text-purple-500'
+      color: 'bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
     },
     {
-      label: 'Lokácie',
-      value: mockMerchants.reduce((sum, m) => sum + m.locationsCount, 0),
-      icon: MapPin,
-      color: 'text-orange-500'
+      label: 'Noví tento mesiac',
+      value: newThisMonth,
+      icon: UserPlus,
+      color: 'bg-purple-100 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400'
     }
   ];
 
+  const actions = (
+    <>
+      <Button variant="outline" className="flex items-center space-x-2">
+        <MapPin className="h-4 w-4" />
+        <span>Mapa</span>
+      </Button>
+      <Button variant="outline" className="flex items-center space-x-2">
+        <TrendingUp className="h-4 w-4" />
+        <span>Reporty</span>
+      </Button>
+      <AddMerchantDialog />
+    </>
+  );
+
   return (
-    <PageHeader
-      title="Merchanti"
-      description="Správa klientov a ich obchodných aktivít"
-      stats={stats}
-      actions={<AddMerchantDialog />}
-    >
+    <div className="space-y-6">
+      <SectionHeader
+        icon={Users}
+        title="Merchanti"
+        description="Správa klientov a ich obchodných aktivít"
+        stats={stats}
+        actions={actions}
+      />
+
       {/* Filters */}
       <Card>
         <CardContent className="p-6">
@@ -336,7 +357,7 @@ export const ClientsPage: React.FC = () => {
           </Table>
         </CardContent>
       </Card>
-    </PageHeader>
+    </div>
   );
 };
 
