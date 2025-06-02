@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -63,7 +64,7 @@ export const ReportsPage: React.FC = () => {
       </div>
 
       {/* Action Panel */}
-      <Card>
+      <Card className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 border-0 shadow-sm">
         <CardContent className="p-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
@@ -83,7 +84,7 @@ export const ReportsPage: React.FC = () => {
                 <Settings className="h-4 w-4" />
                 <span>Nastavenia reportov</span>
               </Button>
-              <Button className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+              <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-200">
                 <BarChart3 className="h-4 w-4 mr-2" />
                 Generovať report
               </Button>

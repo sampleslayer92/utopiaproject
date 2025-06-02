@@ -185,7 +185,7 @@ export const TeamPage: React.FC = () => {
       </div>
 
       {/* Action Panel */}
-      <Card>
+      <Card className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 border-0 shadow-sm">
         <CardContent className="p-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,7 +9,6 @@ import { Plus, Search, Filter, Clock, AlertCircle, CheckCircle, User, FileText, 
 import { useAuth } from '@/contexts/AuthContext';
 import { mockTickets, getClientName, getAssignedToName } from '@/data/demoData';
 import { getFilteredData } from '@/utils/roleUtils';
-import { designSystem } from '@/styles/design-system';
 
 export const TicketsPage: React.FC = () => {
   const { user } = useAuth();
@@ -71,8 +71,8 @@ export const TicketsPage: React.FC = () => {
   const stats = getTicketStats();
 
   return (
-    <div className={`${designSystem.spacing.sectionSpacing} ${designSystem.gradients.background} min-h-screen`}>
-      <div className="flex justify-between items-center mb-6">
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Tikety</h1>
           <p className="text-gray-600 dark:text-gray-400">
@@ -83,8 +83,8 @@ export const TicketsPage: React.FC = () => {
       </div>
 
       {/* Action Panel */}
-      <Card className={`${designSystem.borderRadius.card} ${designSystem.shadows.card} ${designSystem.gradients.card} mb-6`}>
-        <CardContent className={designSystem.spacing.cardPadding}>
+      <Card className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 border-0 shadow-sm">
+        <CardContent className="p-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
@@ -103,8 +103,8 @@ export const TicketsPage: React.FC = () => {
                 <BarChart3 className="h-4 w-4" />
                 <span>Analýza</span>
               </Button>
-              <Button className={`${designSystem.gradients.primary} ${designSystem.gradients.primaryHover} text-white ${designSystem.shadows.button} ${designSystem.transitions.default}`}>
-                <Plus className={`${designSystem.spacing.iconSize} mr-2`} />
+              <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-200">
+                <Plus className="h-4 w-4 mr-2" />
                 Nový tiket
               </Button>
             </div>
@@ -113,57 +113,57 @@ export const TicketsPage: React.FC = () => {
       </Card>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-        <Card className={`${designSystem.borderRadius.card} ${designSystem.shadows.card} ${designSystem.gradients.card}`}>
-          <CardContent className={designSystem.spacing.cardPadding}>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card>
+          <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Celkom</p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
               </div>
-              <div className={`p-3 ${designSystem.borderRadius.button} bg-blue-100 dark:bg-blue-900/20`}>
+              <div className="p-3 rounded-lg bg-blue-100 dark:bg-blue-900/20">
                 <Filter className="h-6 w-6 text-blue-600 dark:text-blue-400" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className={`${designSystem.borderRadius.card} ${designSystem.shadows.card} ${designSystem.gradients.card}`}>
-          <CardContent className={designSystem.spacing.cardPadding}>
+        <Card>
+          <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Otvorené</p>
                 <p className="text-2xl font-bold text-red-600 dark:text-red-400">{stats.open}</p>
               </div>
-              <div className={`p-3 ${designSystem.borderRadius.button} bg-red-100 dark:bg-red-900/20`}>
+              <div className="p-3 rounded-lg bg-red-100 dark:bg-red-900/20">
                 <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className={`${designSystem.borderRadius.card} ${designSystem.shadows.card} ${designSystem.gradients.card}`}>
-          <CardContent className={designSystem.spacing.cardPadding}>
+        <Card>
+          <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">V riešení</p>
                 <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{stats.inProgress}</p>
               </div>
-              <div className={`p-3 ${designSystem.borderRadius.button} bg-yellow-100 dark:bg-yellow-900/20`}>
+              <div className="p-3 rounded-lg bg-yellow-100 dark:bg-yellow-900/20">
                 <Clock className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className={`${designSystem.borderRadius.card} ${designSystem.shadows.card} ${designSystem.gradients.card}`}>
-          <CardContent className={designSystem.spacing.cardPadding}>
+        <Card>
+          <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Vyriešené</p>
                 <p className="text-2xl font-bold text-green-600 dark:text-green-400">{stats.resolved}</p>
               </div>
-              <div className={`p-3 ${designSystem.borderRadius.button} bg-green-100 dark:bg-green-900/20`}>
+              <div className="p-3 rounded-lg bg-green-100 dark:bg-green-900/20">
                 <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
               </div>
             </div>
@@ -172,8 +172,8 @@ export const TicketsPage: React.FC = () => {
       </div>
 
       {/* Filters */}
-      <Card className={`${designSystem.borderRadius.card} ${designSystem.shadows.card} ${designSystem.gradients.card} mb-6`}>
-        <CardContent className={designSystem.spacing.cardPadding}>
+      <Card>
+        <CardContent className="p-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -181,12 +181,12 @@ export const TicketsPage: React.FC = () => {
                 placeholder="Vyhľadať tikety..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className={`pl-10 ${designSystem.borderRadius.input}`}
+                className="pl-10"
               />
             </div>
             
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className={`w-full md:w-48 ${designSystem.borderRadius.input}`}>
+              <SelectTrigger className="w-full md:w-48">
                 <SelectValue placeholder="Stav" />
               </SelectTrigger>
               <SelectContent>
@@ -199,7 +199,7 @@ export const TicketsPage: React.FC = () => {
             </Select>
 
             <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-              <SelectTrigger className={`w-full md:w-48 ${designSystem.borderRadius.input}`}>
+              <SelectTrigger className="w-full md:w-48">
                 <SelectValue placeholder="Priorita" />
               </SelectTrigger>
               <SelectContent>
@@ -215,10 +215,10 @@ export const TicketsPage: React.FC = () => {
       </Card>
 
       {/* Tickets List */}
-      <div className={designSystem.spacing.sectionSpacing}>
+      <div className="space-y-4">
         {filteredTickets.map((ticket) => (
-          <Card key={ticket.id} className={`${designSystem.borderRadius.card} ${designSystem.shadows.card} ${designSystem.gradients.card} ${designSystem.shadows.hover} ${designSystem.transitions.default} cursor-pointer`}>
-            <CardContent className={designSystem.spacing.cardPadding}>
+          <Card key={ticket.id} className="hover:shadow-md transition-shadow cursor-pointer">
+            <CardContent className="p-6">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
@@ -265,8 +265,8 @@ export const TicketsPage: React.FC = () => {
       </div>
 
       {filteredTickets.length === 0 && (
-        <Card className={`${designSystem.borderRadius.card} ${designSystem.shadows.card} ${designSystem.gradients.card}`}>
-          <CardContent className={`${designSystem.spacing.cardPadding} text-center py-12`}>
+        <Card>
+          <CardContent className="text-center py-12">
             <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
               Žiadne tikety
