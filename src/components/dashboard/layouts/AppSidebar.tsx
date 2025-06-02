@@ -50,7 +50,7 @@ export function AppSidebar() {
         roles: ['admin']
       },
       {
-        title: "Kontrakty",
+        title: "Zmluvy",
         url: "/dashboard/contracts",
         icon: FileText,
         roles: ['admin']

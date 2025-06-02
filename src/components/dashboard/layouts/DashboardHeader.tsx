@@ -11,11 +11,21 @@ export const DashboardHeader: React.FC = () => {
     <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
-            {user?.role === 'admin' ? 'ISO Organizácia Dashboard' : 
-             user?.role === 'business_partner' ? 'Business Partner Dashboard' : 
-             'Klient Dashboard'}
-          </h1>
+          <div className="flex items-center space-x-3">
+            <img 
+              src="https://cdn.prod.website-files.com/65bb58bd9feeda1fd2e1b551/65bb58bd9feeda1fd2e1b5ad_logo-header.svg" 
+              alt="Onepos Logo" 
+              className="h-8 w-auto"
+            />
+            <div>
+              <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
+                Onepos
+              </h1>
+              <p className="text-xs text-gray-500">
+                ISO Organizácia
+              </p>
+            </div>
+          </div>
         </div>
         
         <div className="flex items-center space-x-3">

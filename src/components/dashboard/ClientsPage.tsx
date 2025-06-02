@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Search, Edit, Eye, MapPin, Users, Smartphone, DollarSign, Plus, UserPlus } from 'lucide-react';
+import { Search, Edit, Eye, MapPin, Users, Smartphone, DollarSign, Plus, UserPlus, Calendar, Filter, TrendingUp } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Client } from '@/types/dashboard';
 import { useNavigate } from 'react-router-dom';
@@ -157,6 +156,10 @@ export const ClientsPage: React.FC = () => {
     navigate(`/dashboard/merchants/${clientId}`);
   };
 
+  const handleAddNewMerchant = () => {
+    setActiveTab('add');
+  };
+
   // Only admins can see this page
   if (!user || user.role !== 'admin') {
     return (
@@ -168,65 +171,105 @@ export const ClientsPage: React.FC = () => {
     );
   }
 
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Merchanti
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Správa všetkých merchantov v systéme
-          </p>
-        </div>
-      </div>
+  const activeMerchants = filteredClients.filter(c => c.status === 'active').length;
+  const totalValue = filteredClients.reduce((sum, c) => sum + c.totalRevenue, 0);
+  const newThisMonth = filteredClients.filter(c => {
+    const createdDate = new Date(c.createdAt);
+    const now = new Date();
+    return createdDate.getMonth() === now.getMonth() && createdDate.getFullYear() === now.getFullYear();
+  }).length;
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center">
-              <Users className="h-8 w-8 text-blue-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Celkom merchantov</p>
-                <p className="text-2xl font-bold">{filteredClients.length}</p>
+  return (
+    <div className="space-y-8 p-6">
+      {/* Header Section */}
+      <div className="bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 rounded-3xl p-8 border border-blue-100 dark:border-gray-700 shadow-lg">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl">
+                <Users className="h-8 w-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  Merchanti
+                </h1>
+                <p className="text-gray-600 dark:text-gray-300 text-lg">
+                  Vítajte späť, {user?.fullName}! Správa všetkých merchantov v systéme.
+                </p>
               </div>
             </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center">
-              <MapPin className="h-8 w-8 text-green-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Celkom lokácií</p>
-                <p className="text-2xl font-bold">{filteredClients.reduce((sum, c) => sum + c.locationsCount, 0)}</p>
+            
+            {/* Stats Overview */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                    <Users className="h-5 w-5 text-green-600 dark:text-green-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Celkom merchantov</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white">{filteredClients.length}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                    <TrendingUp className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Aktívni</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white">{activeMerchants}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                    <DollarSign className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Celkové tržby</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white">€{totalValue.toLocaleString()}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
+                    <Calendar className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Noví tento mesiac</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white">{newThisMonth}</p>
+                  </div>
+                </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center">
-              <Smartphone className="h-8 w-8 text-purple-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Aktívne zariadenia</p>
-                <p className="text-2xl font-bold">{filteredClients.reduce((sum, c) => sum + c.devicesCount, 0)}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center">
-              <DollarSign className="h-8 w-8 text-orange-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Mesačné tržby</p>
-                <p className="text-2xl font-bold">€{filteredClients.reduce((sum, c) => sum + c.monthlyRevenue, 0).toLocaleString()}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+          
+          {/* Quick Actions */}
+          <div className="flex flex-wrap gap-3">
+            <Button 
+              onClick={handleAddNewMerchant}
+              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg"
+            >
+              <UserPlus className="h-4 w-4 mr-2" />
+              Pridať nového merchanta
+            </Button>
+            <Button variant="outline" className="border-gray-200 dark:border-gray-700">
+              <Calendar className="h-4 w-4 mr-2" />
+              Kalender
+            </Button>
+            <Button variant="outline" className="border-gray-200 dark:border-gray-700">
+              <Filter className="h-4 w-4 mr-2" />
+              Reporty
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* Tabs for List and Add New */}

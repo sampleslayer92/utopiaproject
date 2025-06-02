@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Plus, Search, Filter, Calendar, FileText, User, MapPin, DollarSign, Clock, Eye, Edit } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/contexts/AuthContext';
+import { ContractForm } from './ContractForm';
 
 // Updated contract interface with creator info
 interface ContractWithCreator {
@@ -28,6 +28,8 @@ interface ContractWithCreator {
     email: string;
   };
   createdAt: string;
+  services?: string[];
+  products?: string[];
 }
 
 const mockContracts: ContractWithCreator[] = [
@@ -47,7 +49,9 @@ const mockContracts: ContractWithCreator[] = [
       name: 'Peter Manažér',
       email: 'peter@utopia.sk'
     },
-    createdAt: '2024-01-10'
+    createdAt: '2024-01-10',
+    services: ['POS Systém', 'Online platby'],
+    products: ['POS terminál', 'Platobný terminál']
   },
   {
     id: 'contract-2',
@@ -111,6 +115,8 @@ export const ContractsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [showContractForm, setShowContractForm] = useState(false);
+  const [editingContract, setEditingContract] = useState<ContractWithCreator | null>(null);
 
   const filteredContracts = mockContracts.filter(contract => {
     const matchesSearch = contract.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -176,6 +182,27 @@ export const ContractsPage: React.FC = () => {
     setSelectedContract(contract);
   };
 
+  const handleNewContract = () => {
+    setEditingContract(null);
+    setShowContractForm(true);
+  };
+
+  const handleEditContract = (contract: ContractWithCreator) => {
+    setEditingContract(contract);
+    setShowContractForm(true);
+  };
+
+  const handleSaveContract = (contractData: any) => {
+    console.log('Saving contract:', contractData);
+    setShowContractForm(false);
+    setEditingContract(null);
+  };
+
+  const handleCancelContract = () => {
+    setShowContractForm(false);
+    setEditingContract(null);
+  };
+
   // Only admins can see this page
   if (!user || user.role !== 'admin') {
     return (
@@ -184,6 +211,17 @@ export const ContractsPage: React.FC = () => {
           Nemáte oprávnenie na zobrazenie tejto stránky.
         </p>
       </div>
+    );
+  }
+
+  if (showContractForm) {
+    return (
+      <ContractForm
+        contract={editingContract}
+        isEdit={!!editingContract}
+        onSave={handleSaveContract}
+        onCancel={handleCancelContract}
+      />
     );
   }
 
@@ -249,7 +287,10 @@ export const ContractsPage: React.FC = () => {
           
           {/* Quick Actions */}
           <div className="flex flex-wrap gap-3">
-            <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg">
+            <Button 
+              onClick={handleNewContract}
+              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg"
+            >
               <Plus className="h-4 w-4 mr-2" />
               Nová zmluva
             </Button>
@@ -380,12 +421,24 @@ export const ContractsPage: React.FC = () => {
 
       {/* Contract Detail Dialog */}
       <Dialog open={!!selectedContract} onOpenChange={() => setSelectedContract(null)}>
-        <DialogContent className="max-w-4xl">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Detail zmluvy</DialogTitle>
+            <DialogTitle className="flex items-center justify-between">
+              <span>Detail zmluvy</span>
+              {selectedContract && (
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => handleEditContract(selectedContract)}
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  Upraviť
+                </Button>
+              )}
+            </DialogTitle>
           </DialogHeader>
           {selectedContract && (
-            <div className="grid grid-cols-2 gap-6 p-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-4">
               <div className="space-y-4">
                 <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
                   <h3 className="font-semibold mb-3 flex items-center gap-2">
@@ -473,6 +526,31 @@ export const ContractsPage: React.FC = () => {
                 <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
                   <h3 className="font-semibold mb-3">Popis</h3>
                   <p className="text-gray-600 dark:text-gray-300">{selectedContract.description}</p>
+                </div>
+
+                {/* Services and Products */}
+                <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                    <h3 className="font-semibold mb-3">Služby</h3>
+                    <div className="space-y-2">
+                      {(selectedContract.services || ['POS Systém', 'Online platby']).map((service, index) => (
+                        <Badge key={index} variant="outline" className="mr-2">
+                          {service}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                    <h3 className="font-semibold mb-3">Produkty</h3>
+                    <div className="space-y-2">
+                      {(selectedContract.products || ['POS terminál', 'Platobný terminál']).map((product, index) => (
+                        <Badge key={index} variant="outline" className="mr-2">
+                          {product}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
