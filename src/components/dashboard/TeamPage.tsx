@@ -10,23 +10,23 @@ import {
   Search, 
   Mail, 
   Phone, 
-  Settings,
-  FileText,
-  Calendar,
   Target,
   Grid3X3,
   List,
   Plus,
   Download,
-  Edit,
-  Trash2,
-  Euro
+  Settings,
+  Euro,
+  TrendingUp,
+  Calendar
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { AddEmployeeDialog } from './AddEmployeeDialog';
 import { EditTeamMemberDialog } from './EditTeamMemberDialog';
 import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog';
 import { TeamMember } from '@/types/team';
+import { PageHeader } from '@/components/ui/page-header';
+import { EntityActions } from '@/components/ui/entity-actions';
 
 // Mock data pre tím s reálnejšími údajmi
 const mockTeamMembers: TeamMember[] = [
@@ -151,7 +151,7 @@ export const TeamPage: React.FC = () => {
   const { toast } = useToast();
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>(mockTeamMembers);
   const [searchTerm, setSearchTerm] = useState('');
-  const [viewMode, setViewMode] = useState<'grid' | 'table'>('table'); // Changed default to table
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
   const [deletingMember, setDeletingMember] = useState<TeamMember | null>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -197,95 +197,54 @@ export const TeamPage: React.FC = () => {
     return member.performance.monthlyRevenue * (member.commissionRate || 0) / 100;
   };
 
+  const stats = [
+    {
+      label: 'Celkom členov',
+      value: teamMembers.length,
+      icon: Users,
+      color: 'text-blue-500'
+    },
+    {
+      label: 'Aktívni',
+      value: teamMembers.filter(m => m.status === 'active').length,
+      icon: Target,
+      color: 'text-green-500'
+    },
+    {
+      label: 'Priemerná efektivita',
+      value: `${Math.round(teamMembers.reduce((acc, m) => acc + m.performance.efficiency, 0) / teamMembers.length)}%`,
+      icon: TrendingUp,
+      color: 'text-purple-500'
+    },
+    {
+      label: 'Celkom provízie',
+      value: `€${teamMembers.reduce((acc, m) => acc + calculateCommission(m), 0).toLocaleString()}`,
+      icon: Euro,
+      color: 'text-orange-500'
+    }
+  ];
+
+  const actions = (
+    <>
+      <Button variant="outline">
+        <Download className="h-4 w-4 mr-2" />
+        Export tímu
+      </Button>
+      <Button variant="outline">
+        <Settings className="h-4 w-4 mr-2" />
+        Nastavenia
+      </Button>
+      <AddEmployeeDialog onAddEmployee={handleAddEmployee} />
+    </>
+  );
+
   return (
-    <div className="space-y-6">
-      {/* Action Panel */}
-      <Card className="border-0 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="p-3 bg-white/20 rounded-lg">
-                <Users className="h-8 w-8" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold mb-1">Správa tímu</h2>
-                <p className="text-blue-100 text-sm">
-                  Spravujte členov vášho tímu, sledujte výkonnosť a koordinujte prácu
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Button variant="outline" className="bg-white/20 hover:bg-white/30 border-white/30 text-white">
-                <Download className="h-4 w-4 mr-2" />
-                Export tímu
-              </Button>
-              <Button variant="outline" className="bg-white/20 hover:bg-white/30 border-white/30 text-white">
-                <Settings className="h-4 w-4 mr-2" />
-                Nastavenia
-              </Button>
-              <AddEmployeeDialog onAddEmployee={handleAddEmployee} />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-blue-600">Celkom členov</p>
-                <p className="text-3xl font-bold text-blue-900">{teamMembers.length}</p>
-              </div>
-              <Users className="h-8 w-8 text-blue-600" />
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-green-600">Aktívni</p>
-                <p className="text-3xl font-bold text-green-900">
-                  {teamMembers.filter(m => m.status === 'active').length}
-                </p>
-              </div>
-              <Target className="h-8 w-8 text-green-600" />
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-purple-600">Priemerná efektivita</p>
-                <p className="text-3xl font-bold text-purple-900">
-                  {Math.round(teamMembers.reduce((acc, m) => acc + m.performance.efficiency, 0) / teamMembers.length)}%
-                </p>
-              </div>
-              <Calendar className="h-8 w-8 text-purple-600" />
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-orange-600">Celkom provízie</p>
-                <p className="text-3xl font-bold text-orange-900">
-                  €{teamMembers.reduce((acc, m) => acc + calculateCommission(m), 0).toLocaleString()}
-                </p>
-              </div>
-              <Euro className="h-8 w-8 text-orange-600" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
+    <PageHeader
+      title="Správa tímu"
+      description="Spravujte členov vášho tímu, sledujte výkonnosť a koordinujte prácu"
+      stats={stats}
+      actions={actions}
+    >
       {/* Search and View Toggle */}
       <Card>
         <CardContent className="p-6">
@@ -382,21 +341,23 @@ export const TeamPage: React.FC = () => {
                       Detail
                     </Button>
                   </Link>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => handleEditMember(member)}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => handleDeleteMember(member)}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <EntityActions
+                    actions={[
+                      {
+                        type: 'edit',
+                        label: 'Upraviť',
+                        onClick: () => handleEditMember(member)
+                      },
+                      {
+                        type: 'delete',
+                        label: 'Vymazať',
+                        onClick: () => handleDeleteMember(member)
+                      }
+                    ]}
+                    entityName="člena tímu"
+                    entityId={`${member.firstName} ${member.lastName}`}
+                    compact={true}
+                  />
                 </div>
               </CardContent>
             </Card>
@@ -456,21 +417,23 @@ export const TeamPage: React.FC = () => {
                             Detail
                           </Button>
                         </Link>
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => handleEditMember(member)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => handleDeleteMember(member)}
-                          className="text-red-600 hover:text-red-700"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <EntityActions
+                          actions={[
+                            {
+                              type: 'edit',
+                              label: 'Upraviť',
+                              onClick: () => handleEditMember(member)
+                            },
+                            {
+                              type: 'delete',
+                              label: 'Vymazať',
+                              onClick: () => handleDeleteMember(member)
+                            }
+                          ]}
+                          entityName="člena tímu"
+                          entityId={`${member.firstName} ${member.lastName}`}
+                          compact={true}
+                        />
                       </div>
                     </TableCell>
                   </TableRow>
@@ -498,6 +461,6 @@ export const TeamPage: React.FC = () => {
         description="Ste si istí, že chcete vymazať tohoto člena tímu? Táto akcia sa nedá vrátiť späť."
         itemName={deletingMember ? `${deletingMember.firstName} ${deletingMember.lastName}` : undefined}
       />
-    </div>
+    </PageHeader>
   );
 };
