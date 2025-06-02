@@ -156,6 +156,46 @@ export const MerchantDetailPage: React.FC = () => {
 
   const merchant = mockMerchantData; // In real app, fetch by id
 
+  // Contract handler functions
+  const handleEditContract = (contract: Contract) => {
+    setEditingContract(contract);
+    setShowEditContractDialog(true);
+  };
+
+  const handleDeleteContract = (contract: Contract) => {
+    setDeletingContract(contract);
+    setShowDeleteContractDialog(true);
+  };
+
+  const handleSaveContract = (updatedContract: Contract) => {
+    setContracts(prev => prev.map(contract => 
+      contract.id === updatedContract.id ? updatedContract : contract
+    ));
+    toast({
+      title: "Zmluva aktualizovaná",
+      description: "Zmluva bola úspešne aktualizovaná.",
+    });
+  };
+
+  const handleAddContract = (newContract: Contract) => {
+    setContracts(prev => [...prev, newContract]);
+    toast({
+      title: "Zmluva pridaná",
+      description: "Nová zmluva bola úspešne pridaná.",
+    });
+  };
+
+  const handleConfirmDeleteContract = () => {
+    if (deletingContract) {
+      setContracts(prev => prev.filter(contract => contract.id !== deletingContract.id));
+      toast({
+        title: "Zmluva vymazaná",
+        description: "Zmluva bola úspešne vymazaná.",
+      });
+      setDeletingContract(null);
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
