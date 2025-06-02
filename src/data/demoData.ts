@@ -1,3 +1,4 @@
+
 export interface TeamMemberData {
   id: string;
   name: string;
@@ -110,6 +111,32 @@ export interface ClientData {
   website?: string;
   contactPerson?: string;
   notes?: string;
+}
+
+export interface DeviceData {
+  id: string;
+  name: string;
+  serialNumber: string;
+  model: string;
+  brand: string;
+  status: "active" | "inactive" | "maintenance" | "error";
+  locationId: string;
+  lastActivity: string;
+  firmwareVersion: string;
+  tid: string;
+  clientId: string;
+}
+
+export interface LocationData {
+  id: string;
+  name: string;
+  address: string;
+  city: string;
+  country: string;
+  clientId: string;
+  devicesCount: number;
+  status: "active" | "inactive";
+  createdAt: string;
 }
 
 // Enhanced demo data with more comprehensive information
@@ -539,3 +566,141 @@ export const demoClients: ClientData[] = [
     notes: 'Klient s potenciálom pre rozšírenie služieb'
   }
 ];
+
+export const demoDevices: DeviceData[] = [
+  {
+    id: 'device-1',
+    name: 'Terminál Reštaurácia U Jána',
+    serialNumber: 'PAX001234',
+    model: 'A920',
+    brand: 'PAX Technology',
+    status: 'active',
+    locationId: 'location-1',
+    lastActivity: '2024-11-26T14:30:00Z',
+    firmwareVersion: '2.1.5',
+    tid: 'TID001234',
+    clientId: 'client-1'
+  },
+  {
+    id: 'device-2',
+    name: 'Terminál Kaviarňa Central',
+    serialNumber: 'ING005678',
+    model: 'Move 5000',
+    brand: 'Ingenico',
+    status: 'active',
+    locationId: 'location-2',
+    lastActivity: '2024-11-26T13:45:00Z',
+    firmwareVersion: '1.8.2',
+    tid: 'TID005678',
+    clientId: 'client-2'
+  },
+  {
+    id: 'device-3',
+    name: 'Terminál Pizzeria Italia',
+    serialNumber: 'PAX009876',
+    model: 'A920',
+    brand: 'PAX Technology',
+    status: 'maintenance',
+    locationId: 'location-3',
+    lastActivity: '2024-11-25T18:20:00Z',
+    firmwareVersion: '2.1.3',
+    tid: 'TID009876',
+    clientId: 'client-3'
+  },
+  {
+    id: 'device-4',
+    name: 'Terminál Fitness Power',
+    serialNumber: 'VER004567',
+    model: 'VX520',
+    brand: 'Verifone',
+    status: 'active',
+    locationId: 'location-4',
+    lastActivity: '2024-11-26T16:15:00Z',
+    firmwareVersion: '3.2.1',
+    tid: 'TID004567',
+    clientId: 'client-4'
+  },
+  {
+    id: 'device-5',
+    name: 'Terminál Tech Store',
+    serialNumber: 'ING007890',
+    model: 'Desk 5000',
+    brand: 'Ingenico',
+    status: 'error',
+    locationId: 'location-5',
+    lastActivity: '2024-11-24T09:30:00Z',
+    firmwareVersion: '1.9.1',
+    tid: 'TID007890',
+    clientId: 'client-5'
+  }
+];
+
+export const demoLocations: LocationData[] = [
+  {
+    id: 'location-1',
+    name: 'Reštaurácia U Jána - Hlavná pobočka',
+    address: 'Hlavná 123, 010 01 Žilina',
+    city: 'Žilina',
+    country: 'Slovensko',
+    clientId: 'client-1',
+    devicesCount: 1,
+    status: 'active',
+    createdAt: '2022-05-15'
+  },
+  {
+    id: 'location-2',
+    name: 'Kaviarňa Central - Centrum',
+    address: 'Námestie Slobody 5, 811 01 Bratislava',
+    city: 'Bratislava',
+    country: 'Slovensko',
+    clientId: 'client-2',
+    devicesCount: 1,
+    status: 'active',
+    createdAt: '2022-08-01'
+  },
+  {
+    id: 'location-3',
+    name: 'Pizzeria Italia - Košice',
+    address: 'Štúrova 25, 040 01 Košice',
+    city: 'Košice',
+    country: 'Slovensko',
+    clientId: 'client-3',
+    devicesCount: 1,
+    status: 'active',
+    createdAt: '2022-10-10'
+  },
+  {
+    id: 'location-4',
+    name: 'Fitness Centrum Power - Bratislava',
+    address: 'Trenčianska 45, 821 09 Bratislava',
+    city: 'Bratislava',
+    country: 'Slovensko',
+    clientId: 'client-4',
+    devicesCount: 1,
+    status: 'active',
+    createdAt: '2023-01-20'
+  },
+  {
+    id: 'location-5',
+    name: 'Tech Store - Mlynská dolina',
+    address: 'Mlynská dolina 9, 841 04 Bratislava',
+    city: 'Bratislava',
+    country: 'Slovensko',
+    clientId: 'client-5',
+    devicesCount: 1,
+    status: 'active',
+    createdAt: '2023-03-01'
+  }
+];
+
+// Helper function to get assigned team member name
+export const getAssignedToName = (assignedToId: string): string => {
+  const teamMembers = [
+    { id: 'team-1', name: 'Peter Fekiač' },
+    { id: 'team-2', name: 'Ladislav Mathis' },
+    { id: 'team-3', name: 'Richie Plichta' }
+  ];
+  
+  const member = teamMembers.find(m => m.id === assignedToId);
+  return member ? member.name : assignedToId;
+};

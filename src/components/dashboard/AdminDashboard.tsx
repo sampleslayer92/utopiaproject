@@ -68,14 +68,6 @@ export const AdminDashboard: React.FC = () => {
       data = data.slice(-6);
     }
     
-    // Filter by member
-    if (memberFilter !== 'all') {
-      data = data.map(item => ({
-        month: item.month,
-        [memberFilter]: item[memberFilter as keyof typeof item]
-      }));
-    }
-    
     return data;
   };
 
@@ -96,6 +88,23 @@ export const AdminDashboard: React.FC = () => {
   const applyFilters = () => {
     // Trigger re-render with new filtered data
     console.log('Applying filters:', { periodFilter, memberFilter, roleFilter });
+  };
+
+  // Get lines to display based on member filter
+  const getPerformanceLines = () => {
+    if (memberFilter === 'all') {
+      return (
+        <>
+          <Line type="monotone" dataKey="peter" stroke="#3b82f6" strokeWidth={3} name="Peter Fekiač" />
+          <Line type="monotone" dataKey="ladislav" stroke="#10b981" strokeWidth={3} name="Ladislav Mathis" />
+          <Line type="monotone" dataKey="richie" stroke="#f59e0b" strokeWidth={3} name="Richie Plichta" />
+          <Line type="monotone" dataKey="maria" stroke="#ef4444" strokeWidth={3} name="Mária Novotná" />
+          <Line type="monotone" dataKey="jan" stroke="#8b5cf6" strokeWidth={3} name="Ján Kováč" />
+        </>
+      );
+    } else {
+      return <Line type="monotone" dataKey={memberFilter} stroke="#3b82f6" strokeWidth={3} />;
+    }
   };
 
   return (
@@ -293,17 +302,7 @@ export const AdminDashboard: React.FC = () => {
                       boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                     }}
                   />
-                  {memberFilter === 'all' ? (
-                    <>
-                      <Line type="monotone" dataKey="peter" stroke="#3b82f6" strokeWidth={3} name="Peter Fekiač" />
-                      <Line type="monotone" dataKey="ladislav" stroke="#10b981" strokeWidth={3} name="Ladislav Mathis" />
-                      <Line type="monotone" dataKey="richie" stroke="#f59e0b" strokeWidth={3} name="Richie Plichta" />
-                      <Line type="monotone" dataKey="maria" stroke="#ef4444" strokeWidth={3} name="Mária Novotná" />
-                      <Line type="monotone" dataKey="jan" stroke="#8b5cf6" strokeWidth={3} name="Ján Kováč" />
-                    </>
-                  ) : (
-                    <Line type="monotone" dataKey={memberFilter} stroke="#3b82f6" strokeWidth={3} />
-                  )}
+                  {getPerformanceLines()}
                 </LineChart>
               </ResponsiveContainer>
             </div>
